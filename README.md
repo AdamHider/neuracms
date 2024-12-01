@@ -1,4 +1,4 @@
-# CodeIgniter 4 Framework
+# Your favourite CMS [CI based]
 
 ## What is CodeIgniter?
 
