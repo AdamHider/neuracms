@@ -6,14 +6,16 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
+//$routes->get('/', 'Home::index');
 
-$routes->get('pages', [Pages::class, 'index']);
-$routes->get('(:segment)', [Pages::class, 'view']);
+$routes->group('pages', [], function($routes) {
+    $routes->get('(:segment)', [Pages::class, 'view']);
+});
+
 
 $routes->group('admin', ['filter' => 'auth'], function($routes) {
-    $routes->get('/', 'Admin\Dashboard::index');
-    $routes->get('/dashboard', 'Admin\Dashboard::index');
+    $routes->get('', 'Admin::index');
+    $routes->get('dashboard', 'Admin\Dashboard::index');
     $routes->get('users', 'Admin\Users::index');
     $routes->get('users/create', 'Admin\Users::create');
     $routes->post('users/store', 'Admin\Users::store');

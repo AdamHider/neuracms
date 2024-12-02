@@ -55,4 +55,12 @@ abstract class BaseController extends Controller
 
         // E.g.: $this->session = \Config\Services::session();
     }
+
+    public function setLayout($layout = 'default') 
+    {
+        if (! is_file(APPPATH . 'Views/layouts/' . $layout . '.php')) {
+            $layout = 'default';
+        }
+        return view('layouts/'.$layout.'.php');
+    }
 }
