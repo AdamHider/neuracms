@@ -10,7 +10,6 @@
     <script type="text/javascript" src="<?php echo base_url('assets/bootstrap/js/bootstrap.js')?>"></script>
 </head>
 <body>
-    <?= $this->include('partials/offcanvas') ?>
     <header>
         <?= view_cell('App\Cells\Navigation::render') ?>
     </header>

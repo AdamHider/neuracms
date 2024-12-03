@@ -11,11 +11,11 @@ class Auth implements FilterInterface
     public function before(RequestInterface $request, $arguments = null)
     {
         // Проверка аутентификации пользователя
-        /*
-        if (!session()->get('isLoggedIn')) {
+        
+        if (!session()->get('logged_in')) {
             return redirect()->to('/auth/login');
         }
-        */
+        
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)

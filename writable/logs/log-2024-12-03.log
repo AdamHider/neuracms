@@ -1,0 +1,819 @@
+CRITICAL - 2024-12-03 10:12:51 --> ErrorException: Trying to access array offset on value of type null
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 50.
+ 1 APPPATH\Cells\Menu.php(50): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Trying to access array offset on value of type null', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Cells\\Menu.php', 50)
+ 2 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->render()
+ 3 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'render', [])
+ 4 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::render', [], 0, 'AppCellsMenurender40cd750bba9870f18aada2478b24840a')
+ 5 APPPATH\Views\layouts\admin.php(20): view_cell('App\\Cells\\Menu::render', 2)
+ 6 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 7 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+ 9 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+10 APPPATH\Controllers\Admin\Dashboard.php(43): view('admin/dashboard', [...])
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:12:58 --> ErrorException: Trying to access array offset on value of type null
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 50.
+ 1 APPPATH\Cells\Menu.php(50): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Trying to access array offset on value of type null', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Cells\\Menu.php', 50)
+ 2 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->render()
+ 3 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'render', [])
+ 4 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::render', [], 0, 'AppCellsMenurender40cd750bba9870f18aada2478b24840a')
+ 5 APPPATH\Views\layouts\admin.php(20): view_cell('App\\Cells\\Menu::render', 2)
+ 6 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 7 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+ 9 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+10 APPPATH\Controllers\Admin\Dashboard.php(43): view('admin/dashboard', [...])
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:13:19 --> ErrorException: Trying to access array offset on value of type null
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 50.
+ 1 APPPATH\Cells\Menu.php(50): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Trying to access array offset on value of type null', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Cells\\Menu.php', 50)
+ 2 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->render()
+ 3 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'render', [...])
+ 4 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::render', [...], 0, 'AppCellsMenurender328493c331b2bfa290b464cb37a55048')
+ 5 APPPATH\Views\layouts\admin.php(20): view_cell('App\\Cells\\Menu::render', [...])
+ 6 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 7 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+ 9 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+10 APPPATH\Controllers\Admin\Dashboard.php(43): view('admin/dashboard', [...])
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:13:20 --> ErrorException: Trying to access array offset on value of type null
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 50.
+ 1 APPPATH\Cells\Menu.php(50): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Trying to access array offset on value of type null', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Cells\\Menu.php', 50)
+ 2 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->render()
+ 3 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'render', [...])
+ 4 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::render', [...], 0, 'AppCellsMenurender328493c331b2bfa290b464cb37a55048')
+ 5 APPPATH\Views\layouts\admin.php(20): view_cell('App\\Cells\\Menu::render', [...])
+ 6 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 7 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+ 9 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+10 APPPATH\Controllers\Admin\Dashboard.php(43): view('admin/dashboard', [...])
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:15:56 --> ErrorException: Trying to access array offset on value of type null
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 48.
+ 1 APPPATH\Cells\Menu.php(48): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Trying to access array offset on value of type null', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Cells\\Menu.php', 48)
+ 2 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->render()
+ 3 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'render', [...])
+ 4 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::render', [...], 0, 'AppCellsMenurender022a7bf4a0a63e69fefe09f9fea7210e')
+ 5 APPPATH\Views\layouts\admin.php(20): view_cell('App\\Cells\\Menu::render', [...])
+ 6 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 7 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+ 9 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+10 APPPATH\Controllers\Admin\Dashboard.php(45): view('admin/dashboard', [...])
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:16:20 --> ErrorException: Undefined array key "link"
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Views\cells\menu.php on line 6.
+ 1 APPPATH\Views\cells\menu.php(6): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "link"', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\cells\\menu.php', 6)
+ 2 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\cells\\menu.php')
+ 3 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('cells/menu', [], true)
+ 5 APPPATH\Cells\Menu.php(49): view('cells/menu', [...])
+ 6 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->render()
+ 7 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'render', [...])
+ 8 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::render', [...], 0, 'AppCellsMenurender022a7bf4a0a63e69fefe09f9fea7210e')
+ 9 APPPATH\Views\layouts\admin.php(20): view_cell('App\\Cells\\Menu::render', [...])
+10 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+11 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+12 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+13 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+14 APPPATH\Controllers\Admin\Dashboard.php(45): view('admin/dashboard', [...])
+15 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+16 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+17 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+18 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+19 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+20 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:18:47 --> ErrorException: Undefined property: App\Cells\Menu::$data
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 11.
+ 1 APPPATH\Cells\Menu.php(11): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined property: App\\Cells\\Menu::$data', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Cells\\Menu.php', 11)
+ 2 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->render()
+ 3 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'render', [...])
+ 4 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::render', [...], 0, 'AppCellsMenurender022a7bf4a0a63e69fefe09f9fea7210e')
+ 5 APPPATH\Views\layouts\admin.php(20): view_cell('App\\Cells\\Menu::render', [...])
+ 6 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 7 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+ 9 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+10 APPPATH\Controllers\Admin\Dashboard.php(45): view('admin/dashboard', [...])
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:19:28 --> ErrorException: Array to string conversion
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Views\layouts\admin.php on line 20.
+ 1 APPPATH\Views\layouts\admin.php(20): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Array to string conversion', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php', 20)
+ 2 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 3 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+ 5 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+ 6 APPPATH\Controllers\Admin\Dashboard.php(45): view('admin/dashboard', [...])
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:20:42 --> ErrorException: Declaration of App\Cells\Menu::render($menu): string must be compatible with CodeIgniter\View\Cells\Cell::render(): string
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 10.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+CRITICAL - 2024-12-03 10:20:59 --> ArgumentCountError: Too few arguments to function App\Cells\Menu::renderMenu(), 0 passed in W:\Wamp.NET\sites\neuracms\system\View\Cell.php on line 234 and exactly 1 expected
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 10.
+ 1 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->renderMenu()
+ 2 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'renderMenu', [...])
+ 3 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::renderMenu', [...], 0, 'AppCellsMenurenderMenu022a7bf4a0a63e69fefe09f9fea7210e')
+ 4 APPPATH\Views\layouts\admin.php(20): view_cell('App\\Cells\\Menu::renderMenu', [...])
+ 5 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 6 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 7 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+ 8 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+ 9 APPPATH\Controllers\Admin\Dashboard.php(45): view('admin/dashboard', [...])
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+11 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+12 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:21:32 --> ArgumentCountError: Too few arguments to function App\Cells\Menu::renderMenu(), 0 passed in W:\Wamp.NET\sites\neuracms\system\View\Cell.php on line 234 and exactly 1 expected
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 10.
+ 1 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->renderMenu()
+ 2 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'renderMenu', [...])
+ 3 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::renderMenu', [...], 0, 'AppCellsMenurenderMenu7497e99379c8b346021e3ced7d0298ca')
+ 4 APPPATH\Views\layouts\admin.php(20): view_cell('App\\Cells\\Menu::renderMenu', [...])
+ 5 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 6 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 7 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+ 8 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+ 9 APPPATH\Controllers\Admin\Dashboard.php(45): view('admin/dashboard', [...])
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+11 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+12 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:21:46 --> ArgumentCountError: Too few arguments to function App\Cells\Menu::renderMenu(), 0 passed in W:\Wamp.NET\sites\neuracms\system\View\Cell.php on line 234 and exactly 1 expected
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 10.
+ 1 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->renderMenu()
+ 2 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'renderMenu', [...])
+ 3 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::renderMenu', [...], 0, 'AppCellsMenurenderMenufd59202841a2dbf0415d9e98a19e9436')
+ 4 APPPATH\Views\layouts\admin.php(20): view_cell('App\\Cells\\Menu::renderMenu', 'menu=1')
+ 5 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 6 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 7 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+ 8 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+ 9 APPPATH\Controllers\Admin\Dashboard.php(45): view('admin/dashboard', [...])
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+11 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+12 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:21:47 --> ArgumentCountError: Too few arguments to function App\Cells\Menu::renderMenu(), 0 passed in W:\Wamp.NET\sites\neuracms\system\View\Cell.php on line 234 and exactly 1 expected
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 10.
+ 1 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->renderMenu()
+ 2 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'renderMenu', [...])
+ 3 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::renderMenu', [...], 0, 'AppCellsMenurenderMenufd59202841a2dbf0415d9e98a19e9436')
+ 4 APPPATH\Views\layouts\admin.php(20): view_cell('App\\Cells\\Menu::renderMenu', 'menu=1')
+ 5 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 6 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 7 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+ 8 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+ 9 APPPATH\Controllers\Admin\Dashboard.php(45): view('admin/dashboard', [...])
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+11 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+12 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:23:44 --> ErrorException: Undefined array key "link"
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Views\cells\menu.php on line 6.
+ 1 APPPATH\Views\cells\menu.php(6): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "link"', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\cells\\menu.php', 6)
+ 2 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\cells\\menu.php')
+ 3 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('cells/menu', [], true)
+ 5 APPPATH\Cells\Menu.php(49): view('cells/menu', [...])
+ 6 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->render()
+ 7 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'render', [...])
+ 8 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::render', [...], 0, 'AppCellsMenurender7497e99379c8b346021e3ced7d0298ca')
+ 9 APPPATH\Views\layouts\admin.php(20): view_cell('App\\Cells\\Menu::render', [...])
+10 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+11 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+12 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+13 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+14 APPPATH\Controllers\Admin\Dashboard.php(45): view('admin/dashboard', [...])
+15 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+16 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+17 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+18 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+19 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+20 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:26:24 --> ErrorException: Undefined property: App\Cells\Menu::$uri
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 56.
+ 1 APPPATH\Cells\Menu.php(56): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined property: App\\Cells\\Menu::$uri', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Cells\\Menu.php', 56)
+ 2 APPPATH\Cells\Menu.php(50): App\Cells\Menu->setActive()
+ 3 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->render()
+ 4 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'render', [...])
+ 5 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::render', [...], 0, 'AppCellsMenurender7497e99379c8b346021e3ced7d0298ca')
+ 6 APPPATH\Views\layouts\admin.php(20): view_cell('App\\Cells\\Menu::render', [...])
+ 7 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 8 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 9 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+10 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+11 APPPATH\Controllers\Admin\Dashboard.php(45): view('admin/dashboard', [...])
+12 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+13 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+14 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+15 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+16 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+17 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:27:18 --> ErrorException: Undefined array key "as"
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 57.
+ 1 APPPATH\Cells\Menu.php(57): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "as"', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Cells\\Menu.php', 57)
+ 2 APPPATH\Cells\Menu.php(50): App\Cells\Menu->setActive()
+ 3 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->render()
+ 4 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'render', [...])
+ 5 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::render', [...], 0, 'AppCellsMenurender7497e99379c8b346021e3ced7d0298ca')
+ 6 APPPATH\Views\layouts\admin.php(20): view_cell('App\\Cells\\Menu::render', [...])
+ 7 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 8 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 9 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+10 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+11 APPPATH\Controllers\Admin\Dashboard.php(45): view('admin/dashboard', [...])
+12 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+13 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+14 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+15 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+16 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+17 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:29:35 --> ErrorException: Undefined array key "id"
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 49.
+ 1 APPPATH\Cells\Menu.php(49): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "id"', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Cells\\Menu.php', 49)
+ 2 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->render()
+ 3 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'render', [...])
+ 4 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::render', [...], 0, 'AppCellsMenurender7f405d5a6fa7a54e92e9560f53f4edba')
+ 5 APPPATH\Views\layouts\admin.php(20): view_cell('App\\Cells\\Menu::render', [...])
+ 6 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 7 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+ 9 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+10 APPPATH\Controllers\Admin\Dashboard.php(46): view('admin/dashboard', [...])
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:29:46 --> ErrorException: Undefined array key "link"
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 57.
+ 1 APPPATH\Cells\Menu.php(57): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "link"', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Cells\\Menu.php', 57)
+ 2 APPPATH\Cells\Menu.php(50): App\Cells\Menu->setActive()
+ 3 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->render()
+ 4 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'render', [...])
+ 5 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::render', [...], 0, 'AppCellsMenurender7f405d5a6fa7a54e92e9560f53f4edba')
+ 6 APPPATH\Views\layouts\admin.php(20): view_cell('App\\Cells\\Menu::render', [...])
+ 7 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 8 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 9 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+10 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+11 APPPATH\Controllers\Admin\Dashboard.php(46): view('admin/dashboard', [...])
+12 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+13 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+14 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+15 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+16 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+17 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:31:12 --> ErrorException: Undefined array key "link"
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 57.
+ 1 APPPATH\Cells\Menu.php(57): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "link"', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Cells\\Menu.php', 57)
+ 2 APPPATH\Cells\Menu.php(50): App\Cells\Menu->setActive()
+ 3 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->render()
+ 4 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'render', [...])
+ 5 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::render', [...], 0, 'AppCellsMenurender402b2de1df54c4f9035fa9fc3d409558')
+ 6 APPPATH\Views\layouts\admin.php(22): view_cell('App\\Cells\\Menu::render', [...])
+ 7 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 8 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 9 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+10 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+11 APPPATH\Controllers\Admin\Dashboard.php(46): view('admin/dashboard', [...])
+12 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+13 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+14 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+15 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+16 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+17 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:32:40 --> ErrorException: Undefined array key "link"
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Cells\Menu.php on line 56.
+ 1 APPPATH\Cells\Menu.php(56): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "link"', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Cells\\Menu.php', 56)
+ 2 APPPATH\Cells\Menu.php(49): App\Cells\Menu->setActive()
+ 3 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->render()
+ 4 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'render', [...])
+ 5 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::render', [...], 0, 'AppCellsMenurender402b2de1df54c4f9035fa9fc3d409558')
+ 6 APPPATH\Views\layouts\admin.php(22): view_cell('App\\Cells\\Menu::render', [...])
+ 7 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 8 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 9 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+10 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+11 APPPATH\Controllers\Admin\Dashboard.php(46): view('admin/dashboard', [...])
+12 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+13 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+14 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+15 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+16 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+17 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 10:32:57 --> ErrorException: Undefined array key "is_active"
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Views\cells\menu.php on line 6.
+ 1 APPPATH\Views\cells\menu.php(6): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "is_active"', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\cells\\menu.php', 6)
+ 2 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\cells\\menu.php')
+ 3 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('cells/menu', [], true)
+ 5 APPPATH\Cells\Menu.php(50): view('cells/menu', [...])
+ 6 SYSTEMPATH\View\Cell.php(234): App\Cells\Menu->render()
+ 7 SYSTEMPATH\View\Cell.php(104): CodeIgniter\View\Cell->renderCell(Object(App\Cells\Menu), 'render', [...])
+ 8 SYSTEMPATH\Common.php(1187): CodeIgniter\View\Cell->render('App\\Cells\\Menu::render', [...], 0, 'AppCellsMenurender402b2de1df54c4f9035fa9fc3d409558')
+ 9 APPPATH\Views\layouts\admin.php(22): view_cell('App\\Cells\\Menu::render', [...])
+10 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+11 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+12 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+13 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+14 APPPATH\Controllers\Admin\Dashboard.php(46): view('admin/dashboard', [...])
+15 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+16 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+17 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+18 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+19 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+20 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 13:04:10 --> ErrorException: Undefined array key "layout"
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Views\admin\dashboard.php on line 1.
+ 1 APPPATH\Views\admin\dashboard.php(1): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "layout"', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\admin\\dashboard.php', 1)
+ 2 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\admin\\dashboard.php')
+ 3 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+ 5 APPPATH\Controllers\Admin\Dashboard.php(47): view('admin/dashboard', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 13:04:15 --> ErrorException: Undefined array key "layout"
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Views\admin\dashboard.php on line 1.
+ 1 APPPATH\Views\admin\dashboard.php(1): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "layout"', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\admin\\dashboard.php', 1)
+ 2 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\admin\\dashboard.php')
+ 3 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+ 5 APPPATH\Controllers\Admin\Dashboard.php(47): view('admin/dashboard', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 13:04:40 --> ErrorException: Attempt to read property "layout" on array
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Views\admin\dashboard.php on line 1.
+ 1 APPPATH\Views\admin\dashboard.php(1): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Attempt to read property "layout" on array', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\admin\\dashboard.php', 1)
+ 2 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\admin\\dashboard.php')
+ 3 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+ 5 APPPATH\Controllers\Admin\Dashboard.php(47): view('admin/dashboard', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 13:04:59 --> ErrorException: Attempt to read property "settins" on array
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Views\admin\dashboard.php on line 1.
+ 1 APPPATH\Views\admin\dashboard.php(1): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Attempt to read property "settins" on array', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\admin\\dashboard.php', 1)
+ 2 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\admin\\dashboard.php')
+ 3 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+ 5 APPPATH\Controllers\Admin\Dashboard.php(47): view('admin/dashboard', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 13:06:12 --> ErrorException: Constant expression contains invalid operations
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Controllers\Admin\Dashboard.php on line 7.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+CRITICAL - 2024-12-03 13:06:31 --> ErrorException: New expressions are not supported in this context
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Controllers\Admin\Dashboard.php on line 8.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+CRITICAL - 2024-12-03 13:06:41 --> Error: Attempt to assign property "settings" on null
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Controllers\Admin\Dashboard.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+ 2 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 13:06:59 --> TypeError: view(): Argument #2 ($data) must be of type array, stdClass given, called in W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Dashboard.php on line 49
+[Method: GET, Route: admin/dashboard]
+in SYSTEMPATH\Common.php on line 1159.
+ 1 APPPATH\Controllers\Admin\Dashboard.php(49): view('admin/dashboard', Object(stdClass))
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 13:07:08 --> TypeError: view(): Argument #2 ($data) must be of type array, stdClass given, called in W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Dashboard.php on line 49
+[Method: GET, Route: admin/dashboard]
+in SYSTEMPATH\Common.php on line 1159.
+ 1 APPPATH\Controllers\Admin\Dashboard.php(49): view('admin/dashboard', Object(stdClass))
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 13:08:45 --> ErrorException: Undefined array key "page_title"
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Views\layouts\main.php on line 5.
+ 1 APPPATH\Views\layouts\main.php(5): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "page_title"', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\main.php', 5)
+ 2 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\main.php')
+ 3 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/main', [], true)
+ 5 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+ 6 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('admin/dashboard', [], true)
+ 7 APPPATH\Controllers\Admin\Dashboard.php(47): view('admin/dashboard', [...])
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 13:10:31 --> ErrorException: Undefined array key "settings"
+[Method: GET, Route: auth/login]
+in APPPATH\Views\auth\login.php on line 1.
+ 1 APPPATH\Views\auth\login.php(1): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "settings"', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\auth\\login.php', 1)
+ 2 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\auth\\login.php')
+ 3 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('auth/login', [], true)
+ 5 APPPATH\Controllers\Auth.php(12): view('auth/login')
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Auth->login()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 13:11:23 --> ErrorException: Undefined array key "sections"
+[Method: GET, Route: auth/login]
+in APPPATH\Views\layouts\admin.php on line 19.
+ 1 APPPATH\Views\layouts\admin.php(19): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined array key "sections"', 'W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php', 19)
+ 2 SYSTEMPATH\View\View.php(234): include('W:\\Wamp.NET\\sites\\neuracms\\app\\Views\\layouts\\admin.php')
+ 3 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layouts/admin', [], true)
+ 5 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('auth/login', [], true)
+ 6 APPPATH\Controllers\Auth.php(23): view('auth/login', [...])
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Auth->login()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-03 16:17:17 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "auth/register.php"
+[Method: GET, Route: auth/register]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 41.
+ 1 SYSTEMPATH\View\View.php(222): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('auth/register.php')
+ 2 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('auth/register', [], true)
+ 3 APPPATH\Controllers\Auth.php(75): view('auth/register', [...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Auth->register()
+ 5 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+ 6 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2024-12-03 16:19:52 --> Error connecting to the database: mysqli_sql_exception: Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:187
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php(187): mysqli->real_connect('localhost', 'root', 'root', 'neuracms_db', 3306, '', 0)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#3 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT 1\nFROM `...', Array, false)
+#4 W:\Wamp.NET\sites\neuracms\system\Validation\StrictRules\Rules.php(232): CodeIgniter\Database\BaseBuilder->get()
+#5 W:\Wamp.NET\sites\neuracms\system\Validation\Validation.php(339): CodeIgniter\Validation\StrictRules\Rules->is_unique('asd@gmail.com', 'email', Array, NULL, 'email')
+#6 W:\Wamp.NET\sites\neuracms\system\Validation\Validation.php(204): CodeIgniter\Validation\Validation->processRules('email', 'email', 'asd@gmail.com', Array, Array, 'email')
+#7 W:\Wamp.NET\sites\neuracms\system\Controller.php(137): CodeIgniter\Validation\Validation->run()
+#8 W:\Wamp.NET\sites\neuracms\app\Controllers\Auth.php(97): CodeIgniter\Controller->validate(Array)
+#9 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Auth->store()
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+#11 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#12 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#13 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#14 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#15 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:231
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT 1\nFROM `...', Array, false)
+#3 W:\Wamp.NET\sites\neuracms\system\Validation\StrictRules\Rules.php(232): CodeIgniter\Database\BaseBuilder->get()
+#4 W:\Wamp.NET\sites\neuracms\system\Validation\Validation.php(339): CodeIgniter\Validation\StrictRules\Rules->is_unique('asd@gmail.com', 'email', Array, NULL, 'email')
+#5 W:\Wamp.NET\sites\neuracms\system\Validation\Validation.php(204): CodeIgniter\Validation\Validation->processRules('email', 'email', 'asd@gmail.com', Array, Array, 'email')
+#6 W:\Wamp.NET\sites\neuracms\system\Controller.php(137): CodeIgniter\Validation\Validation->run()
+#7 W:\Wamp.NET\sites\neuracms\app\Controllers\Auth.php(97): CodeIgniter\Controller->validate(Array)
+#8 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Auth->store()
+#9 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#11 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#12 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#13 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#14 {main}
+CRITICAL - 2024-12-03 16:19:52 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение
+[Method: POST, Route: auth/store]
+in SYSTEMPATH\Database\BaseConnection.php on line 467.
+ 1 SYSTEMPATH\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT 1
+FROM `users`
+WHERE `email` = :email:
+ LIMIT 1', [...], false)
+ 3 SYSTEMPATH\Validation\StrictRules\Rules.php(232): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\Validation\Validation.php(339): CodeIgniter\Validation\StrictRules\Rules->is_unique('asd@gmail.com', 'email', [...], null, 'email')
+ 5 SYSTEMPATH\Validation\Validation.php(204): CodeIgniter\Validation\Validation->processRules('email', 'email', 'asd@gmail.com', [...], [...], 'email')
+ 6 SYSTEMPATH\Controller.php(137): CodeIgniter\Validation\Validation->run()
+ 7 APPPATH\Controllers\Auth.php(97): CodeIgniter\Controller->validate([...])
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Auth->store()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2024-12-03 16:21:29 --> Error connecting to the database: mysqli_sql_exception: Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:187
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php(187): mysqli->real_connect('localhost', 'root', 'root', 'neuracms_db', 3306, '', 0)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#3 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT 1\nFROM `...', Array, false)
+#4 W:\Wamp.NET\sites\neuracms\system\Validation\StrictRules\Rules.php(232): CodeIgniter\Database\BaseBuilder->get()
+#5 W:\Wamp.NET\sites\neuracms\system\Validation\Validation.php(339): CodeIgniter\Validation\StrictRules\Rules->is_unique('asd@gmail.com', 'email', Array, NULL, 'email')
+#6 W:\Wamp.NET\sites\neuracms\system\Validation\Validation.php(204): CodeIgniter\Validation\Validation->processRules('email', 'email', 'asd@gmail.com', Array, Array, 'email')
+#7 W:\Wamp.NET\sites\neuracms\system\Controller.php(137): CodeIgniter\Validation\Validation->run()
+#8 W:\Wamp.NET\sites\neuracms\app\Controllers\Auth.php(97): CodeIgniter\Controller->validate(Array)
+#9 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Auth->store()
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+#11 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#12 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#13 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#14 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#15 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:231
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT 1\nFROM `...', Array, false)
+#3 W:\Wamp.NET\sites\neuracms\system\Validation\StrictRules\Rules.php(232): CodeIgniter\Database\BaseBuilder->get()
+#4 W:\Wamp.NET\sites\neuracms\system\Validation\Validation.php(339): CodeIgniter\Validation\StrictRules\Rules->is_unique('asd@gmail.com', 'email', Array, NULL, 'email')
+#5 W:\Wamp.NET\sites\neuracms\system\Validation\Validation.php(204): CodeIgniter\Validation\Validation->processRules('email', 'email', 'asd@gmail.com', Array, Array, 'email')
+#6 W:\Wamp.NET\sites\neuracms\system\Controller.php(137): CodeIgniter\Validation\Validation->run()
+#7 W:\Wamp.NET\sites\neuracms\app\Controllers\Auth.php(97): CodeIgniter\Controller->validate(Array)
+#8 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Auth->store()
+#9 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#11 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#12 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#13 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#14 {main}
+CRITICAL - 2024-12-03 16:21:29 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение
+[Method: POST, Route: auth/store]
+in SYSTEMPATH\Database\BaseConnection.php on line 467.
+ 1 SYSTEMPATH\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT 1
+FROM `users`
+WHERE `email` = :email:
+ LIMIT 1', [...], false)
+ 3 SYSTEMPATH\Validation\StrictRules\Rules.php(232): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\Validation\Validation.php(339): CodeIgniter\Validation\StrictRules\Rules->is_unique('asd@gmail.com', 'email', [...], null, 'email')
+ 5 SYSTEMPATH\Validation\Validation.php(204): CodeIgniter\Validation\Validation->processRules('email', 'email', 'asd@gmail.com', [...], [...], 'email')
+ 6 SYSTEMPATH\Controller.php(137): CodeIgniter\Validation\Validation->run()
+ 7 APPPATH\Controllers\Auth.php(97): CodeIgniter\Controller->validate([...])
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Auth->store()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2024-12-03 16:22:08 --> Error connecting to the database: mysqli_sql_exception: Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:187
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php(187): mysqli->real_connect('localhost', 'root', 'root', 'neuracms_db', 3306, '', 0)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#3 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT 1\nFROM `...', Array, false)
+#4 W:\Wamp.NET\sites\neuracms\system\Validation\StrictRules\Rules.php(232): CodeIgniter\Database\BaseBuilder->get()
+#5 W:\Wamp.NET\sites\neuracms\system\Validation\Validation.php(339): CodeIgniter\Validation\StrictRules\Rules->is_unique('asd@gmail.com', 'email', Array, NULL, 'email')
+#6 W:\Wamp.NET\sites\neuracms\system\Validation\Validation.php(204): CodeIgniter\Validation\Validation->processRules('email', 'email', 'asd@gmail.com', Array, Array, 'email')
+#7 W:\Wamp.NET\sites\neuracms\system\Controller.php(137): CodeIgniter\Validation\Validation->run()
+#8 W:\Wamp.NET\sites\neuracms\app\Controllers\Auth.php(97): CodeIgniter\Controller->validate(Array)
+#9 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Auth->store()
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+#11 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#12 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#13 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#14 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#15 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:231
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT 1\nFROM `...', Array, false)
+#3 W:\Wamp.NET\sites\neuracms\system\Validation\StrictRules\Rules.php(232): CodeIgniter\Database\BaseBuilder->get()
+#4 W:\Wamp.NET\sites\neuracms\system\Validation\Validation.php(339): CodeIgniter\Validation\StrictRules\Rules->is_unique('asd@gmail.com', 'email', Array, NULL, 'email')
+#5 W:\Wamp.NET\sites\neuracms\system\Validation\Validation.php(204): CodeIgniter\Validation\Validation->processRules('email', 'email', 'asd@gmail.com', Array, Array, 'email')
+#6 W:\Wamp.NET\sites\neuracms\system\Controller.php(137): CodeIgniter\Validation\Validation->run()
+#7 W:\Wamp.NET\sites\neuracms\app\Controllers\Auth.php(97): CodeIgniter\Controller->validate(Array)
+#8 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Auth->store()
+#9 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#11 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#12 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#13 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#14 {main}
+CRITICAL - 2024-12-03 16:22:08 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение
+[Method: POST, Route: auth/store]
+in SYSTEMPATH\Database\BaseConnection.php on line 467.
+ 1 SYSTEMPATH\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT 1
+FROM `users`
+WHERE `email` = :email:
+ LIMIT 1', [...], false)
+ 3 SYSTEMPATH\Validation\StrictRules\Rules.php(232): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\Validation\Validation.php(339): CodeIgniter\Validation\StrictRules\Rules->is_unique('asd@gmail.com', 'email', [...], null, 'email')
+ 5 SYSTEMPATH\Validation\Validation.php(204): CodeIgniter\Validation\Validation->processRules('email', 'email', 'asd@gmail.com', [...], [...], 'email')
+ 6 SYSTEMPATH\Controller.php(137): CodeIgniter\Validation\Validation->run()
+ 7 APPPATH\Controllers\Auth.php(97): CodeIgniter\Controller->validate([...])
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Auth->store()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2024-12-03 16:23:33 --> Error connecting to the database: mysqli_sql_exception: Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:187
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php(187): mysqli->real_connect('localhost', 'root', 'root', 'neuracms_db', 3306, '', 0)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#3 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT 1\nFROM `...', Array, false)
+#4 W:\Wamp.NET\sites\neuracms\system\Validation\StrictRules\Rules.php(232): CodeIgniter\Database\BaseBuilder->get()
+#5 W:\Wamp.NET\sites\neuracms\system\Validation\Validation.php(339): CodeIgniter\Validation\StrictRules\Rules->is_unique('asd@gmail.com', 'email', Array, NULL, 'email')
+#6 W:\Wamp.NET\sites\neuracms\system\Validation\Validation.php(204): CodeIgniter\Validation\Validation->processRules('email', 'email', 'asd@gmail.com', Array, Array, 'email')
+#7 W:\Wamp.NET\sites\neuracms\system\Controller.php(137): CodeIgniter\Validation\Validation->run()
+#8 W:\Wamp.NET\sites\neuracms\app\Controllers\Auth.php(97): CodeIgniter\Controller->validate(Array)
+#9 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Auth->store()
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+#11 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#12 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#13 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#14 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#15 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:231
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT 1\nFROM `...', Array, false)
+#3 W:\Wamp.NET\sites\neuracms\system\Validation\StrictRules\Rules.php(232): CodeIgniter\Database\BaseBuilder->get()
+#4 W:\Wamp.NET\sites\neuracms\system\Validation\Validation.php(339): CodeIgniter\Validation\StrictRules\Rules->is_unique('asd@gmail.com', 'email', Array, NULL, 'email')
+#5 W:\Wamp.NET\sites\neuracms\system\Validation\Validation.php(204): CodeIgniter\Validation\Validation->processRules('email', 'email', 'asd@gmail.com', Array, Array, 'email')
+#6 W:\Wamp.NET\sites\neuracms\system\Controller.php(137): CodeIgniter\Validation\Validation->run()
+#7 W:\Wamp.NET\sites\neuracms\app\Controllers\Auth.php(97): CodeIgniter\Controller->validate(Array)
+#8 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Auth->store()
+#9 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#11 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#12 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#13 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#14 {main}
+CRITICAL - 2024-12-03 16:23:33 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение
+[Method: POST, Route: auth/store]
+in SYSTEMPATH\Database\BaseConnection.php on line 467.
+ 1 SYSTEMPATH\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT 1
+FROM `users`
+WHERE `email` = :email:
+ LIMIT 1', [...], false)
+ 3 SYSTEMPATH\Validation\StrictRules\Rules.php(232): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH\Validation\Validation.php(339): CodeIgniter\Validation\StrictRules\Rules->is_unique('asd@gmail.com', 'email', [...], null, 'email')
+ 5 SYSTEMPATH\Validation\Validation.php(204): CodeIgniter\Validation\Validation->processRules('email', 'email', 'asd@gmail.com', [...], [...], 'email')
+ 6 SYSTEMPATH\Controller.php(137): CodeIgniter\Validation\Validation->run()
+ 7 APPPATH\Controllers\Auth.php(97): CodeIgniter\Controller->validate([...])
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Auth->store()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-12-03 16:30:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:30:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:30:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:30:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:30:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:44:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:46:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:46:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:46:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:46:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:46:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:46:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:48:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:48:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2024-12-03 16:48:38 --> Error: Call to undefined function set_value()
+[Method: GET, Route: auth/login]
+in APPPATH\Views\auth\login.php on line 14.
+ 1 SYSTEMPATH\View\View.php(234): include()
+ 2 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 3 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('auth/login', [], true)
+ 4 APPPATH\Controllers\Auth.php(23): view('auth/login', [...])
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Auth->login()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-12-03 16:49:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:49:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:49:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:49:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:49:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:50:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:50:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:50:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:50:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:50:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:50:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:53:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:53:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:53:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:53:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:53:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:54:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:54:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:55:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:55:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:56:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:56:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:58:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:58:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-03 16:58:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

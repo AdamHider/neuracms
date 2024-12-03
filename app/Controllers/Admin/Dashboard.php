@@ -10,8 +10,14 @@ class Dashboard extends \App\Controllers\BaseController
         // Проверка, если пользователь аутентифицирован
         // Если нет, перенаправление на страницу входа
         // Если да, отображение админ-панели
-        $this->data['layout'] = 'default';
-        $this->data['page_title'] = 'Dashboard';
+        $this->data['settings'] = [
+            'layout' => 'admin',
+            'menu' => [
+                'id' => 2
+            ],
+            'title' => 'Dashboard',
+            'path' => '/admin/dashboard'
+        ];
 
         $this->data['sections'] = [
             'main' => [

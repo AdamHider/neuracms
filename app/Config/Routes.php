@@ -12,6 +12,13 @@ $routes->group('pages', [], function($routes) {
     $routes->get('(:segment)', [Pages::class, 'view']);
 });
 
+$routes->group('auth', [], function($routes) {
+    $routes->get('login', 'Auth::login');
+    $routes->post('authenticate', 'Auth::authenticate');
+    $routes->get('logout', 'Auth::logout');
+    $routes->get('register', 'Auth::register');
+    $routes->post('store', 'Auth::store');
+});
 
 $routes->group('admin', ['filter' => 'auth'], function($routes) {
     $routes->get('', 'Admin::index');
