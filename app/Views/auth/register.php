@@ -21,7 +21,7 @@
                             <label for="password" class="form-label">Password</label>
                             <input type="password" name="password" class="form-control" id="password" placeholder="Enter your password">
                         </div>
-                        <?php if(isset($validation)): ?>
+                        <?php if(isset($this->data['validation'])): ?>
                             <div class="alert alert-danger">
                                 <?= $validation->listErrors() ?>
                             </div>

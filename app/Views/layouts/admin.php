@@ -1,24 +1,45 @@
-<?= $this->extend('layouts/main') ?>
+<?= $this->extend('layouts/index') ?>
 
-<?= $this->section('body') ?>
+<?= $this->section('main') ?>
 <div class="container-fluid">
     <div class="row flex-nowrap">
         <div class="col-auto col-md-3 col-xl-2  px-0 bg-dark">
-            <div class="flex-column flex-shrink-0 p-3 text-white min-vh-100">
-                <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                    <span class="fs-5 d-none d-sm-inline">Menu</span>
-                    <p>Hello, <?= session()->get('username'); ?>!</p>
-                    <a href="/auth/logout">Logout</a>
-
+            <div class="d-flex flex-column flex-shrink-0 p-3 text-white min-vh-100">
+                <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                    <span class="fs-4">NeuraCMS</span>
                 </a>
-                <?= view_cell('App\Cells\Menu::render', ['data' => [
-                    'menu' => $this->data['settings']['menu'], 
-                    'current_uri' => $this->data['settings']['path']
-                    ]
-                ]) ?>
+                <hr>
+                <div class="flex-column mb-auto">
+                    <?= view_cell('App\Cells\Menu::render', ['data' => [
+                        'menu' => $this->data['settings']['menu'], 
+                        'current_uri' => $this->data['settings']['path']
+                        ]
+                    ]) ?>
+                </div>
+                <hr>
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser21" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle me-2"></i> 
+                        <strong><?= session()->get('username') ?></strong>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser21">
+                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        <li><a class="dropdown-item" href="#">Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/auth/logout">Sign out</a></li>
+                    </ul>
+                </div>
+                <div class="mt-3 text-white">
+                    <strong>Version:</strong> 1.0.0
+                </div>
             </div>
         </div>
-        <div class="col py-3">
+        <div class="col">
+            <header class="py-3 mb-3 border-bottom">
+                <div class="d-flex  mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+                    <span class="fs-4"><?= $this->data['settings']['title'] ?></span>
+                </a>
+            </header>
             <?php if(!empty($this->data['sections'])) : ?>
             <?php foreach($this->data['sections'] as $section_name => $section) : ?>
                 <section id="<?= $section_name ?>">

@@ -16,15 +16,13 @@ class Auth extends BaseController
     {
 
         $this->data['settings'] = [
-            'layout' => 'admin',
+            'layout' => 'default',
             'menu' => [
                 'id' => 2
             ],
             'title' => 'Dashboard',
             'path' => '/admin/dashboard'
         ];
-
-        // Логика для отображения страницы входа
         return view('auth/login', $this->data);
     }
     public function authenticate()
@@ -69,7 +67,7 @@ class Auth extends BaseController
     public function register()
     {
         $this->data['settings'] = [
-            'layout' => 'admin',
+            'layout' => 'default',
             'menu' => [
                 'id' => 2
             ],
@@ -82,24 +80,19 @@ class Auth extends BaseController
 
     public function store()
     {
+        $session = session();
         $model = new UserModel();
 
-        $rules = [
-            'username' => 'required|min_length[3]|max_length[255]|is_unique[users.username]',
-            'email'    => 'required|valid_email|is_unique[users.email]',
-            'password' => 'required|min_length[8]',
-        ];
-
-        $this->data['settings'] = [
-            'layout' => 'admin',
-            'menu' => [
-                'id' => 2
-            ],
-            'title' => 'Register',
-            'path' => '/auth/register'
-        ];
     
-        if (! $this->validate($rules)) {
+        if (!$this->validate($model->validationRules)) {
+            $this->data['settings'] = [
+                'layout' => 'default',
+                'menu' => [
+                    'id' => 2
+                ],
+                'title' => 'Register',
+                'path' => '/auth/register'
+            ];
             $this->data['validation'] =  $this->validator;
             return view('auth/register', $this->data);
         }

@@ -23,10 +23,12 @@ $routes->group('auth', [], function($routes) {
 $routes->group('admin', ['filter' => 'auth'], function($routes) {
     $routes->get('', 'Admin::index');
     $routes->get('dashboard', 'Admin\Dashboard::index');
-    $routes->get('users', 'Admin\Users::index');
-    $routes->get('users/create', 'Admin\Users::create');
-    $routes->post('users/store', 'Admin\Users::store');
-    $routes->get('users/edit/(:num)', 'Admin\Users::edit/$1');
-    $routes->post('users/update/(:num)', 'Admin\Users::update/$1');
-    $routes->get('users/delete/(:num)', 'Admin\Users::delete/$1');
+    $routes->group('pages', [], function($routes) {
+        $routes->get('', 'Admin\Page::index');
+        $routes->get('create', 'Admin\Page::create');
+        $routes->post('store', 'Admin\Page::store');
+        $routes->get('edit/(:num)', 'Admin\Page::edit/$1');
+        $routes->post('update/(:num)', 'Admin\Page::update/$1');
+        $routes->get('delete/(:num)', 'Admin\Page::delete/$1');
+    });
 });
