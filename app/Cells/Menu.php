@@ -35,12 +35,27 @@ class Menu extends Cell
                     'type'  => 'menu'
                 ],
                 [
+                    'title' => 'Menus',
+                    'link'  => '/admin/menus',
+                    'icon'  => 'list-nested',
+                    'type'  => 'menu'
+                ],
+                [
                     'type'  => 'separator'
                 ],
                 [
                     'title' => 'Media',
                     'link'  => '/admin/dashboard',
                     'icon'  => 'images',
+                    'type'  => 'menu'
+                ],
+                [
+                    'type'  => 'separator'
+                ],
+                [
+                    'title' => 'Languages',
+                    'link'  => '/admin/languages',
+                    'icon'  => 'translate',
                     'type'  => 'menu'
                 ],
             ]
@@ -53,8 +68,7 @@ class Menu extends Cell
     private function setActive()
     {
         foreach($this->data['items'] as &$menu){
-            if(isset($menu['link']) && $menu['link'] == $this->data['current_uri']){
-                
+            if(isset($menu['link']) && strpos($this->data['current_uri'], $menu['link']) !== false){
                 $menu['is_active'] = true;
                 return;
             }

@@ -8,18 +8,38 @@ class PageModel extends Model
 {
     protected $table = 'pages';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['title', 'content'];
+    protected $allowedFields = ['slug', 'parent_id', 'language_id', 'title', 'content', 'meta_description'];
+
     protected $validationRules = [
-        'title' => 'required|is_unique[pages.title,id,{id}]',
-        'content' => 'required',
+        'id' => 'numeric',
+        'title' => 'required',
+        'slug' => 'required|is_unique[pages.slug, id, {id}]'
     ];
     protected $validationMessages = [
-        'title' => [
-            'required' => 'The Title field is required.',
-            'is_unique' => 'The Title must be unique. This title already exists.'
-        ],
-        'content' => [
-            'required' => 'The Content field is required.'
+        'slug' => [
+            'is_unique' => 'The slug  must be unique.'
         ]
     ];
+    public function getTree()
+    {
+        $items = $this->orderBy('created_at', 'ASC')->findAll();
+        return $this->buildTree($items);
+    }
+
+    private function buildTree(array $elements, $parentId = null)
+    {
+        $branch = [];
+
+        foreach ($elements as $element) {
+            if ($element['parent_id'] == $parentId) {
+                $children = $this->buildTree($elements, $element['id']);
+                if ($children) {
+                    $element['children'] = $children;
+                }
+                $branch[] = $element;
+            }
+        }
+
+        return $branch;
+    }
 }

@@ -1,25 +1,16 @@
-<?= $this->extend('layouts/'.$this->data['settings']['layout']) ?>
+<?= $this->extend('layouts/'.$settings['layout']) ?>
 <?= $this->section('content') ?>
 <div class="container ">
-    <a href="/admin/pages/create" class="btn btn-primary mb-3"><i class="bi bi-file-earmark-plus me-2"></i> Create New Page</a>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($this->data['pages'] as $page): ?>
-                <tr>
-                    <td><?= esc($page['title']) ?></td>
-                    <td>
-                        <a href="/admin/pages/edit/<?= $page['id'] ?>" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="/admin/pages/delete/<?= $page['id'] ?>" class="btn btn-danger btn-sm">Delete</a>
-                    </td>
-                </tr>
+    <a href="/admin/pages/create" class="btn btn-primary mb-3"><i class="bi bi-file-earmark-plus me-2"></i> New Page</a>
+    <?php if (!empty($pages)): ?>
+        <ul class="list-group">
+            <?php foreach ($pages as $page): ?>
+                <?= view('admin/pages/_page_item', ['page' => $page]) ?>
             <?php endforeach; ?>
-        </tbody>
-    </table>
+        </ul>
+    <?php else: ?>
+        <p>No pages found.</p>
+    <?php endif; ?>
 </div>
+<?= view('admin/pages/_delete_modal') ?>
 <?= $this->endSection() ?>
