@@ -63,26 +63,9 @@
         </div>
     <?php endif; ?>
     <!-- Sidebar and Content Section -->
-    <div class="d-flex">
-
+    <div class="d-flex my-2">
         <!-- Content -->
-        <div class="flex-grow-1 ms-3 col col-9">
-            
         <?= view('admin/pages/_page_builder') ?>
-            <label for="content" class="form-label">Content</label>
-            <textarea name="content" class="form-control" id="content" rows="20" required><?= set_value('content', $page['content']) ?></textarea>
-            
-        </div>
-        <!-- Sidebar -->
-        <div class="bg-light p-3 col col-3">
-            <ul class="list-group">
-                <li class="list-group-item">An item</li>
-                <li class="list-group-item">A second item</li>
-                <li class="list-group-item">A third item</li>
-                <li class="list-group-item">A fourth item</li>
-                <li class="list-group-item">And a fifth one</li>
-            </ul>
-        </div>
     </div>
 
     </form>

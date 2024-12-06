@@ -81,6 +81,7 @@ class Page extends Controller
             'language_id' => $this->request->getVar('language_id'),
             'title' => $this->request->getVar('title'),
             'content' => $this->request->getVar('content'),
+            'json_content' => $this->request->getVar('json_content'),
             'meta_description' => $this->request->getVar('meta_description'),
         ];
 

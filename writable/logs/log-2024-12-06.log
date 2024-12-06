@@ -1,0 +1,1151 @@
+INFO - 2024-12-06 06:47:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 06:47:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 06:47:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 09:13:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 09:13:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 09:13:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-12-06 09:13:28 --> mysqli_sql_exception: Table 'neuracms_db.menu_items' doesn't exist in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT *\nFROM `...', 0)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *\nFROM `...')
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *\nFROM `...')
+#3 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 W:\Wamp.NET\sites\neuracms\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+#6 W:\Wamp.NET\sites\neuracms\app\Models\MenuItemModel.php(39): CodeIgniter\BaseModel->findAll()
+#7 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Menu.php(23): App\Models\MenuItemModel->getTree()
+#8 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Admin\Menu->index()
+#9 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Menu))
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#11 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#12 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#13 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#14 {main}
+CRITICAL - 2024-12-06 09:13:28 --> CodeIgniter\Database\Exceptions\DatabaseException: Table 'neuracms_db.menu_items' doesn't exist
+[Method: GET, Route: admin/menus]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `menu_items`
+ORDER BY `order` ASC', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Models\MenuItemModel.php(39): CodeIgniter\BaseModel->findAll()
+ 5 APPPATH\Controllers\Admin\Menu.php(23): App\Models\MenuItemModel->getTree()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Menu->index()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Menu))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 09:13:28 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Table 'neuracms_db.menu_items' doesn't exist
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `menu_items`
+ORDER BY `order` ASC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `menu_items`
+ORDER BY `order` ASC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `menu_items`
+ORDER BY `order` ASC', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Models\MenuItemModel.php(39): CodeIgniter\BaseModel->findAll()
+ 7 APPPATH\Controllers\Admin\Menu.php(23): App\Models\MenuItemModel->getTree()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Menu->index()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Menu))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 09:13:28 --> [Caused by] mysqli_sql_exception: Table 'neuracms_db.menu_items' doesn't exist
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT *
+FROM `menu_items`
+ORDER BY `order` ASC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `menu_items`
+ORDER BY `order` ASC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `menu_items`
+ORDER BY `order` ASC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `menu_items`
+ORDER BY `order` ASC', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Models\MenuItemModel.php(39): CodeIgniter\BaseModel->findAll()
+ 8 APPPATH\Controllers\Admin\Menu.php(23): App\Models\MenuItemModel->getTree()
+ 9 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Menu->index()
+10 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Menu))
+11 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+12 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+13 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+14 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-12-06 09:13:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 09:14:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 09:14:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 09:14:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 09:14:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-12-06 11:01:25 --> mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'. in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` ...', 0)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` ...')
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` ...')
+#3 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` ...', Array, false)
+#4 W:\Wamp.NET\sites\neuracms\system\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+#5 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(1028): CodeIgniter\Model->doUpdate(Array, Array)
+#6 W:\Wamp.NET\sites\neuracms\system\Model.php(865): CodeIgniter\BaseModel->update(Array, Array)
+#7 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(749): CodeIgniter\Model->update('5', Array)
+#8 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save(Array)
+#9 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+#11 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+#12 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#14 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 {main}
+CRITICAL - 2024-12-06 11:01:25 --> CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+[Method: POST, Route: admin/pages/update/5]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 2 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 6 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:01:25 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 4 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 5 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 6 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 7 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 8 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+11 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+12 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:01:25 --> [Caused by] mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 5 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 6 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 7 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 8 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 9 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-12-06 11:01:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-12-06 11:01:45 --> mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'. in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` ...', 0)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` ...')
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` ...')
+#3 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` ...', Array, false)
+#4 W:\Wamp.NET\sites\neuracms\system\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+#5 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(1028): CodeIgniter\Model->doUpdate(Array, Array)
+#6 W:\Wamp.NET\sites\neuracms\system\Model.php(865): CodeIgniter\BaseModel->update(Array, Array)
+#7 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(749): CodeIgniter\Model->update('5', Array)
+#8 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save(Array)
+#9 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+#11 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+#12 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#14 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 {main}
+CRITICAL - 2024-12-06 11:01:45 --> CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+[Method: POST, Route: admin/pages/update/5]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 2 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 6 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:01:45 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 4 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 5 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 6 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 7 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 8 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+11 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+12 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:01:45 --> [Caused by] mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 5 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 6 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 7 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 8 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 9 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-12-06 11:02:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:02:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-12-06 11:02:13 --> mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'. in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` ...', 0)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` ...')
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` ...')
+#3 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` ...', Array, false)
+#4 W:\Wamp.NET\sites\neuracms\system\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+#5 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(1028): CodeIgniter\Model->doUpdate(Array, Array)
+#6 W:\Wamp.NET\sites\neuracms\system\Model.php(865): CodeIgniter\BaseModel->update(Array, Array)
+#7 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(749): CodeIgniter\Model->update('5', Array)
+#8 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save(Array)
+#9 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+#11 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+#12 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#14 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 {main}
+CRITICAL - 2024-12-06 11:02:13 --> CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+[Method: POST, Route: admin/pages/update/5]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 2 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 6 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:02:13 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 4 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 5 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 6 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 7 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 8 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+11 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+12 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:02:13 --> [Caused by] mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 5 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 6 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 7 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 8 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 9 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-12-06 11:02:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:02:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:02:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-12-06 11:02:49 --> mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'. in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` ...', 0)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` ...')
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` ...')
+#3 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` ...', Array, false)
+#4 W:\Wamp.NET\sites\neuracms\system\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+#5 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(1028): CodeIgniter\Model->doUpdate(Array, Array)
+#6 W:\Wamp.NET\sites\neuracms\system\Model.php(865): CodeIgniter\BaseModel->update(Array, Array)
+#7 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(749): CodeIgniter\Model->update('5', Array)
+#8 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save(Array)
+#9 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+#11 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+#12 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#14 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 {main}
+CRITICAL - 2024-12-06 11:02:49 --> CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+[Method: POST, Route: admin/pages/update/5]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 2 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 6 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:02:49 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 4 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 5 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 6 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 7 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 8 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+11 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+12 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:02:49 --> [Caused by] mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 5 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 6 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 7 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 8 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 9 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-12-06 11:02:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:03:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:03:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:03:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-12-06 11:03:59 --> mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'. in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` ...', 0)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` ...')
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` ...')
+#3 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` ...', Array, false)
+#4 W:\Wamp.NET\sites\neuracms\system\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+#5 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(1028): CodeIgniter\Model->doUpdate(Array, Array)
+#6 W:\Wamp.NET\sites\neuracms\system\Model.php(865): CodeIgniter\BaseModel->update(Array, Array)
+#7 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(749): CodeIgniter\Model->update('5', Array)
+#8 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save(Array)
+#9 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+#11 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+#12 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#14 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 {main}
+CRITICAL - 2024-12-06 11:03:59 --> CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+[Method: POST, Route: admin/pages/update/5]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 2 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 6 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:03:59 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 4 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 5 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 6 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 7 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 8 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+11 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+12 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:03:59 --> [Caused by] mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 5 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 6 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 7 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 8 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 9 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-12-06 11:04:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:04:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-12-06 11:04:16 --> mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'. in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` ...', 0)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` ...')
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` ...')
+#3 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` ...', Array, false)
+#4 W:\Wamp.NET\sites\neuracms\system\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+#5 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(1028): CodeIgniter\Model->doUpdate(Array, Array)
+#6 W:\Wamp.NET\sites\neuracms\system\Model.php(865): CodeIgniter\BaseModel->update(Array, Array)
+#7 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(749): CodeIgniter\Model->update('5', Array)
+#8 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save(Array)
+#9 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+#11 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+#12 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#14 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 {main}
+CRITICAL - 2024-12-06 11:04:16 --> CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+[Method: POST, Route: admin/pages/update/5]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 2 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 6 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:04:16 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 4 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 5 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 6 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 7 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 8 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+11 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+12 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:04:16 --> [Caused by] mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 5 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 6 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 7 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 8 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 9 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-12-06 11:04:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:04:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:04:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-12-06 11:04:19 --> mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'. in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` ...', 0)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` ...')
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` ...')
+#3 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` ...', Array, false)
+#4 W:\Wamp.NET\sites\neuracms\system\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+#5 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(1028): CodeIgniter\Model->doUpdate(Array, Array)
+#6 W:\Wamp.NET\sites\neuracms\system\Model.php(865): CodeIgniter\BaseModel->update(Array, Array)
+#7 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(749): CodeIgniter\Model->update('5', Array)
+#8 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save(Array)
+#9 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+#11 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+#12 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#14 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 {main}
+CRITICAL - 2024-12-06 11:04:19 --> CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+[Method: POST, Route: admin/pages/update/5]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 2 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 6 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:04:19 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 4 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 5 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 6 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 7 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 8 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+11 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+12 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:04:19 --> [Caused by] mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 5 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 6 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 7 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 8 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 9 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-12-06 11:04:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:04:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-12-06 11:04:40 --> mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'. in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` ...', 0)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` ...')
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` ...')
+#3 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` ...', Array, false)
+#4 W:\Wamp.NET\sites\neuracms\system\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+#5 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(1028): CodeIgniter\Model->doUpdate(Array, Array)
+#6 W:\Wamp.NET\sites\neuracms\system\Model.php(865): CodeIgniter\BaseModel->update(Array, Array)
+#7 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(749): CodeIgniter\Model->update('5', Array)
+#8 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save(Array)
+#9 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+#11 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+#12 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#14 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 {main}
+CRITICAL - 2024-12-06 11:04:40 --> CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+[Method: POST, Route: admin/pages/update/5]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 2 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 6 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:04:40 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 4 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 5 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 6 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 7 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 8 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+11 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+12 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:04:40 --> [Caused by] mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 5 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 6 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 7 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 8 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 9 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-12-06 11:04:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:05:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:05:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:06:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:06:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-12-06 11:06:22 --> mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'. in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` ...', 0)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` ...')
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` ...')
+#3 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` ...', Array, false)
+#4 W:\Wamp.NET\sites\neuracms\system\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+#5 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(1028): CodeIgniter\Model->doUpdate(Array, Array)
+#6 W:\Wamp.NET\sites\neuracms\system\Model.php(865): CodeIgniter\BaseModel->update(Array, Array)
+#7 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(749): CodeIgniter\Model->update('5', Array)
+#8 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save(Array)
+#9 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+#11 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+#12 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#14 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 {main}
+CRITICAL - 2024-12-06 11:06:22 --> CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+[Method: POST, Route: admin/pages/update/5]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 2 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 6 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:06:22 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 4 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 5 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 6 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 7 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 8 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+11 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+12 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:06:22 --> [Caused by] mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 5 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 6 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 7 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 8 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 9 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-12-06 11:06:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:06:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-12-06 11:06:43 --> mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'. in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` ...', 0)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` ...')
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` ...')
+#3 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` ...', Array, false)
+#4 W:\Wamp.NET\sites\neuracms\system\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+#5 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(1028): CodeIgniter\Model->doUpdate(Array, Array)
+#6 W:\Wamp.NET\sites\neuracms\system\Model.php(865): CodeIgniter\BaseModel->update(Array, Array)
+#7 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(749): CodeIgniter\Model->update('5', Array)
+#8 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save(Array)
+#9 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+#11 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+#12 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#14 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 {main}
+CRITICAL - 2024-12-06 11:06:43 --> CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+[Method: POST, Route: admin/pages/update/5]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 2 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 6 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:06:43 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 4 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 5 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 6 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 7 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 8 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+11 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+12 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:06:43 --> [Caused by] mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 5 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 6 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 7 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 8 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 9 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-12-06 11:06:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:07:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2024-12-06 11:07:24 --> mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'. in W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 W:\Wamp.NET\sites\neuracms\system\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` ...', 0)
+#1 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` ...')
+#2 W:\Wamp.NET\sites\neuracms\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` ...')
+#3 W:\Wamp.NET\sites\neuracms\system\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` ...', Array, false)
+#4 W:\Wamp.NET\sites\neuracms\system\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+#5 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(1028): CodeIgniter\Model->doUpdate(Array, Array)
+#6 W:\Wamp.NET\sites\neuracms\system\Model.php(865): CodeIgniter\BaseModel->update(Array, Array)
+#7 W:\Wamp.NET\sites\neuracms\system\BaseModel.php(749): CodeIgniter\Model->update('5', Array)
+#8 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save(Array)
+#9 W:\Wamp.NET\sites\neuracms\app\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+#10 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+#11 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+#12 W:\Wamp.NET\sites\neuracms\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 W:\Wamp.NET\sites\neuracms\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#14 W:\Wamp.NET\sites\neuracms\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 W:\Wamp.NET\sites\neuracms\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 {main}
+CRITICAL - 2024-12-06 11:07:24 --> CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+[Method: POST, Route: admin/pages/update/5]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 2 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 3 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 4 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 5 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 6 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:07:24 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 4 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 5 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 6 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 7 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 8 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+11 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+12 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2024-12-06 11:07:24 --> [Caused by] mysqli_sql_exception: Invalid JSON text: "The document is empty." at position 0 in value for column 'pages.json_content'.
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('UPDATE `pages` SET `slug` = \'custom-child\', `parent_id` = \'4\', `language_id` = \'1\', `title` = \'фывфыв\', `content` = \'asdqwewqe\', `json_content` = \'\', `meta_description` = \'s\'
+WHERE `pages`.`id` IN (\'5\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2516): CodeIgniter\Database\BaseConnection->query('UPDATE `pages` SET `slug` = :slug:, `parent_id` = :parent_id:, `language_id` = :language_id:, `title` = :title:, `content` = :content:, `json_content` = :json_content:, `meta_description` = :meta_description:
+WHERE `pages`.`id` IN :pages.id:', [...], false)
+ 5 SYSTEMPATH\Model.php(461): CodeIgniter\Database\BaseBuilder->update()
+ 6 SYSTEMPATH\BaseModel.php(1028): CodeIgniter\Model->doUpdate([...], [...])
+ 7 SYSTEMPATH\Model.php(865): CodeIgniter\BaseModel->update([...], [...])
+ 8 SYSTEMPATH\BaseModel.php(749): CodeIgniter\Model->update('5', [...])
+ 9 APPPATH\Controllers\Admin\Page.php(90): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\Admin\Page.php(72): App\Controllers\Admin\Page->save('5')
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Page->update('5')
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Page))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2024-12-06 11:08:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:08:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:08:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:09:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:09:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:09:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:09:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:09:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:09:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:09:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:09:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:09:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:09:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:15:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:15:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:15:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:15:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:15:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:18:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:19:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:19:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:19:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:20:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:20:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:20:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:24:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:26:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:26:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:32:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:33:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:36:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:36:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:38:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:38:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:51:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:53:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:53:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 11:59:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 12:00:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 12:02:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 12:02:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 12:02:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 12:03:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 12:04:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 12:04:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 12:04:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 12:04:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 12:05:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:18:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:18:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:20:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:21:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:21:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:22:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:22:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:23:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:23:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:24:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:26:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:26:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:34:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:35:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:35:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:35:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:35:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:36:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:37:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:37:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:37:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:42:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:58:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:58:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 13:59:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 14:00:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:06:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:07:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:09:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:12:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:14:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:16:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:17:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:17:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:18:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:18:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:18:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:19:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:19:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:19:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:19:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:20:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:20:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:21:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:21:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:21:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:21:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:22:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:23:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:23:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:24:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:24:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:25:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:26:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:28:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:28:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:28:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:28:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:28:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:32:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:33:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:33:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:33:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:33:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:33:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:33:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:35:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:35:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:35:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:40:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:43:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:44:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:44:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:44:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:45:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:45:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:45:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:45:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 15:46:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:18:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:18:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:20:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:22:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:23:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:23:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:24:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:24:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:27:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:27:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:28:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:30:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:30:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:31:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:31:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:31:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:33:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:33:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:33:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:34:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:34:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:34:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:34:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:34:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:34:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:34:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:34:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:34:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:37:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:37:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:37:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:40:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:40:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:42:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:43:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:44:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:44:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:48:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:49:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:50:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:55:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:55:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:56:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:57:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:57:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 16:57:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 17:00:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 17:01:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 17:01:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 17:02:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2024-12-06 17:02:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

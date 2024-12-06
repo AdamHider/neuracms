@@ -8,7 +8,7 @@ class PageModel extends Model
 {
     protected $table = 'pages';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['slug', 'parent_id', 'language_id', 'title', 'content', 'meta_description'];
+    protected $allowedFields = ['slug', 'parent_id', 'language_id', 'title', 'content', 'json_content', 'meta_description'];
 
     protected $validationRules = [
         'id' => 'numeric',

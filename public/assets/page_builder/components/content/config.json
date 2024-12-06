@@ -1,0 +1,10 @@
+{
+    "type": "content",
+    "properties": {
+        "text": {
+            "label": "Text",
+            "type": "text",
+            "default": "Sample text"
+        }
+    }
+}

@@ -1,90 +1,139 @@
-<div class="container">
-    <div id="toolbar" class="d-flex justify-content-start">
-        <button class="btn btn-secondary me-2 draggable" data-type="text" draggable="true">Text</button>
-        <button class="btn btn-secondary me-2 draggable" data-type="image" draggable="true">Image</button>
-        <button class="btn btn-secondary me-2 draggable" data-type="button" draggable="true">Button</button>
+<style>
+    #workspace { border: 1px solid #ddd; min-height: 300px; padding: 15px; }
+    #workspace .element-controls {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 5px;
+    }
+    #workspace .element-controls button {
+        margin-left: 5px;
+    }
+    #workspace .section { margin-bottom: 15px; border: 2px solid #007bff; padding: 10px; background-color: #f1f1f1; position: relative; }
+    #workspace .row { margin-bottom: 15px; border: 2px dashed #17a2b8; padding: 10px; background-color: #e9ecef; position: relative; }
+    #workspace .col { margin-bottom: 15px; border: 2px dotted #28a745; padding: 10px; background-color: #d4edda; position: relative; }
+    #workspace .add-control { border: 2px dashed #6c757d; padding: 10px; margin-bottom: 15px; text-align: center; cursor: pointer; color: #6c757d; }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-9">
+            <div id="workspace" class="container">
+                <!-- Рабочая область для конструктора страниц -->
+            </div>
+            <input type="hidden" name="json_content" id="json_content">
+        </div>
+        <div id="sidebar" class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Element Properties</h3>
+                </div>
+                <div class="card-body" id="properties-container">
+                    <!-- Поля свойств будут добавляться здесь -->
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="workspace" contenteditable="true">
-        <!-- Рабочая область для конструктора страниц -->
-    </div>
-    <button id="save" class="btn btn-primary mt-3">Save</button>
-    <textarea id="output" class="form-control mt-3" rows="5" readonly></textarea>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="<?php echo base_url('assets/page_builder/js/data.js')?>"></script>
+<script src="<?php echo base_url('assets/page_builder/js/render.js')?>"></script>
+<script src="<?php echo base_url('assets/page_builder/js/properties.js')?>"></script>
 <script>
-        $(document).ready(function() {
-            let dropHighlight = $('<div class="drop-highlight"></div>');
+const componentConfig = {
+    container: {
+        type: 'container',
+        properties: {
+            class: {
+                "label": "Class Name",
+                "type": "text",
+                "default": ""
+            },
+            backgroundColor: {
+                label: 'Background Color',
+                type: 'color',
+                default: '#ffffff'
+            },
+            padding: {
+                label: 'Padding',
+                type: 'text',
+                default: '10px'
+            }
+        },
+        template: 'components/container/template.html'
+    },
+    content: {
+        type: 'content',
+        properties: {
+            text: {
+                label: 'Text',
+                type: 'text',
+                default: 'Sample text'
+            }
+        },
+        template: 'components/content/template.html'
+    }
+};
 
-            $('.draggable').on('dragstart', function(event) {
-                event.originalEvent.dataTransfer.setData('type', $(this).data('type'));
-            });
+let pageData = <?= isset($page['json_content']) ? json_encode(json_decode($page['json_content']), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) : '[]' ?>;
+let pageBuilderPath = '<?php echo base_url('assets/page_builder')?>';
 
-            $('#workspace').on('dragover', function(event) {
-                event.preventDefault();
-                let offsetY = event.originalEvent.clientY - $(this).offset().top;
-                dropHighlight.css('top', offsetY + 'px');
-                $(this).append(dropHighlight);
-            });
+    let templates = {};
+    let configs = {};
 
-            $('#workspace').on('dragleave', function(event) {
-                dropHighlight.detach();
-            });
+    const loadComponents = [
+        loadComponent('container'),
+        loadComponent('content')
+    ];
 
-            $('#workspace').on('drop', function(event) {
-                event.preventDefault();
-                dropHighlight.detach();
+    $.when(...loadComponents).then(function() {
+        renderWorkspace(pageData, templates);
+    });
 
-                const type = event.originalEvent.dataTransfer.getData('type');
-                let element;
+    $('#element-css-class').on('input', function() {
+        updateCssClass(currentElement, $(this).val());
+        renderWorkspace(pageData, templates);
+    });
 
-                switch (type) {
-                    case 'text':
-                        element = $('<p contenteditable="true">New Text</p>');
-                        break;
-                    case 'image':
-                        element = $('<img src="https://via.placeholder.com/150" alt="Image" contenteditable="true">');
-                        break;
-                    case 'button':
-                        element = $('<button contenteditable="true" class="btn btn-secondary">New Button</button>');
-                        break;
-                }
-
-                if (element) {
-                    let offsetY = event.originalEvent.clientY - $(this).offset().top;
-                    let beforeElement = null;
-
-                    $(this).children().each(function() {
-                        if (offsetY < ($(this).position().top + $(this).outerHeight() / 2)) {
-                            beforeElement = $(this);
-                            return false;
-                        }
-                    });
-
-                    if (beforeElement) {
-                        beforeElement.before(element);
-                    } else {
-                        $(this).append(element);
-                    }
-                }
-            });
-
-            $('#save').on('click', function() {
-                const content = $('#workspace').html();
-                $('#output').val(content);
-            });
-        });
-    </script>
-    <style>
-        #toolbar { margin-bottom: 15px; }
-        #workspace { border: 1px solid #ddd; min-height: 300px; padding: 15px; position: relative;  }
-        .draggable { cursor: grab; }
-        .drop-highlight {
-            border-top: 2px dashed #007bff;
-            position: absolute;
-            width: 100%;
-            top: 0;
-            left: 0;
-        }
+    $('#load').on('click', function() {
+        const content = $('#input').val();
+        pageData = JSON.parse(content);
+        renderWorkspace(pageData, templates);
+    });
     
-    </style>
+    function loadComponent(type) {
+        return $.when(
+            $.get(`${pageBuilderPath}/components/${type}/template.html`, function(data) {
+                templates[type] = data;
+            }),
+            $.getJSON(`${pageBuilderPath}/components/${type}/config.json`, function(data) {
+                configs[type] = data;
+            })
+        );
+    }
+
+</script>
+
+<style>
+    .active-element {
+        border: 2px solid #007bff !important;
+        background-color: #f0f8ff !important;
+    }
+    .add-control-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        border: 2px dashed #6c757d;
+        color: #6c757d;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    .add-control-section:hover {
+        background-color: #f8f9fa;
+        color: #007bff;
+    }
+    .container-component{
+        border: 2px dashed #6c757d;
+        padding: 10px;
+    }
+</style>
+
