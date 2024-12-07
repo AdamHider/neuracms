@@ -34,7 +34,7 @@
                 </div>
             </div>
         </div>
-        <div class="col "> 
+        <div class="col"> 
             <div class="content"><?= $this->renderSection('content') ?></div>
         </div>
     </div>

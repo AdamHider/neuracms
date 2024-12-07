@@ -4,7 +4,9 @@ namespace App\Controllers\Admin;
 
 use App\Models\PageModel;
 use App\Models\LanguageModel;
-use CodeIgniter\Controller;
+use CodeIgniter\Controller;;
+use App\Libraries\PageBuilder;
+
 
 class Page extends Controller
 {
@@ -30,6 +32,7 @@ class Page extends Controller
     public function form($id = null)
     {
         $pageModel = new PageModel();
+        $pageBuilder = new PageBuilder();
         $languageModel = new LanguageModel();
 
         $data['languages'] = $languageModel->findAll();
@@ -43,6 +46,8 @@ class Page extends Controller
             ],
             'path' => '/admin/pages/form'
         ];
+
+        $data['components'] = $pageBuilder->listComponents();
 
         if ($id) {
             $data['page'] = $pageModel->find($id);

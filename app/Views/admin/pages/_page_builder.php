@@ -1,121 +1,56 @@
-<style>
-    #workspace { border: 1px solid #ddd; min-height: 300px; padding: 15px; }
-    #workspace .element-controls {
-        display: flex;
-        justify-content: flex-end;
-        margin-bottom: 5px;
-    }
-    #workspace .element-controls button {
-        margin-left: 5px;
-    }
-    #workspace .section { margin-bottom: 15px; border: 2px solid #007bff; padding: 10px; background-color: #f1f1f1; position: relative; }
-    #workspace .row { margin-bottom: 15px; border: 2px dashed #17a2b8; padding: 10px; background-color: #e9ecef; position: relative; }
-    #workspace .col { margin-bottom: 15px; border: 2px dotted #28a745; padding: 10px; background-color: #d4edda; position: relative; }
-    #workspace .add-control { border: 2px dashed #6c757d; padding: 10px; margin-bottom: 15px; text-align: center; cursor: pointer; color: #6c757d; }
-</style>
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-9">
+            <div id="available-components-container">
+                <ul id="available-components">
+                    <?php foreach ($components as $component): ?>
+                        <li class="component-item " data-type="<?= $component ?>"><?= ucfirst($component) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
             <div id="workspace" class="container">
                 <!-- Рабочая область для конструктора страниц -->
             </div>
             <input type="hidden" name="json_content" id="json_content">
         </div>
-        <div id="sidebar" class="col-md-3">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Element Properties</h3>
+        <div id="sidebar" class="col-md-3 d-flex flex-column flex-shrink-0">
+                <div class="card rounded-0 sticky-top sticky-offset border overflow-auto">
+                    <div class="card-header">
+                        <h4 id="sidebar-title" class="card-title">Element Properties</h4>
+                    </div>
+                    <div class="card-body" id="properties-container">
+                        <!-- Поля свойств будут добавляться здесь -->
+                    </div>
                 </div>
-                <div class="card-body" id="properties-container">
-                    <!-- Поля свойств будут добавляться здесь -->
-                </div>
-            </div>
         </div>
     </div>
 </div>
 
-<script src="<?php echo base_url('assets/page_builder/js/data.js')?>"></script>
-<script src="<?php echo base_url('assets/page_builder/js/render.js')?>"></script>
-<script src="<?php echo base_url('assets/page_builder/js/properties.js')?>"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
 <script>
-const componentConfig = {
-    container: {
-        type: 'container',
-        properties: {
-            class: {
-                "label": "Class Name",
-                "type": "text",
-                "default": ""
-            },
-            backgroundColor: {
-                label: 'Background Color',
-                type: 'color',
-                default: '#ffffff'
-            },
-            padding: {
-                label: 'Padding',
-                type: 'text',
-                default: '10px'
-            }
-        },
-        template: 'components/container/template.html'
-    },
-    content: {
-        type: 'content',
-        properties: {
-            text: {
-                label: 'Text',
-                type: 'text',
-                default: 'Sample text'
-            }
-        },
-        template: 'components/content/template.html'
-    }
-};
-
-let pageData = <?= isset($page['json_content']) ? json_encode(json_decode($page['json_content']), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) : '[]' ?>;
-let pageBuilderPath = '<?php echo base_url('assets/page_builder')?>';
-
-    let templates = {};
-    let configs = {};
-
-    const loadComponents = [
-        loadComponent('container'),
-        loadComponent('content')
-    ];
-
-    $.when(...loadComponents).then(function() {
-        renderWorkspace(pageData, templates);
-    });
-
-    $('#element-css-class').on('input', function() {
-        updateCssClass(currentElement, $(this).val());
-        renderWorkspace(pageData, templates);
-    });
-
-    $('#load').on('click', function() {
-        const content = $('#input').val();
-        pageData = JSON.parse(content);
-        renderWorkspace(pageData, templates);
-    });
+const pageData = <?= isset($page['json_content']) ? json_encode(json_decode($page['json_content']), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) : '[]' ?>;
+</script>
+<script src="<?php echo base_url('assets/pagebuilder/dist/PageBuilder.js')?>"></script>
+<script>
     
-    function loadComponent(type) {
-        return $.when(
-            $.get(`${pageBuilderPath}/components/${type}/template.html`, function(data) {
-                templates[type] = data;
-            }),
-            $.getJSON(`${pageBuilderPath}/components/${type}/config.json`, function(data) {
-                configs[type] = data;
-            })
-        );
-    }
-
 </script>
 
 <style>
+    #workspace { border: 1px solid #ddd; min-height: 300px; padding: 15px; }
+    #workspace .section { margin-bottom: 15px; border: 1px solid #007bff; padding: 10px; background-color: #f1f1f1; position: relative; }
+    #workspace .add-control { border: 1px dashed #6c757d; padding: 10px; margin-bottom: 15px; text-align: center; cursor: pointer; color: #6c757d; }
+
+    .content-component, .container-component{
+        border: 1px dashed #6c757d;
+    }
+    .workspace-component {
+        margin: 5px;
+        position: relative;
+    }
     .active-element {
-        border: 2px solid #007bff !important;
-        background-color: #f0f8ff !important;
+        box-shadow: 0px 0px 0px 1px #007bff !important;
     }
     .add-control-section {
         display: flex;
@@ -131,9 +66,54 @@ let pageBuilderPath = '<?php echo base_url('assets/page_builder')?>';
         background-color: #f8f9fa;
         color: #007bff;
     }
-    .container-component{
-        border: 2px dashed #6c757d;
+    .drop-zone {
+        border: 2px dashed #ccc;
         padding: 10px;
+        text-align: center;
+        margin: 10px 0;
+        background-color: #f9f9f9;
+        display: none;
     }
+    #workspace.drag-active .drop-zone {
+        /*display: block;*/
+    }
+
+    .highlight-dropzone {
+        box-shadow: 0px 0px 0px 1px #4CAF50;
+        background-color: #f0fff0;
+    }
+    .highlight-dropzone-parent {
+        box-shadow: 0px 0px 0px 1px #4CAF50;
+    }
+    
+    #workspace:not(.drag-active) .workspace-component.component-mouseover {
+        box-shadow: 0px 0px 0px 1px #4CAF50;
+    }
+    .workspace-component > .card-header {
+        position: absolute;
+        bottom: 100%;
+        left: 2%;
+        width: 96%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        visibility: hidden;
+    }
+    #workspace:not(.drag-active) .workspace-component.active-element > .card-header {
+        visibility: visible;
+    }
+    .workspace-component .btn-toolbar {
+        display: flex;
+        align-items: center;
+    }
+
+    .workspace-component .btn-toolbar .btn {
+        margin-right: 5px;
+    }
+    .workspace-component.ui-draggable-clone{
+        display: block;
+        width: auto;
+    }
+
 </style>
 

@@ -50,6 +50,7 @@ $routes->group('admin', ['filter' => 'auth'], function($routes) {
     });
     
 });
+$routes->get('component/getComponent/(:segment)', 'Component::getComponent/$1');
 
 //$routes->addPlaceholder('alias', '[a-zA-Z0-9-_]+');
 $routes->get('(:any)', 'Page::view/$1');
