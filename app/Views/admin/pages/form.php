@@ -3,7 +3,7 @@
 <div class="container px-0">
     <form action="/admin/pages/<?= $action ?>" method="post">
     
-    <header class="py-3 border-bottom">
+    <header class="p-3 border-bottom bg-white">
         <div class="d-flex  justify-content-between align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
             <!-- Header Section -->
             <div>
@@ -18,7 +18,6 @@
                         <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMeta" aria-expanded="false" aria-controls="collapseMeta">
                             Settings
                         </button>
-                        
                     </div>
                 </div>
             </div>
@@ -70,4 +69,9 @@
 
     </form>
 </div>
+<script>
+    $('form button:not([type="submit"])').on('click', (e) => {
+        e.preventDefault();
+    })
+</script>
 <?= $this->endSection() ?>

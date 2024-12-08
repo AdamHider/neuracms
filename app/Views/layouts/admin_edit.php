@@ -34,8 +34,8 @@
                 </div>
             </div>
         </div>
-        <div class="col"> 
-            <div class="content"><?= $this->renderSection('content') ?></div>
+        <div class="col px-0"> 
+            <div class="content h-100 bg-light"><?= $this->renderSection('content') ?></div>
         </div>
     </div>
 </div>

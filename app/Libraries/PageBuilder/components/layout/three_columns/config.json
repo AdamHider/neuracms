@@ -1,0 +1,51 @@
+{
+    "type": "template",
+    "name": "Three Columns",
+    "code": "three_columns",
+    "group": "layout",
+    "icon": "layout-three-columns",
+    "properties": {
+        "title": {
+            "label": "Title",
+            "type": "text.input",
+            "default": "Three Columns"
+        },
+        "class": {
+            "label": "Class Name",
+            "type": "text.input",
+            "default": ""
+        }
+    },
+    "children": [
+        {
+            "name": "Row",
+            "code": "row",
+            "group": "layout",
+            "properties": { "class": "", "title": "Row" },
+            "type": "container",
+            "children": [
+                {
+                    "name": "Column",
+                    "code": "column",
+                    "group": "layout",
+                    "properties": { "class": "col-4", "title": "Column" },
+                    "type": "container"
+                },
+                {
+                    "name": "Column",
+                    "code": "column",
+                    "group": "layout",
+                    "properties": { "class": "col-4", "title": "Column" },
+                    "type": "container"
+                },
+                {
+                    "name": "Column",
+                    "code": "column",
+                    "group": "layout",
+                    "properties": { "class": "col-4", "title": "Column" },
+                    "type": "container"
+                }
+            ]
+        }
+    ]
+}

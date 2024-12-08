@@ -4,10 +4,10 @@ namespace App\Libraries;
 
 class PageBuilder
 {
-    public function getComponent($type)
+    public function getComponent($path)
     {
-        $configPath = APPPATH . "Libraries/PageBuilder/components/$type/config.json";
-        $templatePath = APPPATH . "Libraries/PageBuilder/components/$type/template.html";
+        $configPath = "$path/config.json";
+        $templatePath = "$path/template.html";
 
         if (file_exists($configPath) && file_exists($templatePath)) {
             $config = json_decode(file_get_contents($configPath), true);
@@ -22,15 +22,57 @@ class PageBuilder
     public function listComponents()
     {
         $componentsPath = APPPATH . "Libraries/PageBuilder/components/";
-        $componentDirs = array_diff(scandir($componentsPath), ['..', '.']);
+        $componentGroupDirs = array_diff(scandir($componentsPath), ['..', '.']);
         $components = [];
 
-        foreach ($componentDirs as $dir) {
-            if (is_dir($componentsPath . $dir)) {
-                $components[] = $dir;
+        foreach ($componentGroupDirs as $key => $group) {
+            if (is_dir($componentsPath . $group)) {
+                $componentGroup = [
+                    'title' => $group,
+                    'children' => []
+                ];
+                $componentDirs = array_diff(scandir($componentsPath . $group), ['..', '.']);
+                foreach ($componentDirs as $dir) {
+                    if (is_dir($componentsPath . $group .'/'. $dir)) {
+                        $componentGroup['children'][] = $this->getComponent($componentsPath . $group .'/'. $dir);
+                    }
+                }
+                $components[] = $componentGroup;
             }
         }
-
         return $components;
+    }
+
+    public function buildHtmlFromJson($contentJson)
+    {
+        $contentArray = json_decode($contentJson, true);
+        $html = '';
+
+        foreach ($contentArray as $component) {
+            $html .= $this->buildComponentHtml($component);
+        }
+        return $html;
+    }
+
+    private function buildComponentHtml($component)
+    {
+        $componentsPath = APPPATH . "Libraries/PageBuilder/components/";
+        $componentData = $this->getComponent($componentsPath . $component['group'] .'/'. $component['code']);
+        $template = $componentData['template'];
+
+        foreach ($component['properties'] as $key => $value) {
+            $template = str_replace("{{{$key}}}", $value, $template);
+        }
+
+        // Если у компонента есть дочерние элементы, обрабатываем их рекурсивно
+        $childHtml = '';
+        if (!empty($component['children'])) {
+            foreach ($component['children'] as $child) {
+                $childHtml .= $this->buildComponentHtml($child);
+            }
+        }
+        $template = str_replace('{{children}}', $childHtml, $template);
+
+        return $template;
     }
 }

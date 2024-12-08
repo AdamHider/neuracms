@@ -1,0 +1,40 @@
+{
+    "type": "content",
+    "name": "Heading",
+    "code": "heading",
+    "group": "modules",
+    "icon": "type-h2",
+    "properties": {
+        "title": {
+            "label": "Title",
+            "type": "text.input",
+            "default": "Heading"
+        },
+        "class": {
+            "label": "Class",
+            "type": "text.input",
+            "default": ""
+        },
+        "header_tag": {
+            "label": "Header Tag",
+            "type": "text.input",
+            "default": "h2"
+        },
+        "header_text": {
+            "label": "Header Text",
+            "type": "text.input",
+            "default": "Header text"
+        },
+        "subheader_tag": {
+            "label": "Subheader Tag",
+            "type": "text.input",
+            "default": "h4"
+        },
+        "subheader_text": {
+            "label": "Subheader Text",
+            "type": "text.input",
+            "default": "Subheader text"
+        }
+        
+    }
+}

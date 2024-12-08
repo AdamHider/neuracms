@@ -1,0 +1,19 @@
+{
+    "type": "container",
+    "name": "Row",
+    "code": "row",
+    "group": "layout",
+    "icon": "view-list",
+    "properties": {
+        "title": {
+            "label": "Title",
+            "type": "text.input",
+            "default": "Row"
+        },
+        "class": {
+            "label": "Class Name",
+            "type": "text.input",
+            "default": ""
+        }
+    }
+}
