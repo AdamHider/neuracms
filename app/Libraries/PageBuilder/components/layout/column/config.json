@@ -1,0 +1,19 @@
+{
+    "type": "container",
+    "name": "Column",
+    "code": "column",
+    "group": "layout",
+    "icon": "file",
+    "properties": {
+        "title": {
+            "label": "Title",
+            "type": "text.input",
+            "default": "Column"
+        },
+        "class": {
+            "label": "Class Name",
+            "type": "text.input",
+            "default": ""
+        }
+    }
+}

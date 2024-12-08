@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\PageModel;
 use CodeIgniter\Controller;
+use App\Libraries\PageBuilder;
 
 class Page extends Controller
 {
@@ -11,6 +12,7 @@ class Page extends Controller
     public $data;
     public function view($slugPath)
     {
+        $pageBuilder = new PageBuilder();
         $model = new PageModel();
 
         $slugs = explode('/', $slugPath);
@@ -27,7 +29,9 @@ class Page extends Controller
                 throw new \CodeIgniter\Exceptions\PageNotFoundException('Page not found');
             }
         }
-        $this->data['settings'] = [
+        
+
+        $data['settings'] = [
             'layout' => 'default',
             'menu' => [
                 'id' => 1
@@ -35,10 +39,10 @@ class Page extends Controller
             'title' => $page['title'],
             'path' => $page['slug']
         ];
-        $this->data['page'] = $page;
+        $data['page'] = $page;
 
+        $data['page']['content'] = $pageBuilder->buildHtmlFromJson($page['json_content']);
 
-
-        return view('page', $this->data);
+        return view('page', $data);
     }
 }

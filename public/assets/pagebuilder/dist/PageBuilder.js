@@ -1,29 +1,27 @@
 $(document).ready(function() {
-    let templates = {};
-    let configs = {};
     let currentElement = null;
-
-    const loadComponents = ['container', 'content'];
-    $.when(...loadComponents.map(loadComponentFromServer)).then(initWorkspace);
-
-    async function loadComponentFromServer(type) {
-        try {
-            const response = await $.getJSON(`/component/getComponent/${type}`);
-            templates[type] = response.template;
-            configs[type] = response.config;
-        } catch (error) {
-            console.error(`Error loading component ${type} from server:`, error);
+    let templates = {}
+    let configs = {}
+    function composeComponents(){
+        console.log(components)
+        for(const i in components){
+            for(const k in components[i].children){
+                var component = components[i].children[k]
+                templates[component.config.code] = component.template;
+                configs[component.config.code] =  component.config;
+            }
         }
     }
 
     function initWorkspace() {
+        composeComponents()
         $('.component-item').each(function() {
             addComponentDraggable(this, false)
         });
         renderWorkspace(pageData, templates, configs);
     }
 
-
+    initWorkspace()
 
     function renderWorkspace(data) {
         $('#workspace').empty();
@@ -32,23 +30,27 @@ $(document).ready(function() {
             if (componentElement) $('#workspace').append(componentElement);
         });
 
-        const workspaceDropzone = $('<div class="drop-zone">Drop here</div>');
-        addComponentDroppable(workspaceDropzone)
-        $('#workspace').append(workspaceDropzone);
+        //const workspaceDropzone = $('<div class="drop-zone">Drop here</div>');
+        addComponentDroppable($('#workspace'))
+        //$('#workspace').append(workspaceDropzone);
         
         $('#json_content').val(JSON.stringify(data));
 
         // Обновление контейнеров для добавления места "Drop here"
         $('.container-component').each(function() {
-            let droppable = $('<div class="drop-zone">Drop here</div>');
             addComponentDroppable(this)
-            $(this).append(droppable);
         });
 
         $('.workspace-component').each(function() {
             addComponentDraggable(this)
             addComponentHoverable(this)
         });
+    
+
+        /*
+        $('#workspace').on('blur', () => {
+            $('.active-element').removeClass('active-element');
+        })*/
         // Сделать компоненты рабочего пространства перетаскиваемыми
         
     }
@@ -94,11 +96,18 @@ $(document).ready(function() {
             greedy: true,
             accept: '.component-item, .workspace-component',
             drop: function(event, ui) {
+                $('.highlight-dropzone').removeClass('highlight-dropzone');
+                $('.highlight-dropzone-parent').removeClass('highlight-dropzone-parent')
+                const code = ui.helper.data('code');
                 const type = ui.helper.data('type');
-                if (type) {
+                if (code) {
                     const parentId = $(this).closest('.container-component').data('id');
                     const parentComponent = findComponentById(parentId, pageData);
-                    addComponentToWorkspace(type, parentComponent);
+                    if(type == 'template') { 
+                        addTemplateToWorkspace(configs[code], parentComponent);
+                    } else {
+                        addComponentToWorkspace(configs[code], parentComponent);
+                    }
                 } else {
                     const elementId = ui.helper.data('id');
                     const parentId = $(this).closest('.container-component').data('id');
@@ -132,15 +141,47 @@ $(document).ready(function() {
             }
         }
     }
-
-    function addComponentToWorkspace(type, parent) {
+    function addTemplateToWorkspace(template, parent, index = 0) {
+        // Создание нового объекта для добавления в pageData на основе шаблона
         const newComponent = {
             id: generateUniqueId(),
-            type: type,
+            type: template.type,
+            code: template.code,
+            group: template.group,
+            properties: { ...template.properties },
+            children: []
+        };
+        if(template.type == 'template'){
+            for (const [key, value] of Object.entries(template.properties)) {
+                newComponent.properties[key] = value.default;
+            }
+        }
+        // Рекурсивное создание и добавление дочерних элементов
+        if (template.children) {
+            template.children.forEach((childTemplate, index) => {
+                const newChild = addTemplateToWorkspace(childTemplate, newComponent);
+                newComponent.children[index] = newChild;
+            });
+        }
+        if (parent) {
+            parent.children.push(newComponent);
+        } else {
+            pageData.push(newComponent);
+        }
+
+        return newComponent;
+    }
+
+    function addComponentToWorkspace(component, parent) {
+        const newComponent = {
+            id: generateUniqueId(),
+            type: component.type,
+            code: component.code,
+            group: component.group,
             properties: {},
             children: []
         };
-        for (const [key, value] of Object.entries(configs[type].properties)) {
+        for (const [key, value] of Object.entries(component.properties)) {
             newComponent.properties[key] = value.default;
         }
         if (parent) {
@@ -149,24 +190,24 @@ $(document).ready(function() {
             pageData.push(newComponent);
         }
     }
-
+    
     function createComponent(component, templates, configs) {
-        if (!templates[component.type]) {
+        
+        if (!templates[component.code]) {
             console.error(`Template for component type ${component.type} not found`);
             return null;
         }
 
-        const elementHtml = renderMarkup(templates[component.type], component.properties);
+        const elementHtml = renderMarkup(templates[component.code], component.properties);
         const element = $(elementHtml).attr('data-id', component.id).addClass('workspace-component');
 
         // Добавляем класс для контейнеров
-        if (component.type === 'container') {
+        if (component.type === 'container' || component.type === 'template') {
             element.addClass('container-component');
         }
-
         element.append(createComponentControls(component, templates, configs));
+
         $(element).on('click', (event) => {
-            event.preventDefault();
             event.stopPropagation();
             openProperties(component, templates, configs)
         })
@@ -182,20 +223,21 @@ $(document).ready(function() {
         let renderedTemplate = template;
         for (const [key, value] of Object.entries(properties)) {
             renderedTemplate = renderedTemplate.replace(new RegExp(`{{${key}}}`, 'g'), value);
+            renderedTemplate = renderedTemplate.replace(new RegExp(`{{children}}`, 'g'), value);
         }
         return renderedTemplate;
     }
 
     function createComponentControls(component, templates, configs) {
-        const controls = $('<div class="card-header d-flex btn-toolbar" role="toolbar"></div>')
-            .append($('<span class="component-title flex-grow-1"></span>').text(component.properties.title || component.type))
-            .append($('<span class="btn btn-secondary btn-sm move-handle"><i class="bi bi-arrows-move"></i></span>'))
-            .append($('<button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>').on('click', function(event) {
+        const controls = $('<div class="card-header d-flex  align-items-end" role="toolbar"></div>')
+            .append($(`<span class="d-flex flex-grow-1"><span class="component-title px-2 py-1 rounded-top bg-primary text-white">${component.properties.title || component.type}</span></span>`))
+            .append($('<span class="btn btn-secondary btn-sm move-handle rounded-0 rounded-top ms-1"><i class="bi bi-arrows-move"></i></span>'))
+            .append($('<span class="btn btn-danger btn-sm rounded-0 rounded-top ms-1"><i class="bi bi-trash"></i></span>').on('click', function(event) {
                 event.preventDefault();
+                event.stopPropagation();
                 removeComponent(component.id, pageData);
                 renderWorkspace(pageData);
             }));
-
         return controls;
     }
 
@@ -205,7 +247,7 @@ $(document).ready(function() {
         $element.addClass('active-element');
         currentElement = component.id;
         updateSidebarTitle(component.properties.title || component.type);
-        renderProperties(component.type, component.properties, configs);
+        renderProperties(component.code, component.properties, configs);
     }
 
     function findComponentById(id, parent) {
@@ -227,23 +269,36 @@ $(document).ready(function() {
         $('#sidebar-title').text(title);
     }
 
-    function renderProperties(type, properties, configs) {
+    function renderProperties(code, properties, configs) {
         $('#properties-container').empty();
 
-        const config = configs[type].properties;
-        for (const [key, value] of Object.entries(config)) {
-            const field = $('<div class="mb-3">').append(
-                $('<label>').attr('for', key).addClass('form-label').text(value.label),
-                $('<input>').attr({
-                    type: value.type,
-                    id: key,
+        const config = configs[code].properties;
+        for (const [key, value] of Object.entries(config)) 
+        {
+            var input = null
+            if(value.type == 'text.input'){
+                input = $('<input>').attr({
+                    code: value.code,
+                    id: `component_${key}`,
                     class: 'form-control',
                     value: properties[key] || value.default
                 })
+            } else if (value.type == 'text.textarea'){
+                input =  $('<textarea>').attr({
+                    code: value.code,
+                    id: `component_${key}`,
+                    class: 'form-control',
+                }).html(properties[key] || value.default)
+            } 
+            
+
+            const field = $('<div class="mb-3">').append(
+                $('<label>').attr('for', key).addClass('form-label').text(value.label),
+                $(input)
             );
 
             $('#properties-container').append(field);
-            $(`#${key}`).on('input', function() {
+            $(`#component_${key}`).on('input', function() {
                 properties[key] = $(this).val();
                 updateComponentProperties(currentElement, key, properties[key], templates, pageData, configs);
                 $('#json_content').val(JSON.stringify(pageData));
@@ -255,13 +310,16 @@ $(document).ready(function() {
         const component = findComponentById(elementId, pageData);
         if (component) {
             component.properties[property] = value;
-            const updatedElementHtml = renderMarkup(templates[component.type], component.properties);
+            const updatedElementHtml = renderMarkup(templates[component.code], component.properties);
+
+            updateSidebarTitle(component.properties.title || component.type);
 
             const updatedElement = $(updatedElementHtml).attr('data-id', elementId).addClass('workspace-component ui-draggable');
             updatedElement.append(createComponentControls(component, templates, configs));
             if (component.type === 'container') {
                 const children = $(`[data-id="${elementId}"]`).children(':not(.card-header)');
-                updatedElement.append(children);
+                updatedElement.append(children).addClass('container-component');
+                addComponentDroppable(updatedElement)
             }
 
             addComponentDraggable(updatedElement)
@@ -282,6 +340,7 @@ $(document).ready(function() {
     }
 
     function removeComponent(id, parent = pageData) {
+        
         const componentIndex = parent.findIndex(component => component.id === id);
         if (componentIndex !== -1) {
             parent.splice(componentIndex, 1);

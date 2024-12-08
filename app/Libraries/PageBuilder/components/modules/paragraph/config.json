@@ -1,0 +1,24 @@
+{
+    "type": "content",
+    "name": "Paragraph",
+    "code": "paragraph",
+    "group": "modules",
+    "icon": "type",
+    "properties": {
+        "title": {
+            "label": "Title",
+            "type": "text.input",
+            "default": "Paragraph"
+        },
+        "class": {
+            "label": "Class",
+            "type": "text.input",
+            "default": ""
+        },
+        "text": {
+            "label": "Text",
+            "type": "text.textarea",
+            "default": "Sample text"
+        }
+    }
+}

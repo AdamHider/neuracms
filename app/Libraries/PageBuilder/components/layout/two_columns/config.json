@@ -1,0 +1,44 @@
+{
+    "type": "template",
+    "name": "Two Columns",
+    "code": "two_columns",
+    "group": "layout",
+    "icon": "layout-split",
+    "properties": {
+        "title": {
+            "label": "Title",
+            "type": "text.input",
+            "default": "Two Columns"
+        },
+        "class": {
+            "label": "Class Name",
+            "type": "text.input",
+            "default": ""
+        }
+    },
+    "children": [
+        {
+            "name": "Row",
+            "code": "row",
+            "group": "layout",
+            "properties": { "class": "", "title": "Row" },
+            "type": "container",
+            "children": [
+                {
+                    "name": "Column",
+                    "code": "column",
+                    "group": "layout",
+                    "properties": { "class": "col-6", "title": "Column" },
+                    "type": "container"
+                },
+                {
+                    "name": "Column",
+                    "code": "column",
+                    "group": "layout",
+                    "properties": { "class": "col-6", "title": "Column" },
+                    "type": "container"
+                }
+            ]
+        }
+    ]
+}

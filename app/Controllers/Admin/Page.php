@@ -4,7 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Models\PageModel;
 use App\Models\LanguageModel;
-use CodeIgniter\Controller;;
+use CodeIgniter\Controller;
 use App\Libraries\PageBuilder;
 
 
