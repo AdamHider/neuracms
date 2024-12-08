@@ -2,6 +2,7 @@
 // app/Controllers/ComponentController.php
 
 namespace App\Controllers;
+use App\Libraries\PageBuilder\PageBuilder;
 
 use CodeIgniter\HTTP\Response;
 
@@ -23,4 +24,15 @@ class Component extends BaseController
         return $this->response->setStatusCode(Response::HTTP_NOT_FOUND)
                               ->setJSON(['error' => 'Component not found']);
     }
+    public function getGeneratedContent()
+    {
+        $request = \Config\Services::request();
+        $componentData = $request->getJSON(true);
+
+        $pageBuilder = new PageBuilder();
+        $html = $pageBuilder->buildHtmlFromJson(json_encode([$componentData]));
+
+        return $this->response->setJSON(['html' => $html]);
+    }
+
 }

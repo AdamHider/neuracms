@@ -1,13 +1,22 @@
 <?php 
 
-namespace App\Libraries;
+namespace App\Libraries\PageBuilder;
 
-class PageBuilder
+use App\Libraries\PageBuilder\Handlers\ComponentHandler;
+
+class PageBuilder 
 {
-    public function getComponent($path)
+    private $handler;
+
+    public function __construct()
     {
-        $configPath = "$path/config.json";
-        $templatePath = "$path/template.html";
+        $this->handler = new ComponentHandler();
+    }
+    
+    public function getComponent($type, $group)
+    {
+        $configPath = APPPATH . "Libraries/PageBuilder/components/$group/$type/config.json";
+        $templatePath = APPPATH . "Libraries/PageBuilder/components/$group/$type/template.html";
 
         if (file_exists($configPath) && file_exists($templatePath)) {
             $config = json_decode(file_get_contents($configPath), true);
@@ -34,7 +43,7 @@ class PageBuilder
                 $componentDirs = array_diff(scandir($componentsPath . $group), ['..', '.']);
                 foreach ($componentDirs as $dir) {
                     if (is_dir($componentsPath . $group .'/'. $dir)) {
-                        $componentGroup['children'][] = $this->getComponent($componentsPath . $group .'/'. $dir);
+                        $componentGroup['children'][] = $this->getComponent($dir, $group);
                     }
                 }
                 $components[] = $componentGroup;
@@ -54,25 +63,31 @@ class PageBuilder
         return $html;
     }
 
+
     private function buildComponentHtml($component)
     {
-        $componentsPath = APPPATH . "Libraries/PageBuilder/components/";
-        $componentData = $this->getComponent($componentsPath . $component['group'] .'/'. $component['code']);
+        $componentData = $this->getComponent($component['code'], $component['group']);
         $template = $componentData['template'];
 
         foreach ($component['properties'] as $key => $value) {
             $template = str_replace("{{{$key}}}", $value, $template);
         }
 
-        // Если у компонента есть дочерние элементы, обрабатываем их рекурсивно
-        $childHtml = '';
-        if (!empty($component['children'])) {
-            foreach ($component['children'] as $child) {
-                $childHtml .= $this->buildComponentHtml($child);
+        if (isset($component['controller']) && isset($component['method'])) {
+            $childHtml = $this->handler->handle($component);
+            $template = str_replace('{{children}}', $childHtml, $template);
+        } else {
+            $childHtml = '';
+            if (!empty($component['children'])) {
+                foreach ($component['children'] as $child) {
+                    $childHtml .= $this->buildComponentHtml($child);
+                }
             }
+            $template = str_replace('{{children}}', $childHtml, $template);
         }
-        $template = str_replace('{{children}}', $childHtml, $template);
 
         return $template;
     }
+
+
 }

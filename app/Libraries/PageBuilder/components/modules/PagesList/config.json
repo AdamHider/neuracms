@@ -1,0 +1,26 @@
+{
+    "type": "content",
+    "name": "Pages List",
+    "code": "PagesList",
+    "group": "modules",
+    "icon": "list",
+    "properties": {
+        "title": {
+            "label": "Title",
+            "type": "text.input",
+            "default": "Pages List"
+        },
+        "class": {
+            "label": "Class",
+            "type": "text.input",
+            "default": ""
+        },
+        "page_count": {
+            "label": "Количество страниц",
+            "type": "number.input",
+            "default": 5
+        }
+    },
+    "controller": "App\\Libraries\\PageBuilder\\Components\\Modules\\PagesList\\PagesListController",
+    "method": "getPagesHtml"
+}

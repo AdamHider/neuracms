@@ -1,7 +1,7 @@
 {
     "type": "container",
     "name": "Row",
-    "code": "row",
+    "code": "Row",
     "group": "layout",
     "icon": "view-list",
     "properties": {

@@ -1,7 +1,7 @@
 {
     "type": "container",
     "name": "Column",
-    "code": "column",
+    "code": "Column",
     "group": "layout",
     "icon": "file",
     "properties": {

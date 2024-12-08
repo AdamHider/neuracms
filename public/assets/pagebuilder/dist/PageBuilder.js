@@ -1,9 +1,8 @@
-$(document).ready(function() {
+//$(document).ready(function() {
     let currentElement = null;
     let templates = {}
     let configs = {}
     function composeComponents(){
-        console.log(components)
         for(const i in components){
             for(const k in components[i].children){
                 var component = components[i].children[k]
@@ -46,7 +45,6 @@ $(document).ready(function() {
             addComponentHoverable(this)
         });
     
-
         /*
         $('#workspace').on('blur', () => {
             $('.active-element').removeClass('active-element');
@@ -178,6 +176,8 @@ $(document).ready(function() {
             type: component.type,
             code: component.code,
             group: component.group,
+            controller: component.controller ?? null,
+            method: component.method ?? null,
             properties: {},
             children: []
         };
@@ -192,7 +192,6 @@ $(document).ready(function() {
     }
     
     function createComponent(component, templates, configs) {
-        
         if (!templates[component.code]) {
             console.error(`Template for component type ${component.type} not found`);
             return null;
@@ -211,25 +210,48 @@ $(document).ready(function() {
             event.stopPropagation();
             openProperties(component, templates, configs)
         })
-        component.children.forEach(child => {
-            const childElement = createComponent(child, templates, configs);
-            if (childElement) element.append(childElement);
-        });
-
+        if (component.controller) {
+            loadDynamicContent(component, element, templates, configs)
+        } else {
+            component.children.forEach(child => {
+                const childElement = createComponent(child, templates, configs);
+                if (childElement) element.append(childElement);
+            });
+        }
         return element;
+    }
+    
+    function loadDynamicContent(component, element, templates, configs) {
+        $.ajax({
+            url: '/component/getGeneratedContent', // Путь к вашему серверному обработчику
+            method: 'POST',
+            data: JSON.stringify(component),
+            contentType: 'application/json',
+            success: function(response) {
+                element.html(response.html);
+                element.append(createComponentControls(component, templates, configs));
+                component.children.forEach(child => {
+                    const childElement = createComponent(child, templates, configs);
+                    if (childElement) element.append(childElement);
+                });
+            },
+            error: function() {
+                console.error(`Failed to load dynamic content for component ${component.id}`);
+            }
+        });
     }
 
     function renderMarkup(template, properties) {
         let renderedTemplate = template;
         for (const [key, value] of Object.entries(properties)) {
             renderedTemplate = renderedTemplate.replace(new RegExp(`{{${key}}}`, 'g'), value);
-            renderedTemplate = renderedTemplate.replace(new RegExp(`{{children}}`, 'g'), value);
+            renderedTemplate = renderedTemplate.replace(new RegExp(`{{children}}`, 'g'), '');
         }
         return renderedTemplate;
     }
-
+    
     function createComponentControls(component, templates, configs) {
-        const controls = $('<div class="card-header d-flex  align-items-end" role="toolbar"></div>')
+        const controls = $('<div class="card-header d-flex align-items-end" role="toolbar"></div>')
             .append($(`<span class="d-flex flex-grow-1"><span class="component-title px-2 py-1 rounded-top bg-primary text-white">${component.properties.title || component.type}</span></span>`))
             .append($('<span class="btn btn-secondary btn-sm move-handle rounded-0 rounded-top ms-1"><i class="bi bi-arrows-move"></i></span>'))
             .append($('<span class="btn btn-danger btn-sm rounded-0 rounded-top ms-1"><i class="bi bi-trash"></i></span>').on('click', function(event) {
@@ -240,6 +262,7 @@ $(document).ready(function() {
             }));
         return controls;
     }
+    
 
     function openProperties(component, templates, configs){
         $('.active-element').removeClass('active-element');
@@ -247,7 +270,7 @@ $(document).ready(function() {
         $element.addClass('active-element');
         currentElement = component.id;
         updateSidebarTitle(component.properties.title || component.type);
-        renderProperties(component.code, component.properties, configs);
+        renderProperties(component, configs);
     }
 
     function findComponentById(id, parent) {
@@ -269,14 +292,22 @@ $(document).ready(function() {
         $('#sidebar-title').text(title);
     }
 
-    function renderProperties(code, properties, configs) {
+    function renderProperties(component, configs) {
         $('#properties-container').empty();
-
+        var code = component.code
+        var properties = component.properties
         const config = configs[code].properties;
         for (const [key, value] of Object.entries(config)) 
         {
             var input = null
             if(value.type == 'text.input'){
+                input = $('<input>').attr({
+                    code: value.code,
+                    id: `component_${key}`,
+                    class: 'form-control',
+                    value: properties[key] || value.default
+                })
+            } else if(value.type == 'number.input'){
                 input = $('<input>').attr({
                     code: value.code,
                     id: `component_${key}`,
@@ -300,7 +331,11 @@ $(document).ready(function() {
             $('#properties-container').append(field);
             $(`#component_${key}`).on('input', function() {
                 properties[key] = $(this).val();
-                updateComponentProperties(currentElement, key, properties[key], templates, pageData, configs);
+                if (component.controller) {
+                    loadDynamicContent(component, $(`[data-id="${component.id}"]`), templates, configs);
+                } else {
+                    updateComponentProperties(currentElement, key, properties[key], templates, pageData, configs);
+                }
                 $('#json_content').val(JSON.stringify(pageData));
             });
         }
@@ -340,7 +375,7 @@ $(document).ready(function() {
     }
 
     function removeComponent(id, parent = pageData) {
-        
+        $('#properties-container').empty();
         const componentIndex = parent.findIndex(component => component.id === id);
         if (componentIndex !== -1) {
             parent.splice(componentIndex, 1);
@@ -357,5 +392,5 @@ $(document).ready(function() {
         return false;
     }
 
-});
+//});
 

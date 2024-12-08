@@ -1,7 +1,7 @@
 {
     "type": "content",
     "name": "Paragraph",
-    "code": "paragraph",
+    "code": "Paragraph",
     "group": "modules",
     "icon": "type",
     "properties": {

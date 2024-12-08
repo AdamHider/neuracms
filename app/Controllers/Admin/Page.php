@@ -5,7 +5,7 @@ namespace App\Controllers\Admin;
 use App\Models\PageModel;
 use App\Models\LanguageModel;
 use CodeIgniter\Controller;
-use App\Libraries\PageBuilder;
+use App\Libraries\PageBuilder\PageBuilder;
 
 
 class Page extends Controller

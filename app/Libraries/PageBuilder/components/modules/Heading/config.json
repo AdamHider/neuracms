@@ -1,7 +1,7 @@
 {
     "type": "content",
     "name": "Heading",
-    "code": "heading",
+    "code": "Heading",
     "group": "modules",
     "icon": "type-h2",
     "properties": {

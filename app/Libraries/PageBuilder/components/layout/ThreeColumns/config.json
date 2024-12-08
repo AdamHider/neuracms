@@ -1,7 +1,7 @@
 {
     "type": "template",
     "name": "Three Columns",
-    "code": "three_columns",
+    "code": "ThreeColumns",
     "group": "layout",
     "icon": "layout-three-columns",
     "properties": {
@@ -19,28 +19,28 @@
     "children": [
         {
             "name": "Row",
-            "code": "row",
+            "code": "Row",
             "group": "layout",
             "properties": { "class": "", "title": "Row" },
             "type": "container",
             "children": [
                 {
                     "name": "Column",
-                    "code": "column",
+                    "code": "Column",
                     "group": "layout",
                     "properties": { "class": "col-4", "title": "Column" },
                     "type": "container"
                 },
                 {
                     "name": "Column",
-                    "code": "column",
+                    "code": "Column",
                     "group": "layout",
                     "properties": { "class": "col-4", "title": "Column" },
                     "type": "container"
                 },
                 {
                     "name": "Column",
-                    "code": "column",
+                    "code": "Column",
                     "group": "layout",
                     "properties": { "class": "col-4", "title": "Column" },
                     "type": "container"

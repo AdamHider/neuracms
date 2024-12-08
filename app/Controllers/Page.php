@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Models\PageModel;
 use CodeIgniter\Controller;
-use App\Libraries\PageBuilder;
+use App\Libraries\PageBuilder\PageBuilder;
 
 class Page extends Controller
 {
