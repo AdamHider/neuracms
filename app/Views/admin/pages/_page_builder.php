@@ -10,7 +10,7 @@
                                 </button>
                             </li>
                             <li>
-                                <input type="checkbox" class="btn-check" id="workspace_marked_toggle" autocomplete="off">
+                                <input type="checkbox" class="btn-check" id="workspace_marked_toggle" autocomplete="off" checked="checked">
                                 <label class="btn btn-light m-2 mt-0" for="workspace_marked_toggle"><i class="bi bi-border-outer"></i></label>
                             </li>
                         </ul>
@@ -65,8 +65,8 @@
     </div>
 </div>
 
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="<?php echo base_url('assets/jquery-ui/jquery-ui.min.css')?>" type="text/css">
+<script type="text/javascript" src="<?php echo base_url('assets/jquery-ui/jquery-ui.min.js')?>"></script>
 
 <script>
 var pageData = <?= isset($page['json_content']) ? json_encode(json_decode($page['json_content']), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) : '[]' ?>;
@@ -80,7 +80,11 @@ $('#toolbar').on('click', (e) => {
     $('.active-element').removeClass('active-element');
 })
 </script>
-<script src="<?php echo base_url('assets/pagebuilder/dist/PageBuilder.js')?>"></script>
+<script src="<?php echo base_url('assets/pagebuilder/dist/fields.js')?>"></script>
+<script src="<?php echo base_url('assets/pagebuilder/dist/properties.js')?>"></script>
+<script src="<?php echo base_url('assets/pagebuilder/dist/render.js')?>"></script>
+<script src="<?php echo base_url('assets/pagebuilder/dist/data.js')?>"></script>
+<script src="<?php echo base_url('assets/pagebuilder/dist/main.js')?>"></script>
 
 <style >
     #offcanvasComponents{

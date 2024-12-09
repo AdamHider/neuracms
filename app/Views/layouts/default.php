@@ -4,8 +4,8 @@
 <div class="container-fluid">
     <div class="row flex-nowrap">
         <div class="col py-3">
-            <?php if(!empty($this->data['sections'])) : ?>
-            <?php foreach($this->data['sections'] as $section_name => $section) : ?>
+            <?php if(!empty($sections)) : ?>
+            <?php foreach($sections as $section_name => $section) : ?>
                 <section id="<?= $section_name ?>">
                     <div class="container px-5">
                     <?php foreach($section['rows'] as $row) : ?>

@@ -11,8 +11,8 @@
                 <hr>
                 <div class="flex-column mb-auto">
                     <?= view_cell('App\Cells\Menu::render', ['data' => [
-                        'menu' => $this->data['settings']['menu'], 
-                        'current_uri' => $this->data['settings']['path']
+                        'menu' => $settings['menu'], 
+                        'current_uri' => $settings['path']
                         ]
                     ]) ?>
                 </div>
@@ -37,11 +37,11 @@
         <div class="col ">
                 <header class="py-3 mb-3 border-bottom">
                     <div class="d-flex  mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-                        <span class="fs-4"><?= $this->data['settings']['title'] ?></span>
+                        <span class="fs-4"><?= $settings['title'] ?></span>
                     </a>
                 </header>
-                <?php if(!empty($this->data['sections'])) : ?>
-                <?php foreach($this->data['sections'] as $section_name => $section) : ?>
+                <?php if(!empty($sections)) : ?>
+                <?php foreach($sections as $section_name => $section) : ?>
                     <section id="<?= $section_name ?>">
                         <div class="container px-5">
                         <?php foreach($section['rows'] as $row) : ?>

@@ -11,8 +11,8 @@
                 <hr>
                 <div class="flex-column mb-auto">
                     <?= view_cell('App\Cells\Menu::render', ['data' => [
-                        'menu' => $this->data['settings']['menu'], 
-                        'current_uri' => $this->data['settings']['path']
+                        'menu' => $settings['menu'], 
+                        'current_uri' => $settings['path']
                         ]
                     ]) ?>
                 </div>
