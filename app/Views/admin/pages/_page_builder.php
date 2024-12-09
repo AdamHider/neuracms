@@ -1,7 +1,7 @@
 <div class="container-fluid">
         <div class="row g-2 justify-content-between">
             <div class="col-auto">
-                <div class="card">
+                <div id="toolbar" class="card sticky-top sticky-offset">
                     <div class="d-flex flex-column flex-shrink-0">
                         <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
                             <li class="nav-item">
@@ -11,14 +11,14 @@
                             </li>
                             <li>
                                 <input type="checkbox" class="btn-check" id="workspace_marked_toggle" autocomplete="off">
-                                <label class="btn btn-light m-2" for="workspace_marked_toggle"><i class="bi bi-border-outer"></i></label>
+                                <label class="btn btn-light m-2 mt-0" for="workspace_marked_toggle"><i class="bi bi-border-outer"></i></label>
                             </li>
                         </ul>
                     </div>
                 </div>
             </div>
             <div class="col-8">
-                <div id="workspace" class=" container bg-white" tabindex="-1">
+                <div id="workspace" class="workspace-marked container bg-white" tabindex="-1">
                     <!-- Рабочая область для конструктора страниц -->
                 </div>
                 <input type="hidden" name="json_content" id="json_content">
@@ -34,7 +34,7 @@
                     </div>
             </div>
     </div>
-    <div class="offcanvas offcanvas-end" tabindex="-1"  data-bs-backdrop="false"  id="offcanvasComponents" aria-labelledby="offcanvasComponentsLabel">
+    <div class="offcanvas offcanvas-end" tabindex="-1" data-bs-scroll="true"   data-bs-backdrop="false"  id="offcanvasComponents" aria-labelledby="offcanvasComponentsLabel">
         <div class="offcanvas-header">
             <h5 id="offcanvasComponentsLabel">Offcanvas right</h5>
             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -69,14 +69,16 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 
 <script>
-const pageData = <?= isset($page['json_content']) ? json_encode(json_decode($page['json_content']), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) : '[]' ?>;
+var pageData = <?= isset($page['json_content']) ? json_encode(json_decode($page['json_content']), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) : '[]' ?>;
 const components = <?= isset($components) ? json_encode($components) : '[]' ?>;
 
 $('#workspace_marked_toggle').on('change', (e) => {
     if($(e.target).is(":checked")) return $('#workspace').addClass("workspace-marked");
     $('#workspace').removeClass("workspace-marked");
 })
-
+$('#toolbar').on('click', (e) => {
+    $('.active-element').removeClass('active-element');
+})
 </script>
 <script src="<?php echo base_url('assets/pagebuilder/dist/PageBuilder.js')?>"></script>
 
@@ -87,8 +89,7 @@ $('#workspace_marked_toggle').on('change', (e) => {
     
     #workspace { border: 1px solid #ddd; min-height: 300px; padding: 15px; }
 
-    #workspace.workspace-marked .content-component, 
-    #workspace.workspace-marked .container-component{
+    #workspace.workspace-marked .workspace-component{
         border: 1px dashed #6c757d;
     }
     .workspace-component {
@@ -99,10 +100,20 @@ $('#workspace_marked_toggle').on('change', (e) => {
     .active-element {
         box-shadow: 0px 0px 0px 1px #007bff !important;
     }
+    *:has(+ .workspace-component.active-element:not(.ui-draggable-clone)){
+        visibility: hidden;
+    }
+    .active-element .drop-zone{
+        visibility: hidden;
+    }
+    .workspace-component.active-element + .drop-zone {
+        visibility: hidden;
+    }
     .highlight-dropzone {
         box-shadow: 0px 0px 0px 1px #4CAF50;
-        background-color: #f0fff0;
+        background-color: green;
     }
+    
     .highlight-dropzone-parent {
         box-shadow: 0px 0px 0px 1px #4CAF50;
     }
@@ -144,7 +155,33 @@ $('#workspace_marked_toggle').on('change', (e) => {
         display: block;
         width: auto;
     }
-    
+    .drop-zone {
+        width: 100%;
+        height: 5px;
+        /*background-color: gray;*/
+    }
+    .workspace-component > .drop-zone {
+        width: 100%;
+        height: 5px;
+    }
+    .container-no-child > .drop-zone {
+        
+        height: 100%;
+    }
+    .workspace-component.row > .drop-zone{
+        width: 5px;
+        margin: 0;
+        padding: 0;
+        height: initial;
+        margin-left: -5px;
+        transform: translateX(2px);
+    }
+    .drop-hover {
+        background-color: green;
+    }
+    .ui-draggable-clone{
+        opacity: 0.2;
+    }
 
 </style>
 

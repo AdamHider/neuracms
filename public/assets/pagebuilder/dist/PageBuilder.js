@@ -24,34 +24,47 @@
 
     function renderWorkspace(data) {
         $('#workspace').empty();
-        data.forEach(component => {
-            const componentElement = createComponent(component, templates, configs);
+        data.forEach((component, index) => {
+    
+            const dropZoneBefore = $('<div class="drop-zone" data-index="' + (index) + '" data-parent-id="root"></div>');
+            addComponentDroppable(dropZoneBefore, 'root');
+            $('#workspace').append(dropZoneBefore);
+
+            const componentElement = createComponent(component, templates, configs, index);
             if (componentElement) $('#workspace').append(componentElement);
+    
         });
-
-        //const workspaceDropzone = $('<div class="drop-zone">Drop here</div>');
-        addComponentDroppable($('#workspace'))
-        //$('#workspace').append(workspaceDropzone);
-        
+        const dropZoneAfter = $('<div class="drop-zone" data-index="' + (data.length) + '" data-parent-id="root"></div>');
+        addComponentDroppable(dropZoneAfter, 'root');
+        $('#workspace').append(dropZoneAfter);
+        if(data.length == 0){
+            const dropZoneAfter = $('<div class="drop-zone" data-index="' + (data.length) + '" data-parent-id="root"></div>');
+            addComponentDroppable(dropZoneAfter, 'root');
+            $('#workspace').append(dropZoneAfter);
+        }
         $('#json_content').val(JSON.stringify(data));
-
-        // Обновление контейнеров для добавления места "Drop here"
-        $('.container-component').each(function() {
-            addComponentDroppable(this)
-        });
 
         $('.workspace-component').each(function() {
             addComponentDraggable(this)
             addComponentHoverable(this)
         });
-    
-        /*
-        $('#workspace').on('blur', () => {
-            $('.active-element').removeClass('active-element');
-        })*/
-        // Сделать компоненты рабочего пространства перетаскиваемыми
         
     }
+    
+    function updateComponentOrder() {
+        const newOrder = [];
+        $('#workspace').children('.workspace-component').each(function() {
+            const componentId = $(this).attr('data-id');
+            const component = pageData.find(comp => comp.id === componentId);
+            if (component) {
+                newOrder.push(component);
+            }
+        });
+        pageData = newOrder;
+        $('#json_content').val(JSON.stringify(pageData));
+    }
+    
+
     function addComponentHoverable(element){
         $(element).on('mouseenter', function(e){
             e.stopPropagation();
@@ -70,7 +83,6 @@
             helper: 'clone',
             scrollSpeed: 100,
             zIndex: 1000,
-            cursorAt: { left: 5 },
             cursor: "crosshair",
             /*
             containment: "form",*/
@@ -87,58 +99,46 @@
             }
         });
     }
-    
-    function addComponentDroppable(element){
+    function addComponentDroppable(element) {
         $(element).droppable({
             tolerance: "pointer",
             greedy: true,
             accept: '.component-item, .workspace-component',
             drop: function(event, ui) {
+                const dropZoneIndex = $(this).data('index');
                 $('.highlight-dropzone').removeClass('highlight-dropzone');
-                $('.highlight-dropzone-parent').removeClass('highlight-dropzone-parent')
+                $('.highlight-dropzone-parent').removeClass('highlight-dropzone-parent');
                 const code = ui.helper.data('code');
                 const type = ui.helper.data('type');
+                
                 if (code) {
                     const parentId = $(this).closest('.container-component').data('id');
                     const parentComponent = findComponentById(parentId, pageData);
-                    if(type == 'template') { 
-                        addTemplateToWorkspace(configs[code], parentComponent);
+                    if(type === 'template') {
+                        addTemplateToWorkspace(configs[code], parentComponent, dropZoneIndex);
                     } else {
-                        addComponentToWorkspace(configs[code], parentComponent);
+                        addComponentToWorkspace(configs[code], parentComponent, dropZoneIndex);
                     }
                 } else {
                     const elementId = ui.helper.data('id');
                     const parentId = $(this).closest('.container-component').data('id');
                     const parentComponent = findComponentById(parentId, pageData);
-                    moveComponentToWorkspace(elementId, parentComponent);
+                    moveComponentToWorkspace(elementId, parentComponent, dropZoneIndex);
                 }
                 renderWorkspace(pageData);
             },
             over: function(event, ui) {
                 $(this).addClass('highlight-dropzone');
-                $(this).closest('.workspace-component').addClass('highlight-dropzone-parent')
+                $(this).closest('.workspace-component').addClass('highlight-dropzone-parent');
             },
             out: function(event, ui) {
                 $(this).removeClass('highlight-dropzone');
-                $(this).closest('.workspace-component').removeClass('highlight-dropzone-parent')
+                $(this).closest('.workspace-component').removeClass('highlight-dropzone-parent');
             }
         });
     }
+    
 
-    function moveComponentToWorkspace(elementId, parent) {
-        const component = findComponentById(elementId, pageData);
-        if (component) {
-            if (parent) {
-                // Удаляем компонент из его текущего родителя
-                removeComponent(elementId, pageData);
-                parent.children.push(component); // Добавляем компонент к новому родителю
-            } else {
-                // Удаляем компонент из его текущего родителя и добавляем в корень рабочего пространства
-                removeComponent(elementId, pageData);
-                pageData.push(component);
-            }
-        }
-    }
     function addTemplateToWorkspace(template, parent, index = 0) {
         // Создание нового объекта для добавления в pageData на основе шаблона
         const newComponent = {
@@ -169,8 +169,8 @@
 
         return newComponent;
     }
-
-    function addComponentToWorkspace(component, parent) {
+    
+    function addComponentToWorkspace(component, parent, index = 0) {
         const newComponent = {
             id: generateUniqueId(),
             type: component.type,
@@ -185,27 +185,49 @@
             newComponent.properties[key] = value.default;
         }
         if (parent) {
-            parent.children.push(newComponent);
+            parent.children.splice(index, 0, newComponent);
         } else {
-            pageData.push(newComponent);
+            pageData.splice(index, 0, newComponent);
         }
     }
-    
-    function createComponent(component, templates, configs) {
-        if (!templates[component.code]) {
-            console.error(`Template for component type ${component.type} not found`);
-            return null;
-        }
 
-        const elementHtml = renderMarkup(templates[component.code], component.properties);
+    function moveComponentToWorkspace(elementId, parent, index = 0) {
+        const component = findComponentById(elementId, pageData);
+        if (component) {
+            if (parent) {
+                removeComponent(elementId, pageData);
+                component.id = generateUniqueId();
+                parent.children.splice(index, 0, component);
+            } else {
+                removeComponent(elementId, pageData);
+                pageData.splice(index, 0, component);
+            }
+        }
+    }
+
+    function createComponent(component, templates, configs, index = 0) {
+        let elementHtml;
+        if (!templates[component.code]) {
+            console.warn(`Template for component type ${component.type} not found. Creating an empty placeholder component.`);
+            elementHtml = '<div class="empty-component">Component template not found. This is a placeholder.</div>';
+        } else {
+            elementHtml = renderMarkup(templates[component.code], component.properties);
+        }
         const element = $(elementHtml).attr('data-id', component.id).addClass('workspace-component');
 
+        element.append(createComponentControls(component, templates, configs));
         // Добавляем класс для контейнеров
         if (component.type === 'container' || component.type === 'template') {
             element.addClass('container-component');
-        }
-        element.append(createComponentControls(component, templates, configs));
-
+            if(component.children.length == 0){
+                element.addClass('container-no-child');
+            } else { 
+                element.removeClass('container-no-child');
+            }
+            const dropZoneInitial = $('<div class="drop-zone" data-index="0"></div>');
+            addComponentDroppable(dropZoneInitial, component.id);
+            element.append(dropZoneInitial);
+        } 
         $(element).on('click', (event) => {
             event.stopPropagation();
             openProperties(component, templates, configs)
@@ -213,9 +235,12 @@
         if (component.controller) {
             loadDynamicContent(component, element, templates, configs)
         } else {
-            component.children.forEach(child => {
-                const childElement = createComponent(child, templates, configs);
+            component.children.forEach((child, childIndex) => {
+                const childElement = createComponent(child, templates, configs, childIndex);
                 if (childElement) element.append(childElement);
+                const dropZoneAfter = $('<div class="drop-zone" data-index="' + (childIndex+1) + '" ></div>');
+                addComponentDroppable(dropZoneAfter, child.id);
+                dropZoneAfter.insertAfter(childElement);
             });
         }
         return element;
@@ -262,7 +287,6 @@
             }));
         return controls;
     }
-    
 
     function openProperties(component, templates, configs){
         $('.active-element').removeClass('active-element');
@@ -296,6 +320,7 @@
         $('#properties-container').empty();
         var code = component.code
         var properties = component.properties
+        if(!configs[code]) return
         const config = configs[code].properties;
         for (const [key, value] of Object.entries(config)) 
         {
@@ -376,7 +401,8 @@
 
     function removeComponent(id, parent = pageData) {
         $('#properties-container').empty();
-        const componentIndex = parent.findIndex(component => component.id === id);
+        componentIndex = parent.findIndex(component => component.id === id);
+        
         if (componentIndex !== -1) {
             parent.splice(componentIndex, 1);
             return true;
