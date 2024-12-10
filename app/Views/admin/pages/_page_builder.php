@@ -104,23 +104,6 @@ $('#toolbar').on('click', (e) => {
     .active-element {
         box-shadow: 0px 0px 0px 1px #007bff !important;
     }
-    *:has(+ .workspace-component.active-element:not(.ui-draggable-clone)){
-        visibility: hidden;
-    }
-    .active-element .drop-zone{
-        visibility: hidden;
-    }
-    .workspace-component.active-element + .drop-zone {
-        visibility: hidden;
-    }
-    .highlight-dropzone {
-        box-shadow: 0px 0px 0px 1px #4CAF50;
-        background-color: green;
-    }
-    
-    .highlight-dropzone-parent {
-        box-shadow: 0px 0px 0px 1px #4CAF50;
-    }
     
     #workspace:not(.drag-active) .workspace-component.component-mouseover {
         box-shadow: 0px 0px 0px 1px #4CAF50;
@@ -146,6 +129,8 @@ $('#toolbar').on('click', (e) => {
     .workspace-component > .card-header .btn{
         pointer-events: all;
         font-size: 12px;
+        position: relative;
+        z-index: 120;
     }
     .workspace-component .btn-toolbar {
         display: flex;
@@ -159,18 +144,79 @@ $('#toolbar').on('click', (e) => {
         display: block;
         width: auto;
     }
-    .drop-zone {
+    .drop-hover {
+        background-color: green;
+    }
+    .ui-draggable-clone{
+        opacity: 0.2;
+    }
+
+
+    .drop-zone{
         width: 100%;
         height: 5px;
+        margin-top: -5px;
+        transform: translateY(2.5px);
+        position:relative;
+        z-index: 100;
+        pointer-events: none;
         /*background-color: gray;*/
+    } 
+    .drop-zone::before {
+        content: "";
+        position: absolute;
+        top: calc(50% - 5px);
+        left: 0;
+        height: 10px;
+        width: 2px;
+    } 
+    .drop-zone::after {
+        content: "";
+        position: absolute;
+        top: calc(50% - 5px);
+        right: 0;
+        height: 10px;
+        width: 2px;
+    } 
+    .drop-zone .plus-button{
+        display: none;
+        position: absolute;
+        border-radius: 2px;
+        color: white;
+        height: 15px;
+        width: 15px;
+        line-height: 15px;
+        bottom: -10px;
+        right: calc(50% - 7.5px);
     }
-    .workspace-component > .drop-zone {
+    .drop-zone .drop-line{
+        position: absolute;
+        top: calc(50% - 1.5px);
+        left: 0;
         width: 100%;
-        height: 5px;
+        height: 2px;
     }
-    .container-no-child > .drop-zone {
-        
+    *:has(+ .workspace-component.active-element:not(.ui-draggable-clone)),
+    .active-element .drop-zone{
+        visibility: hidden;
+    }
+    .workspace-component.active-element + .drop-zone {
+        pointer-events: all;
+        background-color: blue;
+    }
+    .workspace-component.active-element + .drop-zone .plus-button {
+        display: block;
+        background-color: blue;
+    }
+    .workspace-component.active-element + .drop-zone:hover,
+    .workspace-component.active-element + .drop-zone:hover .plus-button {
+        background: black;
+    } 
+    .workspace-component.container-no-child > .drop-zone {
         height: 100%;
+        top: 0;
+        transform: none;
+        margin: 0;
     }
     .workspace-component.row > .drop-zone{
         width: 5px;
@@ -178,13 +224,42 @@ $('#toolbar').on('click', (e) => {
         padding: 0;
         height: initial;
         margin-left: -5px;
-        transform: translateX(2px);
+        transform: translateX(2.5px);
     }
-    .drop-hover {
-        background-color: green;
+
+    .workspace-component.row > .drop-zone::before {
+        top: 0;
+        left: calc(50% - 5px);
+        height: 2px;
+        width: 10px;
     }
-    .ui-draggable-clone{
-        opacity: 0.2;
+    .workspace-component.row > .drop-zone::after {
+        bottom: 0;
+        top: unset;
+        left: calc(50% - 5px);
+        height: 2px;
+        width: 10px;
+    }
+    .workspace-component.row > .drop-zone > .plus-button{
+        top: calc(50% - 7.5px);
+        right: -10px;
+        left: unset;
+    }
+    .workspace-component.row > .drop-zone > .drop-line{
+        left: calc(50% - 1.5px);
+        top: 0;
+        width: 2px;
+        height: 100%;
+    }
+    
+    .drop-zone.highlight-dropzone::before, 
+    .drop-zone.highlight-dropzone::after,
+    .drop-zone.highlight-dropzone .drop-line{
+        background: red;
+    }
+    
+    .highlight-dropzone-parent {
+        box-shadow: 0px 0px 0px 1px #4CAF50;
     }
 
 </style>

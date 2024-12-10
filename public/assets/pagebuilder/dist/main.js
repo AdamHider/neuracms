@@ -9,23 +9,16 @@ function composeComponents() {
         });
     });
 }
-
 function initWorkspace() {
     composeComponents()
+    initializeDraggableComponents()
     renderWorkspace(pageData);
 }
-
 function initializeDraggableComponents() {
-    $('.component-item, .workspace-component').each(function() {
+    $('.component-item').each(function() {
         makeDraggable(this, false);
     });
 }
-function initializeHoverableComponents() {
-    $('.workspace-component').each(function() {
-        makeHoverable(this, false);
-    });
-}
-
 function makeHoverable(element){
     $(element).on('mouseenter', function(e){
         e.stopPropagation();
@@ -44,6 +37,7 @@ function makeDraggable(element, handle = '.move-handle'){
         cursor: "crosshair",
         revertDuration: 100,
         start: function(event, ui) {
+            $('.active-element').removeClass('active-element');
             $('#workspace').addClass('drag-active');
             $(ui.helper).addClass("ui-draggable-clone");
             $(this).css('opacity', '0.5');
@@ -62,22 +56,15 @@ function makeDroppable(element) {
         accept: '.component-item, .workspace-component',
         drop: function(event, ui) {
             const dropZoneIndex = $(this).data('index');
-            resetHighlighting();
+            resetDropzoneHighlighting();
             const code = ui.helper.data('code');
+            const parentId = $(this).closest('.container-component').data('id');
+            const parentComponent = findComponentById(parentId, pageData);
             if (code) {
-                const parentId = $(this).closest('.container-component').data('id');
-                const parentComponent = findComponentById(parentId, pageData);
-                const type = ui.helper.data('type');
-                if(type === 'template') {
-                    addTemplateToWorkspace(configs[code], parentComponent, dropZoneIndex);
-                } else {
-                    addComponentToWorkspace(configs[code], parentComponent, dropZoneIndex);
-                }
+                addComponent(configs[code], parentComponent, dropZoneIndex);
             } else {
                 const elementId = ui.helper.data('id');
-                const parentId = $(this).closest('.container-component').data('id');
-                const parentComponent = findComponentById(parentId, pageData);
-                moveComponentToWorkspace(elementId, parentComponent, dropZoneIndex);
+                moveComponent(elementId, parentComponent, dropZoneIndex);
             }
             renderWorkspace(pageData);
         },
@@ -85,20 +72,37 @@ function makeDroppable(element) {
             highlightDropzone($(this));
         },
         out: function(event, ui) {
-            resetHighlighting();
+            resetDropzoneHighlighting();
         }
     });
 }
+function makeClickable(element) {
+    const elementId = $(element).data('id')
+    const component = findComponentById(elementId, pageData);
+    $(element).on('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        resetActiveHighlighting();
+        openProperties(component);
+        highlightActive(component.id);
+    })
+}
 
-function resetHighlighting() {
+
+function resetActiveHighlighting(){
+    $('.active-element').removeClass('active-element');
+}
+function highlightActive(elementId){
+    $(`[data-id="${elementId}"]`).addClass('active-element');
+}
+
+function resetDropzoneHighlighting() {
     $('.highlight-dropzone').removeClass('highlight-dropzone');
     $('.highlight-dropzone-parent').removeClass('highlight-dropzone-parent');
 }
-
 function highlightDropzone(dropzone) {
     dropzone.addClass('highlight-dropzone');
     dropzone.closest('.workspace-component').addClass('highlight-dropzone-parent');
 }
-
 initWorkspace()
 

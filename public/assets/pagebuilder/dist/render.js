@@ -4,12 +4,8 @@ function renderWorkspace(data) {
         $('#workspace').append(createDropzone('root', index));
         const componentElement = createComponent(component);
         if (componentElement) $('#workspace').append(componentElement);
-
     });
     $('#workspace').append(createDropzone('root', data.length));
-    
-    initializeDraggableComponents()
-    initializeHoverableComponents()
     $('#json_content').val(JSON.stringify(data));
 }
 
@@ -17,40 +13,31 @@ function renderWorkspace(data) {
 function createComponent(component) {
     let elementHtml;
     if (!templates[component.code]) {
-        console.warn(`Template for component type ${component.type} not found. Creating an empty placeholder component.`);
         elementHtml = '<div class="empty-component">Component template not found. This is a placeholder.</div>';
     } else {
         elementHtml = renderMarkup(templates[component.code], component.properties);
     }
-    const element = $(elementHtml).attr('data-id', component.id).addClass('workspace-component');
-
+    const element = $(elementHtml).attr('data-id', component.id).addClass('workspace-component '+component.type+'-component');
     element.append(createComponentControls(component));
-    // Добавляем класс для контейнеров
-    if (component.type === 'container' || component.type === 'template') {
-        element.addClass('container-component');
 
+    if (component.type === 'container' || component.type === 'template') {
+        element.append(createDropzone(component.id, 0));
         if(component.children.length == 0){
             element.addClass('container-no-child');
-        } else { 
-            element.removeClass('container-no-child');
         }
-        element.append(createDropzone(component.id, 0));
-    } 
-    $(element).on('click', (event) => {
-        event.stopPropagation();
-        openProperties(component)
-    })
+    }
+    
     if (component.controller) {
         loadDynamicContent(component, element)
     } else {
         component.children.forEach((child, childIndex) => {
             const childElement = createComponent(child);
-
-            if (childElement) element.append(childElement)
-                                     .append(createDropzone(child.id, childIndex+1));
-            
+            if (childElement) element.append(childElement).append(createDropzone(child.id, childIndex+1));
         });
     }
+    makeHoverable(element)
+    makeClickable(element)
+    makeDraggable(element);
     return element;
 }
 
@@ -75,7 +62,17 @@ function createComponentControls(component) {
 }
 
 function createDropzone(elementId, index){
-    const dropZone = $('<div class="drop-zone" data-index="' + index + '" ></div>');
+    const dropZone = $('<div class="drop-zone" data-index="' + index + '" ><span class="drop-line"></span><span class="plus-button"><i class="bi bi-plus"></i></span></div>');
+    $(dropZone).on('click', (event) => {
+        event.stopPropagation()
+        const activeElementId = $('.active-element').data('id');
+        const parentId = $('.active-element').parent().closest('.container-component').data('id');
+        const parentComponent = findComponentById(parentId, pageData);
+        if(!activeElementId) return
+        cloneComponent(activeElementId, parentComponent, index)
+        resetActiveHighlighting()
+        renderWorkspace(pageData);
+    });
     makeDroppable(dropZone, elementId);
     return dropZone;
 }

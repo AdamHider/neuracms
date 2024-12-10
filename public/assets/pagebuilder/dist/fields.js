@@ -21,7 +21,7 @@ function createField(key, value, property){
             class: 'form-control',
         }).html(property || value.default)
     } 
-
+    $(input).attr('data-key', key)
     return $('<div class="mb-3">').append(
         $('<label>').attr('for', key).addClass('form-label').text(value.label),
         $(input)
