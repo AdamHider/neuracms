@@ -4,6 +4,7 @@
     "code": "Column",
     "group": "layout",
     "icon": "file",
+    "accept": "content,template",
     "properties": {
         "title": {
             "label": "Title",

@@ -48,7 +48,7 @@
                             <div class="row g-2">
                                 <?php foreach ($componentGroup['children'] as $component): ?>
                                 <div class="col-6">
-                                    <div class="card text-center component-item" data-type="<?= $component['config']['type'] ?>" data-code="<?= $component['config']['code'] ?>">
+                                    <div class="card text-center component-item <?= $component['config']['type'] ?>-component" data-type="<?= $component['config']['type'] ?>" data-code="<?= $component['config']['code'] ?>">
                                         <div class="card-body px-1 py-2">
                                             <h4><i class="bi bi-<?= $component['config']['icon'] ?>"></i></h4>
                                             <span><?= ucfirst($component['config']['name']) ?></span>
@@ -89,6 +89,9 @@ $('#toolbar').on('click', (e) => {
 <style >
     #offcanvasComponents{
         max-width: 300px;
+    }
+    .component-item:hover{
+        border-color: blue;
     }
     
     #workspace { border: 1px solid #ddd; min-height: 300px; padding: 15px; }
@@ -210,13 +213,23 @@ $('#toolbar').on('click', (e) => {
     }
     .workspace-component.active-element + .drop-zone:hover,
     .workspace-component.active-element + .drop-zone:hover .plus-button {
-        background: black;
+        background: green;
     } 
     .workspace-component.container-no-child > .drop-zone {
-        height: 100%;
-        top: 0;
-        transform: none;
+        height: 22px;
         margin: 0;
+        transform: none;
+    }
+    .workspace-component.container-no-child > .drop-zone > .drop-line {
+        
+    }
+    .workspace-component.row.container-no-child > .drop-zone {
+        width: 100%;
+        margin: 0;
+        transform: none;
+    }
+    .workspace-component.row.container-no-child > .drop-zone > .drop-line {
+       
     }
     .workspace-component.row > .drop-zone{
         width: 5px;
@@ -255,11 +268,20 @@ $('#toolbar').on('click', (e) => {
     .drop-zone.highlight-dropzone::before, 
     .drop-zone.highlight-dropzone::after,
     .drop-zone.highlight-dropzone .drop-line{
-        background: red;
+        background: blue;
     }
     
     .highlight-dropzone-parent {
         box-shadow: 0px 0px 0px 1px #4CAF50;
+    }
+    .highlight-dropzone-parent > .card-header {
+        visibility: visible;
+    }
+    .highlight-dropzone-parent > .card-header > :not(.component-title-container) {
+        visibility: hidden;
+    }
+    .highlight-dropzone-parent > .card-header .component-title{
+        background: green !important;
     }
 
 </style>

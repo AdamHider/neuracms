@@ -2,22 +2,17 @@ function generateUniqueId() {
     return 'id-' + Math.random().toString(36).substr(2, 16);
 }
 function addComponent(component, parent, index = 0) {
-    const newComponent = {
-        id: generateUniqueId(),
-        type: component.type,
-        code: component.code,
-        group: component.group,
-        controller: component.controller ?? null,
-        method: component.method ?? null,
-        properties: { ...component.properties },
-        children: []
-    };
+    const newComponent = JSON.parse(JSON.stringify(component));
+    newComponent.id = generateUniqueId()
+    newComponent.children = []
+
     for (const [key, value] of Object.entries(component.properties)) {
         newComponent.properties[key] = value.default ?? value;
     }
     if (component.children) {
-        component.children.forEach((childTemplate, index) => {
-            const newChild = addComponent(childTemplate, component);
+        component.children.forEach((child, index) => {
+            child.lock = component.lock
+            const newChild = addComponent(child, newComponent, index);
             newComponent.children[index] = newChild;
         });
     }
@@ -44,22 +39,22 @@ function moveComponent(elementId, parent, index = 0) {
 function cloneComponent(componentId, parent, index = 0) {
     const component = findComponentById(componentId, pageData);
     if (component) {
-        const shallowCopy = JSON.parse(JSON.stringify(component));
-        shallowCopy.id = generateUniqueId()
-        shallowCopy.children = cloneChildren(component.children)
+        const copy = JSON.parse(JSON.stringify(component));
+        copy.id = generateUniqueId()
+        copy.children = cloneChildren(component.children)
         if (parent) {
-            parent.children.splice(index, 0, shallowCopy);
+            parent.children.splice(index, 0, copy);
         } else {
-            pageData.splice(index, 0, shallowCopy);
+            pageData.splice(index, 0, copy);
         }
     }
 }
 function cloneChildren(children) {
     return children.map(child => {
-        const shallowCopy = JSON.parse(JSON.stringify(child));
-        shallowCopy.id = generateUniqueId()
-        shallowCopy.children = cloneChildren(child.children)
-        return shallowCopy;
+        const copy = JSON.parse(JSON.stringify(child));
+        copy.id = generateUniqueId()
+        copy.children = cloneChildren(child.children)
+        return copy;
     });
 }
 

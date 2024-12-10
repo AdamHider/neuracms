@@ -28,6 +28,7 @@ function makeHoverable(element){
     });
 }
 function makeDraggable(element, handle = '.move-handle'){
+    if(isLocked(element)) return false
     $(element).draggable({
         handle: handle,
         revert: true,
@@ -49,11 +50,12 @@ function makeDraggable(element, handle = '.move-handle'){
         }
     });
 }
-function makeDroppable(element) {
-    $(element).droppable({
+function makeDroppable(target, accept) {
+    if(isLocked(target)) return false
+    $(target).droppable({
         tolerance: "pointer",
         greedy: true,
-        accept: '.component-item, .workspace-component',
+        accept: accept,
         drop: function(event, ui) {
             const dropZoneIndex = $(this).data('index');
             resetDropzoneHighlighting();
@@ -87,7 +89,10 @@ function makeClickable(element) {
         highlightActive(component.id);
     })
 }
-
+function isLocked(element){
+    if($(element).hasClass('locked-component')) return true
+    return false
+}
 
 function resetActiveHighlighting(){
     $('.active-element').removeClass('active-element');
@@ -104,5 +109,6 @@ function highlightDropzone(dropzone) {
     dropzone.addClass('highlight-dropzone');
     dropzone.closest('.workspace-component').addClass('highlight-dropzone-parent');
 }
+
 initWorkspace()
 

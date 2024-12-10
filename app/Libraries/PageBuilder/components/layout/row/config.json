@@ -4,6 +4,7 @@
     "code": "Row",
     "group": "layout",
     "icon": "view-list",
+    "accept": "template,container",
     "properties": {
         "title": {
             "label": "Title",
