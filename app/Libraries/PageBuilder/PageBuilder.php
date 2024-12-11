@@ -54,6 +54,7 @@ class PageBuilder
 
     public function buildHtmlFromJson($contentJson)
     {
+        if(empty($contentJson)) return '';
         $contentArray = json_decode($contentJson, true);
         $html = '';
 
