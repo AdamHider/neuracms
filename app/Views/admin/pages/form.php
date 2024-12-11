@@ -1,4 +1,4 @@
-<?= $this->extend('layouts/'.$this->data['settings']['layout']) ?>
+<?= $this->extend('layouts/'.$settings['layout']) ?>
 <?= $this->section('content') ?>
 <div class="container px-0">
     <form action="/admin/pages/<?= $action ?>" method="post">
@@ -12,7 +12,7 @@
                         <input type="text" name="title" class="form-control" id="title" value="<?= set_value('title', $page['title']) ?>" placeholder="Title" required>
                     </div>
                     <div class="me-3">
-                        <input type="text" name="slug" class="form-control" id="slug" value="<?= set_value('slug', $page['slug']) ?>" placeholder="Slug" required>
+                        <input type="text" name="slug" class="form-control" id="slug" value="<?= set_value('slug', $page['slug']) ?>" placeholder="Generated from title">
                     </div>
                     <div class="dropdown">
                         <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMeta" aria-expanded="false" aria-controls="collapseMeta">
@@ -22,7 +22,9 @@
                 </div>
             </div>
             <div>
-                <button class="btn btn-info">Preview</button>
+                <?php if (isset($preview_link)) : ?>
+                <a href="<?=base_url($preview_link)  ?>" class="btn btn-info" target="_blank">Preview</a>
+                <?php endif; ?>
                 <button type="submit" class="btn btn-primary">Save</button>
             </div>
         </div>
@@ -30,7 +32,7 @@
             <div class="row g-3">
                 <div class="col">
                     <label for="meta_description" class="form-label">Meta Description</label>
-                    <textarea name="meta_description" class="form-control" id="meta_description" rows="2" required><?= set_value('meta_description', $page['meta_description']) ?></textarea>
+                    <textarea name="meta_description" class="form-control" id="meta_description" rows="2"><?= set_value('meta_description', $page['meta_description']) ?></textarea>
                 </div>
                 <div class="col">
                     <label for="language_id" class="form-label">Language</label>
@@ -52,13 +54,22 @@
             </div>
         </div>
     </header>
+    
+    <?php if (session()->getFlashdata('status')): ?>
+        <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+            <strong>Success!</strong> <?= session()->getFlashdata('status') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
     <?php if (session()->getFlashdata('errors')): ?>
-        <div class="alert alert-danger">
+        <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+            <strong>Warning!</strong> 
             <ul>
                 <?php foreach (session()->getFlashdata('errors') as $error): ?>
                     <li><?= $error ?></li>
                 <?php endforeach; ?>
             </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
     <!-- Sidebar and Content Section -->

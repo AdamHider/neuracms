@@ -4,8 +4,8 @@
     "code": "workspace",
     "group": "layout",
     "icon": "file",
-    "lock": true,
     "accept": "all",
+    "is_private": true, 
     "properties": {
         "title": {
             "label": "Title",

@@ -49,6 +49,7 @@ class Page extends BaseController
                 throw new \CodeIgniter\Exceptions\PageNotFoundException('Page not found');
             }
             $data['action'] = 'update/' . $id;
+            $data['preview_link'] = $pageModel->generatePagePath($id);
             $data['button_text'] = 'Update';
             $data['settings']['title'] = 'Edit page'; 
         } else {
@@ -57,14 +58,15 @@ class Page extends BaseController
             $data['button_text'] = 'Create';
             $data['settings']['title'] = 'New page';
             $data['page']['json_content'] = json_encode([[
-                'type' => 'workspace',
+                'id' => 'page_holder',
+                'type' => 'container',
                 'code' => 'workspace',
                 'group' => 'layout',
+                'lock' => 'self',
                 'accept' => 'all',
-                'lock' => true,
                 'properties' => [
                     'title' => 'My Workspace',
-                    'backgroundColor' => '#ffffff'
+                    'class' => ''
                 ],
                 'children' => []
             ]]);
@@ -95,18 +97,22 @@ class Page extends BaseController
             'json_content' => $this->request->getVar('json_content'),
             'meta_description' => $this->request->getVar('meta_description'),
         ];
+        if(empty($data['slug']) && !empty($data['title'])){
+            $data['slug'] = $pageModel->generateUniqueSlug($data['title']);
+        }
 
         if ($id) {
             $data['id'] = $id;
             if (!$pageModel->save($data)) {
                 return redirect()->back()->with('errors', $pageModel->errors());
             }
-            return redirect()->back()->with('status', 'Page created successfully');
+            return redirect()->back()->with('status', 'Page updated successfully');
         } else {
+            $data['id'] = 0;
             if (!$pageModel->insert($data)) {
                 return redirect()->back()->with('errors', $pageModel->errors());
             }
-            return redirect()->back()->with('status', 'Page updated successfully');
+            return redirect()->to('/admin/pages/form/'.$pageModel->insertId())->with('status', 'Page created successfully');
         }
     }
     public function delete($id)

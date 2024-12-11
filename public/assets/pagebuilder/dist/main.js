@@ -28,7 +28,7 @@ function makeHoverable(element){
     });
 }
 function makeDraggable(element, handle = '.move-handle'){
-    if(isLocked(element)) return false
+    if($(element).hasClass('locked-all-component') || $(element).hasClass('locked-self-component')) return false
     $(element).draggable({
         handle: handle,
         revert: true,
@@ -51,7 +51,7 @@ function makeDraggable(element, handle = '.move-handle'){
     });
 }
 function makeDroppable(target, accept) {
-    if(isLocked(target)) return false
+    if($(target).hasClass('locked-all-component')) return false
     $(target).droppable({
         tolerance: "pointer",
         greedy: true,
@@ -90,7 +90,7 @@ function makeClickable(element) {
     })
 }
 function isLocked(element){
-    if($(element).hasClass('locked-component')) return true
+    
     return false
 }
 

@@ -1,11 +1,9 @@
 function renderWorkspace(data) {
     $('#workspace').empty();
     data.forEach((component, index) => {
-        $('#workspace').append(createDropzone(index));
         const componentElement = createComponent(component);
         if (componentElement) $('#workspace').append(componentElement);
     });
-    $('#workspace').append(createDropzone(data.length));
     $('#json_content').val(JSON.stringify(data));
 }
 
@@ -18,8 +16,9 @@ function createComponent(component) {
         elementHtml = renderMarkup(templates[component.code], component.properties);
     }
     const element = $(elementHtml).attr('data-id', component.id).addClass('workspace-component '+component.type+'-component');
-    if(component.lock) {
-        element.addClass('locked-component');
+    if(component.lock){
+        if(component.lock == 'all') element.addClass('locked-all-component');
+        if(component.lock == 'self') element.addClass('locked-self-component');
     } 
     element.append(createComponentControls(component));
     if (component.type === 'container' || component.type === 'template') {
@@ -53,11 +52,11 @@ function renderMarkup(template, properties) {
 
 function createComponentControls(component) {
     const controls = $('<div class="card-header d-flex align-items-center bg-primary" role="toolbar"></div>');
-    if(!component.lock){
+    if(!component.lock || component.lock == 'none'){
         controls.append($('<span class="btn btn-sm move-handle rounded-0 rounded-top text-white"><i class="bi bi-grip-vertical"></i></span>'));
     }
     controls.append($(`<span class="component-title move-handle px-2 py-1 rounded-top text-white">${component.properties.title || component.type}</span>`))
-    if(!component.lock){
+    if(!component.lock || component.lock == 'none'){
         controls.append($('<span class="btn btn-sm rounded-0 rounded-top text-white"><i class="bi bi-x"></i></span>').on('click', function(event) {
             removeComponent(component.id, pageData);
             renderWorkspace(pageData);
@@ -69,7 +68,7 @@ function createComponentControls(component) {
 
 function createDropzone(index, component = {}){
     const accept = getComponentAccept(component)
-    if(!accept || component.lock) return ''
+    if(!accept || component.lock == 'all') return ''
     const dropZone = $('<div class="drop-zone" data-index="' + index + '" ><span class="drop-line"></span><span class="plus-button"><i class="bi bi-plus"></i></span></div>');
     $(dropZone).on('click', (event) => {
         event.stopPropagation()

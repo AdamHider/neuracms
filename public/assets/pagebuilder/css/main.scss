@@ -14,9 +14,11 @@ $component-border-width: 1px;
 }
 
 #workspace { 
-    border: 1px solid #ddd; 
-    min-height: 300px;
-    padding: 15px; 
+    > .workspace-holder{
+        border: 1px solid #ddd !important;
+        min-height: 300px !important;
+        padding: 15px !important;
+    }
     &:not(.drag-active) .workspace-component{
         &.active-element > .card-header {
             visibility: visible;
@@ -42,11 +44,14 @@ $component-border-width: 1px;
             z-index: 120;
             font-size: 13px;
             border-radius: 3px 3px 0 0;
-            cursor: pointer;
+            .component-title{
+                cursor: pointer;
+            }
             .btn{
                 font-size: 13px;
                 pointer-events: all;
                 position: relative;
+                cursor: pointer;
             }
         }
         &.active-element {

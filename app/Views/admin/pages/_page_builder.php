@@ -18,13 +18,13 @@
                 </div>
             </div>
             <div class="col-8">
-                <div id="workspace" class="workspace-marked container bg-white" tabindex="-1">
+                <div id="workspace" class="workspace-marked bg-white" tabindex="-1">
                     <!-- Рабочая область для конструктора страниц -->
                 </div>
                 <input type="hidden" name="json_content" id="json_content">
             </div>
             <div id="sidebar" class="col-3 d-flex flex-column flex-shrink-0">
-                    <div class="card rounded-0 sticky-top sticky-offset border overflow-auto">
+                    <div class="card sticky-top sticky-offset border overflow-auto">
                         <div class="card-header">
                             <h4 id="sidebar-title" class="card-title">Element Properties</h4>
                         </div>
@@ -47,6 +47,7 @@
                             <h5><?= ucfirst($componentGroup['title']) ?></h5>   
                             <div class="row g-2">
                                 <?php foreach ($componentGroup['children'] as $component): ?>
+                                <?php if(isset($component['config']['is_private']) && $component['config']['is_private']) { continue; } ?>
                                 <div class="col-6">
                                     <div class="card text-center component-item <?= $component['config']['type'] ?>-component" data-type="<?= $component['config']['type'] ?>" data-code="<?= $component['config']['code'] ?>">
                                         <div class="card-body px-1 py-2">

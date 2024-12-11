@@ -4,10 +4,10 @@
 .component-item:hover {
   border-color: var(--bs-primary);
 }
-#workspace {
-  border: 1px solid #ddd;
-  min-height: 300px;
-  padding: 15px;
+#workspace > .workspace-holder {
+  border: 1px solid #ddd !important;
+  min-height: 300px !important;
+  padding: 15px !important;
 }
 #workspace:not(.drag-active) .workspace-component.active-element > .card-header {
   visibility: visible;
@@ -33,12 +33,15 @@
   z-index: 120;
   font-size: 13px;
   border-radius: 3px 3px 0 0;
+}
+#workspace .workspace-component > .card-header .component-title {
   cursor: pointer;
 }
 #workspace .workspace-component > .card-header .btn {
   font-size: 13px;
   pointer-events: all;
   position: relative;
+  cursor: pointer;
 }
 #workspace .workspace-component.active-element {
   box-shadow: 0px 0px 0px 1px var(--bs-primary) !important;

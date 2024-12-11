@@ -11,7 +11,9 @@ function addComponent(component, parent, index = 0) {
     }
     if (component.children) {
         component.children.forEach((child, index) => {
-            child.lock = component.lock
+            if(component.lock && component.lock == 'all'){
+                child.lock = component.lock
+            }
             const newChild = addComponent(child, newComponent, index);
             newComponent.children[index] = newChild;
         });
