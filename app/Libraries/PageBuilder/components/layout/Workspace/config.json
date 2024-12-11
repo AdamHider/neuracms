@@ -1,0 +1,21 @@
+{
+    "type": "container",
+    "name": "Workspace",
+    "code": "workspace",
+    "group": "layout",
+    "icon": "file",
+    "lock": true,
+    "accept": "all",
+    "properties": {
+        "title": {
+            "label": "Title",
+            "type": "text.input",
+            "default": "Workspace"
+        },
+        "class": {
+            "label": "Class Name",
+            "type": "text.input",
+            "default": ""
+        }
+    }
+}

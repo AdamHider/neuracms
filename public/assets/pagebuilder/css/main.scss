@@ -1,0 +1,208 @@
+$dropzone-width: 5px;
+$dropzone-line-width: 2px;
+$dropzone-button-width: 15px;
+
+$offcanvas-width: 300px;
+
+$component-border-width: 1px;
+
+#offcanvasComponents{
+    max-width: $offcanvas-width;
+}
+.component-item:hover{
+    border-color: var(--bs-primary);
+}
+
+#workspace { 
+    border: 1px solid #ddd; 
+    min-height: 300px;
+    padding: 15px; 
+    &:not(.drag-active) .workspace-component{
+        &.active-element > .card-header {
+            visibility: visible;
+        }
+        &.component-mouseover {
+            box-shadow: 0px 0px 0px 1px #4CAF50;
+        }
+    }
+    &.workspace-marked .workspace-component{
+        border: 1px dashed #6c757d;
+    }
+    .workspace-component {
+        position: relative;
+        min-height: 40px;
+        padding: 5px;
+        > .card-header {
+            position: absolute;
+            bottom: 100%;
+            left: 2%;
+            width: auto;
+            visibility: hidden;
+            margin-bottom: 1px;
+            z-index: 120;
+            font-size: 13px;
+            border-radius: 3px 3px 0 0;
+            cursor: pointer;
+            .btn{
+                font-size: 13px;
+                pointer-events: all;
+                position: relative;
+            }
+        }
+        &.active-element {
+            box-shadow: 0px 0px 0px $component-border-width var(--bs-primary) !important;
+            + .drop-zone {
+                pointer-events: all;
+                background-color: var(--bs-primary);
+                .plus-button {
+                    visibility: visible;
+                    display: flex;
+                    background-color: var(--bs-primary);
+                }
+                &:hover{
+                    background: var(--bs-success);
+                    .plus-button {
+                        background: var(--bs-success);
+                    }
+                }
+            }
+            .drop-zone{
+                display: none;
+            }
+        }
+        &.container-no-child > .drop-zone {
+            height: 22px;
+            margin: 0;
+            transform: none;
+        }
+        &.row {
+            > .drop-zone{
+                width: 5px;
+                margin: 0;
+                padding: 0;
+                height: initial;
+                margin-left: -5px;
+                transform: translateX(2.5px);
+                &:before {
+                    top: 0;
+                    left: calc(50% - 5px);
+                    height: 2px;
+                    width: 10px;
+                }
+                &:after {
+                    bottom: 0;
+                    top: unset;
+                    left: calc(50% - 5px);
+                    height: 2px;
+                    width: 10px;
+                }
+                & > .plus-button{
+                    border-radius: 0 3px 3px 0 ;
+                    top: calc(50% - #{$dropzone-button-width});
+                    right: -$dropzone-button-width/3*2;
+                    left: unset;
+                    width: $dropzone-button-width;
+                    height: $dropzone-button-width*2;
+                    display: flex;
+                    align-items: center;
+                }
+                & > .drop-line{
+                    left: calc(50% - #{$dropzone-line-width*0.5});
+                    top: 0;
+                    width: $dropzone-line-width;
+                    height: 100%;
+                }
+            }
+            &.container-no-child > .drop-zone {
+                width: 100%;
+                margin: 0;
+                transform: none;
+            }
+        }
+    }
+}
+.component-item.ui-draggable-clone{
+    opacity: 0.3;
+}
+.workspace-component.ui-draggable-clone {
+    width: 0px;
+    height: 0px;
+    padding: 0 !important;
+    border: none !important;
+    > :not(.card-header){
+        display: none !important;
+    }
+    > .card-header{
+        opacity: 0.5;
+        border-radius: 3px !important;
+        visibility: visible !important;
+    }
+}
+
+.drop-zone{
+    width: 100%;
+    height: $dropzone-width;
+    margin-top: -$dropzone-width;
+    transform: translateY($dropzone-width*0.5);
+    position: relative;
+    z-index: 100;
+    pointer-events: none;
+    &:before {
+        content: "";
+        position: absolute;
+        top: calc(50% - #{$dropzone-width});
+        left: 0;
+        height: $dropzone-width*2;
+        width: $dropzone-width*0.5;
+    } 
+    &:after {
+        content: "";
+        position: absolute;
+        top: calc(50% - #{$dropzone-width});
+        right: 0;
+        height: $dropzone-width*2;
+        width: $dropzone-width*0.5;
+    } 
+    .plus-button{
+        display: none;
+        position: absolute;
+        border-radius: 0 0 3px 3px;
+        color: white;
+        height: $dropzone-button-width;
+        width: $dropzone-button-width*2;
+        line-height: $dropzone-button-width;
+        bottom: -$dropzone-button-width/3*2;
+        right: calc(50% - #{$dropzone-button-width});
+        display: flex;
+        justify-content: center;
+        visibility: hidden;
+    }
+    .drop-line{
+        position: absolute;
+        top: calc(50% - #{$dropzone-line-width*0.5});
+        left: 0;
+        width: 100%;
+        height: $dropzone-line-width;
+    }
+    &.hidden{
+        display: none;
+    }
+} 
+
+
+.drop-zone.highlight-dropzone::before, 
+.drop-zone.highlight-dropzone::after,
+.drop-zone.highlight-dropzone .drop-line{
+    background: var(--bs-primary);
+}
+
+.highlight-dropzone-parent {
+    box-shadow: 0px 0px 0px $component-border-width var(--bs-success);
+    > .card-header {
+        visibility: visible !important;
+        background: var(--bs-success) !important;
+        > :not(.component-title) {
+            visibility: hidden;
+        }
+    }
+}

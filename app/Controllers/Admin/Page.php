@@ -4,17 +4,11 @@ namespace App\Controllers\Admin;
 
 use App\Models\PageModel;
 use App\Models\LanguageModel;
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 use App\Libraries\PageBuilder\PageBuilder;
 
-
-class Page extends Controller
+class Page extends BaseController
 {
-    public function __construct()
-    {
-        helper(['form']);
-    }
-
     public function index()
     {
         $data['settings'] = [
@@ -62,6 +56,18 @@ class Page extends Controller
             $data['action'] = 'store';
             $data['button_text'] = 'Create';
             $data['settings']['title'] = 'New page';
+            $data['page']['json_content'] = json_encode([[
+                'type' => 'workspace',
+                'code' => 'workspace',
+                'group' => 'layout',
+                'accept' => 'all',
+                'lock' => true,
+                'properties' => [
+                    'title' => 'My Workspace',
+                    'backgroundColor' => '#ffffff'
+                ],
+                'children' => []
+            ]]);
         }
 
         return view('admin/pages/form', $data);

@@ -33,19 +33,19 @@ function makeDraggable(element, handle = '.move-handle'){
         handle: handle,
         revert: true,
         helper: 'clone',
-        scrollSpeed: 100,
         zIndex: 1000,
-        cursor: "crosshair",
         revertDuration: 100,
         start: function(event, ui) {
             $('.active-element').removeClass('active-element');
             $('#workspace').addClass('drag-active');
             $(ui.helper).addClass("ui-draggable-clone");
+            $(this).next().addClass('hidden');
             $(this).css('opacity', '0.5');
         },
         stop: function(event, ui) {
             $('#workspace').removeClass('drag-active');
             $(ui.helper).removeClass("ui-draggable-clone");
+            $('hidden').removeClass('hidden');
             $(this).css('opacity', '1');
         }
     });
@@ -71,7 +71,7 @@ function makeDroppable(target, accept) {
             renderWorkspace(pageData);
         },
         over: function(event, ui) {
-            highlightDropzone($(this));
+            highlightDropzone(this);
         },
         out: function(event, ui) {
             resetDropzoneHighlighting();
@@ -105,9 +105,9 @@ function resetDropzoneHighlighting() {
     $('.highlight-dropzone').removeClass('highlight-dropzone');
     $('.highlight-dropzone-parent').removeClass('highlight-dropzone-parent');
 }
-function highlightDropzone(dropzone) {
-    dropzone.addClass('highlight-dropzone');
-    dropzone.closest('.workspace-component').addClass('highlight-dropzone-parent');
+function highlightDropzone(element) {
+    $(element).addClass('highlight-dropzone');
+    $(element).closest('.workspace-component').addClass('highlight-dropzone-parent');
 }
 
 initWorkspace()

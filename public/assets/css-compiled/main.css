@@ -1,0 +1,189 @@
+#offcanvasComponents {
+  max-width: 300px;
+}
+.component-item:hover {
+  border-color: var(--bs-primary);
+}
+#workspace {
+  border: 1px solid #ddd;
+  min-height: 300px;
+  padding: 15px;
+}
+#workspace:not(.drag-active) .workspace-component.active-element > .card-header {
+  visibility: visible;
+}
+#workspace:not(.drag-active) .workspace-component.component-mouseover {
+  box-shadow: 0px 0px 0px 1px #4CAF50;
+}
+#workspace.workspace-marked .workspace-component {
+  border: 1px dashed #6c757d;
+}
+#workspace .workspace-component {
+  position: relative;
+  min-height: 40px;
+  padding: 5px;
+}
+#workspace .workspace-component > .card-header {
+  position: absolute;
+  bottom: 100%;
+  left: 2%;
+  width: auto;
+  visibility: hidden;
+  margin-bottom: 1px;
+  z-index: 120;
+  font-size: 13px;
+  border-radius: 3px 3px 0 0;
+  cursor: pointer;
+}
+#workspace .workspace-component > .card-header .btn {
+  font-size: 13px;
+  pointer-events: all;
+  position: relative;
+}
+#workspace .workspace-component.active-element {
+  box-shadow: 0px 0px 0px 1px var(--bs-primary) !important;
+}
+#workspace .workspace-component.active-element + .drop-zone {
+  pointer-events: all;
+  background-color: var(--bs-primary);
+}
+#workspace .workspace-component.active-element + .drop-zone .plus-button {
+  visibility: visible;
+  display: flex;
+  background-color: var(--bs-primary);
+}
+#workspace .workspace-component.active-element + .drop-zone:hover {
+  background: var(--bs-success);
+}
+#workspace .workspace-component.active-element + .drop-zone:hover .plus-button {
+  background: var(--bs-success);
+}
+#workspace .workspace-component.active-element .drop-zone {
+  display: none;
+}
+#workspace .workspace-component.container-no-child > .drop-zone {
+  height: 22px;
+  margin: 0;
+  transform: none;
+}
+#workspace .workspace-component.row > .drop-zone {
+  width: 5px;
+  margin: 0;
+  padding: 0;
+  height: initial;
+  margin-left: -5px;
+  transform: translateX(2.5px);
+}
+#workspace .workspace-component.row > .drop-zone:before {
+  top: 0;
+  left: calc(50% - 5px);
+  height: 2px;
+  width: 10px;
+}
+#workspace .workspace-component.row > .drop-zone:after {
+  bottom: 0;
+  top: unset;
+  left: calc(50% - 5px);
+  height: 2px;
+  width: 10px;
+}
+#workspace .workspace-component.row > .drop-zone > .plus-button {
+  border-radius: 0 3px 3px 0;
+  top: calc(50% - 15px);
+  right: -10px;
+  left: unset;
+  width: 15px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+#workspace .workspace-component.row > .drop-zone > .drop-line {
+  left: calc(50% - 1px);
+  top: 0;
+  width: 2px;
+  height: 100%;
+}
+#workspace .workspace-component.row.container-no-child > .drop-zone {
+  width: 100%;
+  margin: 0;
+  transform: none;
+}
+.component-item.ui-draggable-clone {
+  opacity: 0.3;
+}
+.workspace-component.ui-draggable-clone {
+  width: 0px;
+  height: 0px;
+  padding: 0 !important;
+  border: none !important;
+}
+.workspace-component.ui-draggable-clone > :not(.card-header) {
+  display: none !important;
+}
+.workspace-component.ui-draggable-clone > .card-header {
+  opacity: 0.5;
+  border-radius: 3px !important;
+  visibility: visible !important;
+}
+.drop-zone {
+  width: 100%;
+  height: 5px;
+  margin-top: -5px;
+  transform: translateY(2.5px);
+  position: relative;
+  z-index: 100;
+  pointer-events: none;
+}
+.drop-zone:before {
+  content: "";
+  position: absolute;
+  top: calc(50% - 5px);
+  left: 0;
+  height: 10px;
+  width: 2.5px;
+}
+.drop-zone:after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 5px);
+  right: 0;
+  height: 10px;
+  width: 2.5px;
+}
+.drop-zone .plus-button {
+  display: none;
+  position: absolute;
+  border-radius: 0 0 3px 3px;
+  color: white;
+  height: 15px;
+  width: 30px;
+  line-height: 15px;
+  bottom: -10px;
+  right: calc(50% - 15px);
+  display: flex;
+  justify-content: center;
+  visibility: hidden;
+}
+.drop-zone .drop-line {
+  position: absolute;
+  top: calc(50% - 1px);
+  left: 0;
+  width: 100%;
+  height: 2px;
+}
+.drop-zone.hidden {
+  display: none;
+}
+.drop-zone.highlight-dropzone::before, .drop-zone.highlight-dropzone::after, .drop-zone.highlight-dropzone .drop-line {
+  background: var(--bs-primary);
+}
+.highlight-dropzone-parent {
+  box-shadow: 0px 0px 0px 1px var(--bs-success);
+}
+.highlight-dropzone-parent > .card-header {
+  visibility: visible !important;
+  background: var(--bs-success) !important;
+}
+.highlight-dropzone-parent > .card-header > :not(.component-title) {
+  visibility: hidden;
+}

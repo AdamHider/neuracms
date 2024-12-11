@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/'.$settings['layout']) ?>
 <?= $this->section('content') ?>
 <div class="container ">
-    <a href="/admin/pages/create" class="btn btn-primary mb-3"><i class="bi bi-file-earmark-plus me-2"></i> New Page</a>
+    <a href="/admin/pages/form" class="btn btn-primary mb-3"><i class="bi bi-file-earmark-plus me-2"></i> New Page</a>
     <?php if (!empty($pages)): ?>
         <ul class="list-group">
             <?php foreach ($pages as $page): ?>

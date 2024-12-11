@@ -11,7 +11,6 @@ function renderWorkspace(data) {
 
 
 function createComponent(component) {
-    console.log(component)
     let elementHtml;
     if (!templates[component.code]) {
         elementHtml = '<div class="empty-component">Component template not found. This is a placeholder.</div>';
@@ -19,21 +18,16 @@ function createComponent(component) {
         elementHtml = renderMarkup(templates[component.code], component.properties);
     }
     const element = $(elementHtml).attr('data-id', component.id).addClass('workspace-component '+component.type+'-component');
-    
     if(component.lock) {
         element.addClass('locked-component');
     } 
-
     element.append(createComponentControls(component));
-
-
     if (component.type === 'container' || component.type === 'template') {
         element.append(createDropzone(0, component));
         if(component.children.length == 0){
             element.addClass('container-no-child');
         }
     }
-    
     if (component.controller) {
         loadDynamicContent(component, element)
     } else {
@@ -58,11 +52,13 @@ function renderMarkup(template, properties) {
 }
 
 function createComponentControls(component) {
-    const controls = $('<div class="card-header d-flex align-items-end" role="toolbar"></div>')
-        .append($(`<span class="d-flex flex-grow-1 component-title-container"><span class="component-title px-2 py-1 rounded-top bg-primary text-white">${component.properties.title || component.type}</span></span>`))
+    const controls = $('<div class="card-header d-flex align-items-center bg-primary" role="toolbar"></div>');
     if(!component.lock){
-        controls.append($('<span class="btn btn-secondary btn-sm move-handle rounded-0 rounded-top ms-1"><i class="bi bi-arrows-move"></i></span>'))
-        .append($('<span class="btn btn-danger btn-sm rounded-0 rounded-top ms-1"><i class="bi bi-trash"></i></span>').on('click', function(event) {
+        controls.append($('<span class="btn btn-sm move-handle rounded-0 rounded-top text-white"><i class="bi bi-grip-vertical"></i></span>'));
+    }
+    controls.append($(`<span class="component-title move-handle px-2 py-1 rounded-top text-white">${component.properties.title || component.type}</span>`))
+    if(!component.lock){
+        controls.append($('<span class="btn btn-sm rounded-0 rounded-top text-white"><i class="bi bi-x"></i></span>').on('click', function(event) {
             removeComponent(component.id, pageData);
             renderWorkspace(pageData);
         }));
