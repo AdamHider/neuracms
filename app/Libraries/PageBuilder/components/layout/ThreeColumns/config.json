@@ -4,6 +4,7 @@
     "code": "ThreeColumns",
     "group": "layout",
     "icon": "layout-three-columns",
+    "accept": "none",
     "properties": {
         "title": {
             "label": "Title",
@@ -23,6 +24,9 @@
             "group": "layout",
             "properties": { "class": "", "title": "Row" },
             "type": "container",
+            "accept": "none",
+            "lock": true,
+            "ghost": true,
             "children": [
                 {
                     "name": "Column",

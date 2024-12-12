@@ -1,7 +1,7 @@
 {
     "type": "template",
-    "name": "Two Columns",
-    "code": "TwoColumns",
+    "name": "Header",
+    "code": "Header",
     "group": "layout",
     "icon": "layout-split",
     "accept": "none",
@@ -9,13 +9,16 @@
         "title": {
             "label": "Title",
             "type": "text.input",
-            "default": "Two Columns"
+            "default": "Header"
         },
         "class": {
             "label": "Class Name",
             "type": "text.input",
             "default": ""
-        }
+        },
+        "color": { "type": "color.picker", "label": "Color", "default": "red", "presetColors": [
+            "var(--bs-primary)", "var(--bs-secondary)", "var(--bs-success)", "var(--bs-info)", "var(--bs-warning)", "var(--bs-danger)"
+        ]}
     },
     "children": [
         {
@@ -24,10 +27,28 @@
             "group": "layout",
             "properties": { "class": "", "title": "Row" },
             "type": "container",
-            "accept": "none",
             "lock": true,
+            "accept": "container",
             "ghost": true,
             "children": [
+                {
+                    "name": "Column",
+                    "code": "Column",
+                    "group": "layout",
+                    "properties": { "width": "col-3", "title": "Column" },
+                    "type": "container",
+                    "accept": "none",
+                    "children": [
+                        {
+                            "name": "Paragraph",
+                            "code": "Paragraph",
+                            "group": "modules",
+                            "properties": { "class": "logo", "title": "Logo", "text": "Logo here" },
+                            "type": "content",
+                            "lock": "self"
+                        }
+                    ]
+                },
                 {
                     "name": "Column",
                     "code": "Column",
@@ -40,7 +61,7 @@
                     "name": "Column",
                     "code": "Column",
                     "group": "layout",
-                    "properties": { "width": "col-6", "title": "Column" },
+                    "properties": { "width": "col-3", "title": "Column" },
                     "type": "container",
                     "accept": "content,template"
                 }

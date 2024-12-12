@@ -15,6 +15,13 @@
             "label": "Class Name",
             "type": "text.input",
             "default": ""
-        }
+        },
+        "width": { "type": "select", "label": "Width", "default": "", "options": [
+            { "value": "", "label": "Please select" },
+            { "value": "col-12", "label": "100%" },
+            { "value": "col-6", "label": "50%" },
+            { "value": "col-3", "label": "25%" }
+        ]}
+    
     }
 }

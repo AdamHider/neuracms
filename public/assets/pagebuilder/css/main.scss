@@ -18,6 +18,7 @@ $component-border-width: 1px;
         border: 1px solid #ddd !important;
         min-height: 300px !important;
         padding: 15px !important;
+        padding-bottom: 300px !important;
     }
     &:not(.drag-active) .workspace-component{
         &.active-element > .card-header {
@@ -27,13 +28,13 @@ $component-border-width: 1px;
             box-shadow: 0px 0px 0px 1px #4CAF50;
         }
     }
-    &.workspace-marked .workspace-component{
+    &.workspace-marked .workspace-component:not(.ghost-component){
         border: 1px dashed #6c757d;
+        padding: 5px;
     }
     .workspace-component {
         position: relative;
         min-height: 40px;
-        padding: 5px;
         > .card-header {
             position: absolute;
             bottom: 100%;
@@ -193,8 +194,6 @@ $component-border-width: 1px;
         display: none;
     }
 } 
-
-
 .drop-zone.highlight-dropzone::before, 
 .drop-zone.highlight-dropzone::after,
 .drop-zone.highlight-dropzone .drop-line{

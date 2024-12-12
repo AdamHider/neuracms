@@ -28,7 +28,7 @@ function makeHoverable(element){
     });
 }
 function makeDraggable(element, handle = '.move-handle'){
-    if($(element).hasClass('locked-all-component') || $(element).hasClass('locked-self-component')) return false
+    if($(element).hasClass('locked-component')) return false
     $(element).draggable({
         handle: handle,
         revert: true,
@@ -39,7 +39,7 @@ function makeDraggable(element, handle = '.move-handle'){
             $('.active-element').removeClass('active-element');
             $('#workspace').addClass('drag-active');
             $(ui.helper).addClass("ui-draggable-clone");
-            $(this).next().addClass('hidden');
+            if($(this).hasClass('workspace-component')) $(this).next().addClass('hidden');
             $(this).css('opacity', '0.5');
         },
         stop: function(event, ui) {
@@ -51,7 +51,6 @@ function makeDraggable(element, handle = '.move-handle'){
     });
 }
 function makeDroppable(target, accept) {
-    if($(target).hasClass('locked-all-component')) return false
     $(target).droppable({
         tolerance: "pointer",
         greedy: true,
