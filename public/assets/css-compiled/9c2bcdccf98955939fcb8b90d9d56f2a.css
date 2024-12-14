@@ -191,3 +191,12 @@
 .highlight-dropzone-parent > .card-header > :not(.component-title) {
   visibility: hidden;
 }
+#properties-container .group-title {
+  margin-top: -1.5rem;
+}
+#properties-container .group-title span {
+  background: white;
+}
+#properties-container .form-label {
+  font-size: 14px;
+}

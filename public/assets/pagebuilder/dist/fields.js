@@ -5,7 +5,7 @@ function createField(key, value, property) {
             type: 'text',
             code: value.code,
             id: `component_${key}`,
-            class: 'form-control',
+            class: 'form-control form-control-sm',
             value: property || value.default,
             'data-key': key
         });
@@ -14,7 +14,7 @@ function createField(key, value, property) {
             type: 'number',
             code: value.code,
             id: `component_${key}`,
-            class: 'form-control',
+            class: 'form-control form-control-sm',
             value: property || value.default,
             'data-key': key
         });
@@ -23,7 +23,7 @@ function createField(key, value, property) {
         input = $('<textarea>').attr({
             code: value.code,
             id: `component_${key}`,
-            class: 'form-control',
+            class: 'form-control form-control-sm',
             'data-key': key
         }).html(property || value.default);
         $(input).attr('data-key', key);
@@ -32,7 +32,7 @@ function createField(key, value, property) {
             type: 'checkbox',
             code: value.code,
             id: `component_${key}`,
-            class: 'form-check-input',
+            class: 'form-check-input form-control-sm',
             checked: property || value.default,
             'data-key': key
         });
@@ -41,13 +41,16 @@ function createField(key, value, property) {
         input = $('<select>').attr({
             code: value.code,
             id: `component_${key}`,
-            class: 'form-select',
+            class: 'form-select form-control-sm',
             'data-key': key
         });
         $(input).attr('data-key', key);
         value.options.forEach(option => {
             const optionElement = $('<option>').attr('value', option.value).text(option.label);
             if (option.value == property) {
+                optionElement.attr('selected', 'selected');
+            }
+            if (option.value == value.default) {
                 optionElement.attr('selected', 'selected');
             }
             input.append(optionElement);
@@ -57,7 +60,7 @@ function createField(key, value, property) {
             type: 'text',
             code: value.code,
             id: `component_${key}`,
-            class: 'form-control',
+            class: 'form-control form-control-sm',
             value: property || value.default,
             'data-key': key
         })
@@ -67,44 +70,9 @@ function createField(key, value, property) {
             }
         })
     }
-
-    return $('<div class="mb-3">').append(
+    return $(`<div class="col ${value?.class ?? 'col-12'}">`).append(
         $('<label>').attr('for', key).addClass('form-label').text(value.label),
         $(input)
     );
 }
 
-function createColorPicker(key, value, property) {
-    const container = $('<div class="color-picker-container"></div>');
-
-    const presetColors = value.presetColors || [];
-    const presetContainer = $('<div class="preset-colors d-flex mb-2"></div>');
-    presetColors.forEach(color => {
-        const colorSwatch = $('<div class="color-swatch rounded-circle me-2"></div>').css({
-            'background-color': color,
-            'width': '30px',
-            'height': '30px',
-            'cursor': 'pointer'
-        }).attr('data-color', color);
-        if (color === property) {
-            colorSwatch.addClass('border border-2 border-dark');
-        }
-        presetContainer.append(colorSwatch);
-    });
-    container.append(presetContainer);
-
-    const customColorInput = $('<input class="form-control form-control-color">').val(property || value.default).attr('data-key', key).colorpicker();
-    container.append(customColorInput);
-
-    container.on('click', '.color-swatch', function() {
-        container.find('.color-swatch').removeClass('border border-2 border-dark');
-        $(this).addClass('border border-2 border-dark');
-        customColorInput.val($(this).data('color')).trigger('input');
-    });
-
-    customColorInput.on('input', function() {
-        container.find('.color-swatch').removeClass('border border-2 border-dark');
-    });
-
-    return container;
-}

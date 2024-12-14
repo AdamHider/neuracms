@@ -40,6 +40,14 @@ $routes->group('admin', ['filter' => 'auth'], function($routes) {
         $routes->post('update/(:num)', 'Admin\Menu::update/$1');
         $routes->get('delete/(:num)', 'Admin\Menu::delete/$1');
     });
+    $routes->group('file-explorer', function($routes) {
+        $routes->get('', 'Admin\FileExplorer::index');
+        $routes->get('list', 'Admin\FileExplorer::listFiles');
+        $routes->post('upload', 'Admin\FileExplorer::upload');
+        $routes->post('create-directory', 'Admin\FileExplorer::createDirectory');
+        $routes->post('rename', 'Admin\FileExplorer::rename');
+        $routes->post('delete', 'Admin\FileExplorer::delete');
+    });
     $routes->group('languages', function($routes) {
         $routes->get('', 'Admin\Language::index');
         $routes->get('create', 'Admin\Language::create');
@@ -48,8 +56,11 @@ $routes->group('admin', ['filter' => 'auth'], function($routes) {
         $routes->post('update/(:num)', 'Admin\Language::update/$1');
         $routes->get('delete/(:num)', 'Admin\Language::delete/$1');
     });
-    
 });
+
+$routes->get('image/(:any)', 'Image::index/$1');
+
+
 $routes->get('component/getComponent/(:segment)', 'Component::getComponent/$1');
 $routes->post('component/getGeneratedContent', 'Component::getGeneratedContent');
 

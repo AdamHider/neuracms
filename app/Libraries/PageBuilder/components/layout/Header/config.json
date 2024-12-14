@@ -9,15 +9,39 @@
         "title": {
             "label": "Title",
             "type": "text.input",
-            "default": "Header"
+            "default": "Header",
+            "group": "Main",
+            "class": ""
         },
         "class": {
             "label": "Class Name",
             "type": "text.input",
-            "default": ""
+            "default": "",
+            "group": "Main",
+            "class": ""
         },
-        "color": { "type": "color.picker", "label": "Color", "default": "red", "presetColors": [
-            "var(--bs-primary)", "var(--bs-secondary)", "var(--bs-success)", "var(--bs-info)", "var(--bs-warning)", "var(--bs-danger)"
+        "color": { 
+            "label": "Text Color", 
+            "type": "color.picker", 
+            "default": "",
+            "group": "Theme",
+            "class": "col-6"
+        },
+        "backgroundColor": { 
+            "label": "Background Color", 
+            "type": "color.picker", 
+            "default": "",
+            "group": "Theme",
+            "class": "col-6"
+        },
+        "isSticky": { 
+            "type": "select", 
+            "group": "Theme",
+            "label": "Sticky", 
+            "default": "", 
+            "options": [
+                { "value": "", "label": "No" },
+                { "value": "sticky-top sticky-offset", "label": "Yes" }
         ]}
     },
     "children": [

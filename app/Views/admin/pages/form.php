@@ -25,7 +25,7 @@
                 <?php if (isset($preview_link)) : ?>
                 <a href="<?=base_url($preview_link)  ?>" class="btn btn-info" target="_blank">Preview</a>
                 <?php endif; ?>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary" disabled>Save</button>
             </div>
         </div>
         <div class="collapse mt-2" id="collapseMeta">
@@ -84,5 +84,14 @@
     $('form button:not([type="submit"])').on('click', (e) => {
         e.preventDefault();
     })
+    $('form button[type="submit"]').on('click', (e) => {
+        $(window).off('beforeunload')
+    })
+    $('input').on('change', () => {
+        $('form button[type="submit"]').prop('disabled', false)
+        $(window).on('beforeunload', function(e){
+            return 'You have unsaved changes. Are you sure?';
+        });
+    });
 </script>
 <?= $this->endSection() ?>

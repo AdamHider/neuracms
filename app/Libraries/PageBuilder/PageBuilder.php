@@ -86,6 +86,7 @@ class PageBuilder
             }
             $template = str_replace('{{children}}', $childHtml, $template);
         }
+        $template = preg_replace('/{{.*}}/', '', $template);
 
         return $template;
     }

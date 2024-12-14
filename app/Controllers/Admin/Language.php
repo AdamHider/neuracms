@@ -3,14 +3,10 @@
 namespace App\Controllers\Admin;
 
 use App\Models\LanguageModel;
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 
-class Language extends Controller
+class Language extends BaseController
 {
-    public function __construct()
-    {
-        helper(['form']);
-    }
     public function index()
     {
         $data['settings'] = [

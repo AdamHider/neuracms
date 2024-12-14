@@ -10,7 +10,6 @@
                                 </button>
                             </li>
                             <li>
-                                
                                 <input type="checkbox" class="btn-check" id="workspace_marked_toggle" autocomplete="off" checked="checked">
                                 <label class="btn btn-light m-2 mt-0" for="workspace_marked_toggle"><i class="bi bi-border-outer"></i></label>
                             </li>
@@ -29,7 +28,7 @@
                         <div class="card-header">
                             <h4 id="sidebar-title" class="card-title">Element Properties</h4>
                         </div>
-                        <div class="card-body" id="properties-container">
+                        <div class="card-body p-0" id="properties-container">
                             <!-- Поля свойств будут добавляться здесь -->
                         </div>
                     </div>
@@ -70,14 +69,16 @@
 <link rel="stylesheet" href="<?php echo base_url('assets/jquery-ui/jquery-ui.min.css')?>" type="text/css">
 <script type="text/javascript" src="<?php echo base_url('assets/jquery-ui/jquery-ui.min.js')?>"></script>
 
+<link rel="stylesheet" href="<?php echo base_url('assets/colorpicker/css/colorpicker.css')?>" type="text/css">
 <script type="text/javascript" src="<?php echo base_url('assets/colorpicker/js/colors.js')?>"></script>
-<script type="text/javascript" src="<?php echo base_url('assets/colorpicker/js/jqColorPicker.js')?>"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/colorpicker/js/colorpicker.js')?>"></script>
 
 
 
 <script>
 var pageData = <?= isset($page['json_content']) ? json_encode(json_decode($page['json_content']), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) : '[]' ?>;
 const components = <?= isset($components) ? json_encode($components) : '[]' ?>;
+let isChanged = false
 
 $('#workspace_marked_toggle').on('change', (e) => {
     if($(e.target).is(":checked")) return $('#workspace').addClass("workspace-marked");

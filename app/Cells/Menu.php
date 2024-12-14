@@ -45,7 +45,13 @@ class Menu extends Cell
                 ],
                 [
                     'title' => 'Media',
-                    'link'  => '/admin/dashboard',
+                    'link'  => '/admin/media',
+                    'icon'  => 'images',
+                    'type'  => 'menu'
+                ],
+                [
+                    'title' => 'File Explorer',
+                    'link'  => '/admin/file-explorer',
                     'icon'  => 'images',
                     'type'  => 'menu'
                 ],

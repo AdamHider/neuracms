@@ -210,3 +210,14 @@ $component-border-width: 1px;
         }
     }
 }
+#properties-container{
+    .group-title{
+        margin-top: -1.5rem;
+        span{
+            background: white;
+        }
+    }
+    .form-label{
+        font-size: 14px;
+    }
+}

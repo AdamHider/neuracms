@@ -11,10 +11,28 @@ function renderProperties(component) {
     $('#properties-container').empty();
     if(!configs[component.code]) return;
     const config = configs[component.code].properties;
-    for (const [key, value] of Object.entries(config)){
-        const field = createField(key, value, component.properties[key]);
-        makeInputable($(field).find('[data-key]'), component);
-        $('#properties-container').append(field);
+    const groups = {};
+
+    // Группировка свойств по их группам
+    for (const [key, value] of Object.entries(config)) {
+        const group = value.group || 'General';
+        if (!groups[group]) groups[group] = [];
+        groups[group].push({ key, value });
+    }
+
+    // Отображение свойств по группам
+    for (const [group, properties] of Object.entries(groups)) {
+        const groupContainer = $('<div class="group-container p-3 border-bottom">').append(
+            $('<h6>').addClass('group-title').html(`<span>${group}</span>`)
+        );
+        const row = $('<div class="row g-2">');
+        properties.forEach(({ key, value }) => {
+            const field = createField(key, value, component.properties[key]);
+            makeInputable($(field).find('[data-key]'), component);
+            row.append(field);
+        });
+        groupContainer.append(row)
+        $('#properties-container').append(groupContainer);
     }
 }
 
@@ -24,7 +42,6 @@ function makeInputable(field, component){
         e.stopPropagation()
         const value = $(this).attr('type') === 'checkbox' ? $(this).is(':checked') :
                       $(this).attr('type') === 'color' ? $(this).val() : $(this).val();
-
         const key = $(this).data('key');
         component.properties[key] = value;
         if (component.controller) {
@@ -32,14 +49,13 @@ function makeInputable(field, component){
         } else {
             updateComponentProperty(component, key, value);
         }
-        $('#json_content').val(JSON.stringify(pageData));
+        $('#json_content').val(JSON.stringify(pageData)).trigger('change');
     });
 }
 
 function updateComponentProperty(component, key, value) {
     if(key == 'title') updateSidebarTitle(value || component.type);
     const updatedElement = createComponent(component, templates, configs);
-    
     const targetElement = $(`[data-id="${component.id}"]`);
     targetElement.replaceWith(updatedElement);
     highlightActive(component.id);

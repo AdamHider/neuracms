@@ -13,6 +13,7 @@ function initWorkspace() {
     composeComponents()
     initializeDraggableComponents()
     renderWorkspace(pageData);
+
 }
 function initializeDraggableComponents() {
     $('.component-item').each(function() {
@@ -88,11 +89,6 @@ function makeClickable(element) {
         highlightActive(component.id);
     })
 }
-function isLocked(element){
-    
-    return false
-}
-
 function resetActiveHighlighting(){
     $('.active-element').removeClass('active-element');
 }

@@ -4,7 +4,7 @@ function renderWorkspace(data) {
         const componentElement = createComponent(component);
         if (componentElement) $('#workspace').append(componentElement);
     });
-    $('#json_content').val(JSON.stringify(data));
+    $('#json_content').val(JSON.stringify(data)).trigger('change');
 }
 
 
