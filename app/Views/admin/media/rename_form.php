@@ -7,7 +7,7 @@
             </div>
             <div class="modal-body">
                 <form id="renameForm">
-                    <input type="hidden" id="rename-dir" name="dir">
+                    <input type="hidden" id="rename-dir" name="dir" value="<?=$currentDir?>">
                     <input type="hidden" id="rename-oldName" name="oldName">
                     <div class="form-group">
                         <label for="rename-newName">New Name</label>

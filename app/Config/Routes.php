@@ -42,7 +42,7 @@ $routes->group('admin', ['filter' => 'auth'], function($routes) {
     });
     $routes->group('media', function($routes) {
         $routes->get('', 'Admin\Media::index');
-        $routes->get('list', 'Admin\Media::listFiles');
+        $routes->get('list', 'Admin\Media::getData');
         $routes->post('upload', 'Admin\Media::upload');
         $routes->post('create-directory', 'Admin\Media::createDirectory');
         $routes->post('rename', 'Admin\Media::rename');

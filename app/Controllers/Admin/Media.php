@@ -3,6 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
+use App\Libraries\FileExplorer;
 class Media extends BaseController
 {
     protected $baseMediaPath = WRITEPATH . 'uploads/media/';
@@ -19,24 +20,18 @@ class Media extends BaseController
         ];
         return view('admin/media/index', $data);
     }
-    public function listFiles()
+    public function getData()
     {
+        $FileExplorer = new FileExplorer();
+
         $dir = $this->request->getGet('dir') ?? '';
         $dir = trim($dir, '/');
-        $path = $dir ? $this->baseMediaPath . $dir : $this->baseMediaPath;
-
-        $files = directory_map($path, 1);
-        $folders = array_filter($files, function($f) use($path) {
-            return is_dir($path.'/'.$f);
-        });
-        $files = array_filter($files, function($f) use($path) {
-            return  is_file($path.'/'.$f);
-        });
-       
-        return view('admin/media/_file_explorer_directory', ['currentDir' => $dir, 'files' => array_merge($folders, $files)]);
-        //return $this->response->setJSON(['currentDir' => $dir, 'files' => array_merge($folders, $files)]);
+        $data = [
+            'currentDir' => $dir, 
+            'files' => $FileExplorer->listFiles( $this->baseMediaPath, $dir)
+        ];
+        return view('admin/media/_file_explorer', $data);
     }
-
     public function upload()
     {
         $dir = $this->request->getPost('dir') ?? '';

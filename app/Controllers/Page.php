@@ -29,8 +29,6 @@ class Page extends Controller
                 throw new \CodeIgniter\Exceptions\PageNotFoundException('Page not found');
             }
         }
-        
-
         $data['settings'] = [
             'layout' => 'default',
             'menu' => [
