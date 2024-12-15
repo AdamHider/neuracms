@@ -1,0 +1,34 @@
+.fe-item{
+    font-size: 14px;
+}
+.fe-item:hover .dropdown{
+    visibility: visible !important;
+}
+.fe-item .select-file{
+    z-index: 100;
+}
+.card-image.card-media{
+    background-color: rgb(255, 255, 255);
+    background-image: linear-gradient(45deg, rgb(246, 247, 249) 25%, rgba(0, 0, 0, 0) 25%, rgba(0, 0, 0, 0) 75%, rgb(238, 238, 238) 75%, rgb(246, 247, 249) 100%), linear-gradient(45deg, rgb(238, 238, 238) 25%, rgba(0, 0, 0, 0) 25%, rgba(0, 0, 0, 0) 75%, rgb(246, 247, 249) 75%, rgb(246, 247, 249) 100%);
+    background-position-x: 0px, 10px;
+    background-position-y: 0px, 10px;
+    background-size: 20px 20px, 20px 20px
+}
+.card-image .image-preview{
+    display: flex;
+    align-content: center;
+    justify-content: center;
+}
+.card-image .image-preview > *{
+    align-self: center;
+}
+.card-image img{
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1;
+    object-fit: contain;
+    border-radius: .25rem;
+}
+.card-image .bi{
+    font-size: 60px;
+}

@@ -96,4 +96,14 @@ $('#toolbar').on('click', (e) => {
 
 <link rel="stylesheet" href="<?= useStyle('assets/pagebuilder/css/main.scss'); ?>">
 
+<div class="modal fade" id="pickerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="file_picker">
+                <?= view('admin/media/_file_explorer') ?>
+            </div>
+        </div>
+    </div>
+</div>
+
 

@@ -1,0 +1,29 @@
+{
+    "type": "content",
+    "name": "Image",
+    "code": "Image",
+    "group": "modules",
+    "icon": "type",
+    "properties": {
+        "title": {
+            "label": "Title",
+            "type": "text.input",
+            "default": "Image"
+        },
+        "class": {
+            "label": "Class",
+            "type": "text.input",
+            "default": ""
+        },
+        "image": {
+            "label": "Image",
+            "type": "image.picker",
+            "default": ""
+        },
+        "width": {
+            "label": "Width",
+            "type": "text.input",
+            "default": ""
+        }
+    }
+}

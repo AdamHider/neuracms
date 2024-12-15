@@ -50,12 +50,6 @@ class Menu extends Cell
                     'type'  => 'menu'
                 ],
                 [
-                    'title' => 'File Explorer',
-                    'link'  => '/admin/file-explorer',
-                    'icon'  => 'images',
-                    'type'  => 'menu'
-                ],
-                [
                     'type'  => 'separator'
                 ],
                 [

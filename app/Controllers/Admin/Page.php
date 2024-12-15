@@ -71,7 +71,6 @@ class Page extends BaseController
                 'children' => []
             ]]);
         }
-
         return view('admin/pages/form', $data);
     }
 

@@ -3,134 +3,118 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-
 class Media extends BaseController
 {
-    
     protected $baseMediaPath = WRITEPATH . 'uploads/media/';
 
-    public function index($currentDir = '')
+    public function index()
     {
-        $currentDir = trim($currentDir, '/');
-        $currentPath = $currentDir ? $this->baseMediaPath . $currentDir : $this->baseMediaPath;
-
-        $data = [
-            'currentDir' => $currentDir,
-            'files' => directory_map($currentPath, 1)
-        ];
-        
         $data['settings'] = [
             'layout' => 'admin',
             'menu' => [
                 'id' => 2
             ],
-            'title' => 'Pages',
-            'path' => '/admin/pages'
+            'title' => 'Media',
+            'path' => '/admin/media'
         ];
         return view('admin/media/index', $data);
     }
-
-    public function getFileList($currentDir = '')
+    public function listFiles()
     {
-        $currentDir = trim($currentDir, '/');
-        $currentPath = $currentDir ? $this->baseMediaPath . $currentDir : $this->baseMediaPath;
+        $dir = $this->request->getGet('dir') ?? '';
+        $dir = trim($dir, '/');
+        $path = $dir ? $this->baseMediaPath . $dir : $this->baseMediaPath;
 
-        $data = [
-            'currentDir' => $currentDir,
-            'files' => directory_map($currentPath, 1)
-        ];
-
-        return view('admin/media/file_list', $data);
+        $files = directory_map($path, 1);
+        $folders = array_filter($files, function($f) use($path) {
+            return is_dir($path.'/'.$f);
+        });
+        $files = array_filter($files, function($f) use($path) {
+            return  is_file($path.'/'.$f);
+        });
+       
+        return view('admin/media/_file_explorer_directory', ['currentDir' => $dir, 'files' => array_merge($folders, $files)]);
+        //return $this->response->setJSON(['currentDir' => $dir, 'files' => array_merge($folders, $files)]);
     }
 
-    public function upload($currentDir = '')
+    public function upload()
     {
-        $currentDir = trim($currentDir, '/');
-        $currentPath = $currentDir ? $this->baseMediaPath . $currentDir : $this->baseMediaPath;
-
-        $validationRule = [
-            'file' => [
-                'label' => 'Media File',
-                'rules' => 'uploaded[file]|mime_in[file,image/jpg,image/jpeg,image/png,video/mp4,video/avi]|max_size[file,20480]',
-            ],
-        ];
-
-        if (!$this->validate($validationRule)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
+        $dir = $this->request->getPost('dir') ?? '';
+        $dir = trim($dir, '/');
+        $path = $dir ? $this->baseMediaPath . $dir : $this->baseMediaPath;
 
         $file = $this->request->getFile('file');
-        $file->move($currentPath);
+        if ($file->isValid() && !$file->hasMoved()) {
+            $file->move($path);
+            return $this->response->setJSON(['status' => 'success', 'message' => 'File uploaded successfully']);
+        }
 
-        return redirect()->back()->withInput()->with('success', 'File uploaded successfully.');
+        return $this->response->setJSON(['status' => 'error', 'message' => 'File upload failed']);
     }
 
-    public function createDirectory($currentDir = '')
+    public function createDirectory()
     {
-        $currentDir = trim($currentDir, '/');
-        $currentPath = $currentDir ? $this->baseMediaPath . $currentDir : $this->baseMediaPath;
-        
-        $dirName = $this->request->getPost('dirname');
-        $newDirPath = $currentPath . '/' . $dirName;
+        $dir = $this->request->getPost('dir') ?? '';
+        $dir = trim($dir, '/');
+        $path = $dir ? $this->baseMediaPath . $dir : $this->baseMediaPath;
+
+        $newDirName = $this->request->getPost('dirname');
+        $newDirPath = $path . '/' . $newDirName;
 
         if (!is_dir($newDirPath)) {
             mkdir($newDirPath, 0777, true);
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Directory created successfully']);
         }
 
-        return redirect()->to("/admin/media/$currentDir")->with('success', 'Directory created successfully.');
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Directory creation failed']);
     }
 
-    public function deleteFile($currentDir, $fileName)
+    public function rename()
     {
-        $currentDir = trim($currentDir, '/');
-        $filePath = $this->baseMediaPath . $currentDir . '/' . $fileName;
+        $dir = $this->request->getPost('dir') ?? '';
+        $dir = trim($dir, '/');
+        $path = $dir ? $this->baseMediaPath . $dir : $this->baseMediaPath;
 
-        if (file_exists($filePath)) {
-            unlink($filePath);
-        }
-
-        return $this->index($currentDir);
-    }
-
-    public function deleteDirectory($currentDir, $dirName)
-    {
-        $currentDir = trim($currentDir, '/');
-        $dirPath = $this->baseMediaPath . $currentDir . '/' . $dirName;
-
-        if (is_dir($dirPath)) {
-            rmdir($dirPath);
-        }
-
-        return $this->index($currentDir);
-    }
-
-    public function renameFile($currentDir = '')
-    {
-        $currentDir = trim($currentDir, '/');
-        $currentPath = $currentDir ? $this->baseMediaPath . $currentDir : $this->baseMediaPath;
-        
         $oldName = $this->request->getPost('oldName');
         $newName = $this->request->getPost('newName');
-        
-        if (file_exists($currentPath . '/' . $oldName)) {
-            rename($currentPath . '/' . $oldName, $currentPath . '/' . $newName);
+        $oldPath = $path . '/' . $oldName;
+        $newPath = $path . '/' . $newName;
+
+        if (file_exists($oldPath)) {
+            rename($oldPath, $newPath);
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Renamed successfully']);
         }
 
-        return redirect()->to("/admin/media/$currentDir")->with('success', 'File renamed successfully.');
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Rename failed']);
     }
 
-    public function renameDirectory($currentDir = '')
+    public function delete()
     {
-        $currentDir = trim($currentDir, '/');
-        $currentPath = $currentDir ? $this->baseMediaPath . $currentDir : $this->baseMediaPath;
-        
-        $oldName = $this->request->getPost('oldName');
-        $newName = $this->request->getPost('newName');
-        
-        if (is_dir($currentPath . '/' . $oldName)) {
-            rename($currentPath . '/' . $oldName, $currentPath . '/' . $newName);
+        $dir = $this->request->getPost('dir') ?? '';
+        $dir = trim($dir, '/');
+        $path = $dir ? $this->baseMediaPath . $dir : $this->baseMediaPath;
+
+        $name = $this->request->getPost('name');
+        $targetPath = $path . '/' . $name;
+
+        if (is_dir($targetPath)) {
+            $this->deleteDirectory($targetPath);
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Directory deleted successfully']);
+        } elseif (is_file($targetPath)) {
+            unlink($targetPath);
+            return $this->response->setJSON(['status' => 'success', 'message' => 'File deleted successfully']);
         }
 
-        return redirect()->to("/admin/media/$currentDir")->with('success', 'Directory renamed successfully.');
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Delete failed']);
+    }
+
+    private function deleteDirectory($dir)
+    {
+        $files = array_diff(scandir($dir), ['.', '..']);
+        foreach ($files as $file) {
+            $path = $dir . '/' . $file;
+            is_dir($path) ? $this->deleteDirectory($path) : unlink($path);
+        }
+        return rmdir($dir);
     }
 }

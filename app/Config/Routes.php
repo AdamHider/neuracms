@@ -40,13 +40,13 @@ $routes->group('admin', ['filter' => 'auth'], function($routes) {
         $routes->post('update/(:num)', 'Admin\Menu::update/$1');
         $routes->get('delete/(:num)', 'Admin\Menu::delete/$1');
     });
-    $routes->group('file-explorer', function($routes) {
-        $routes->get('', 'Admin\FileExplorer::index');
-        $routes->get('list', 'Admin\FileExplorer::listFiles');
-        $routes->post('upload', 'Admin\FileExplorer::upload');
-        $routes->post('create-directory', 'Admin\FileExplorer::createDirectory');
-        $routes->post('rename', 'Admin\FileExplorer::rename');
-        $routes->post('delete', 'Admin\FileExplorer::delete');
+    $routes->group('media', function($routes) {
+        $routes->get('', 'Admin\Media::index');
+        $routes->get('list', 'Admin\Media::listFiles');
+        $routes->post('upload', 'Admin\Media::upload');
+        $routes->post('create-directory', 'Admin\Media::createDirectory');
+        $routes->post('rename', 'Admin\Media::rename');
+        $routes->post('delete', 'Admin\Media::delete');
     });
     $routes->group('languages', function($routes) {
         $routes->get('', 'Admin\Language::index');

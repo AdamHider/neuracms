@@ -69,7 +69,36 @@ function createField(key, value, property) {
                 $($elm).val($elm._css.backgroundColor).trigger("input");
             }
         })
+    } else if (value.type == 'image.picker') {
+        input = $('<input>').attr({
+            type: 'text',
+            code: value.code,
+            id: `component_${key}`,
+            class: 'form-control form-control-sm',
+            value: property || value.default,
+            'data-key': key
+        })
+        input.on('click', () => {
+            let modal = new bootstrap.Modal(document.getElementById('pickerModal'), {})
+            initFileExplorer({
+                filePickerElement: '#file_picker',
+                multipleMode: false,
+                pickerMode: true,
+                onPicked: (url) => {
+                    $(input).val('/image'+url).trigger("input");
+                    modal.hide()
+                }
+            });
+            
+            modal.show()
+        })
+        
+  
+
     }
+
+    
+    
     return $(`<div class="col ${value?.class ?? 'col-12'}">`).append(
         $('<label>').attr('for', key).addClass('form-label').text(value.label),
         $(input)

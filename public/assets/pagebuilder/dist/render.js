@@ -24,7 +24,7 @@ function createComponent(component) {
     } 
     element.append(createComponentControls(component));
     if (component.type === 'container' || component.type === 'template') {
-        element.append(createDropzone(0, component));
+        element.append(createDropzone(0, component, element));
         if(component.children.length == 0){
             element.addClass('container-no-child');
         }
@@ -34,7 +34,7 @@ function createComponent(component) {
     } else {
         component.children.forEach((child, childIndex) => {
             const childElement = createComponent(child);
-            if (childElement) element.append(childElement).append(createDropzone(childIndex+1, component));
+            if (childElement) element.append(childElement).append(createDropzone(childIndex+1, component, childElement));
         });
     }
     if(!component.ghost){
@@ -71,7 +71,7 @@ function createComponentControls(component) {
     return controls;
 }
 
-function createDropzone(index, component = {}){
+function createDropzone(index, component = {}, element = {}){
     const accept = getComponentAccept(component)
     if(!accept) return ''
     const dropZone = $('<div class="drop-zone" data-index="' + index + '" ><span class="drop-line"></span><span class="plus-button"><i class="bi bi-plus"></i></span></div>');

@@ -35,6 +35,7 @@ $component-border-width: 1px;
     .workspace-component {
         position: relative;
         min-height: 40px;
+        min-width: 40px;
         > .card-header {
             position: absolute;
             bottom: 100%;
