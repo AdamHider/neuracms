@@ -3,9 +3,8 @@ let activeFiles = [];
 let filePickerElement = '';
 let multipleMode = false
 let pickerMode = false
-let callbackFunc = () => {}
 let onPicked = function(filePath){
-    return '/image'+filePath
+    return '/image/'+filePath
 }
 function initFileExplorer(config){
     filePickerElement = config.filePickerElement
@@ -64,13 +63,12 @@ function initControls(){
     });
 }
 function loadFiles(dir = '') {
+    activeFiles = []
     currentDir = dir;
     $.get(basePath+'list', { dir: currentDir }, function(html) {
         $(filePickerElement).empty()
         $(filePickerElement).html(html);
-        //updateBreadcrumbs(data.currentDir);
-        activeFiles = []
-        //renderSelected()
+        renderSelected()
         initControls()
     });
 }
@@ -84,7 +82,6 @@ function upload(formData){
         success: function(response) {
             loadFiles(currentDir);
             $('#uploadModal').modal('hide');
-            //alert(response.message);
         },
         dataType: 'json'
     });
@@ -93,20 +90,17 @@ function createDirectory(data){
     $.post(basePath+'create-directory', data, function(response) {
         loadFiles(currentDir);
         $('#createDirModal').modal('hide');
-        //alert(response.message);
     }, 'json');
 }
 function rename(data){
     $.post(basePath+'rename', data, function(response) {
         loadFiles(currentDir);
         $('#renameModal').modal('hide');
-        //alert(response.message);
     }, 'json');
 }
 function deleteItem(data){
     $.post(basePath+'delete', data, function(response) {
         loadFiles(currentDir);
-        //alert(response.message);
     }, 'json');
 }
 function removeFromActive(dir){
@@ -117,26 +111,32 @@ function removeFromActive(dir){
     activeFiles = newActive
 }
 function renderSelected() {
-    $('#selectedFiles').empty();
-    let controls = $('<div>');
-    if (activeFiles.length == 0) return;
-    controls.append($('<b>Selected: ' + activeFiles.length + '</b>'))
+    let selectedFiles = $('#selectedFiles')
+    if (activeFiles.length == 0) return selectedFiles.addClass('invisible');
     if (activeFiles.length == 1) {
-        controls.append($('<button class="btn btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#renameModal" data-name="' + activeFiles[0] + '" data-dir="' + currentDir + '">Rename</button>'));
-        controls.append($('<button class="btn btn-primary ms-2" data-file="' + activeFiles[0] + '">Delete</button>').on('click', function(e) {
+        selectedFiles.find('b').html(activeFiles.length)
+        selectedFiles.find('[data-file]').attr('data-file', activeFiles[0])
+        selectedFiles.find('[data-dir]').attr('data-dir', currentDir)
+        selectedFiles.find('.delete-file').on('click', function(e) {
             e.preventDefault();
             const file = $(this).data('file');
             deleteItem({ name: file, dir: currentDir })
-        }));
+        });
         if(pickerMode){
-            controls.append($('<button class="btn btn-success ms-2" data-file="' + activeFiles[0] + '">Select</button>').on('click', function(e) {
+            selectedFiles.find('.select-file').on('click', function(e) {
                 e.preventDefault();
                 const file = $(this).data('file');
+                console.log(currentDir)
+                if(currentDir == '') {
+                    currentDir = '/image'
+                }  else {
+                    currentDir = '/image/'+currentDir
+                }
                 return onPicked(currentDir+'/'+file)
-            }));
+            });
         }
     }
-    $('#selectedFiles').append(controls);
+    selectedFiles.removeClass('invisible');
 }
 function selectItem(element, checked){
     let dir = $(element).data('dir')

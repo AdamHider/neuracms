@@ -64,10 +64,10 @@
                     "accept": "none",
                     "children": [
                         {
-                            "name": "Paragraph",
-                            "code": "Paragraph",
+                            "name": "Image",
+                            "code": "Image",
                             "group": "modules",
-                            "properties": { "class": "logo", "title": "Logo", "text": "Logo here" },
+                            "properties": { "class": "logo", "title": "Logo", "image": "" },
                             "type": "content",
                             "lock": "self"
                         }

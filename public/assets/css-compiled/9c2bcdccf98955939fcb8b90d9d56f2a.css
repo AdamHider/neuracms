@@ -32,7 +32,7 @@
   width: auto;
   visibility: hidden;
   margin-bottom: 1px;
-  z-index: 120;
+  z-index: 1200;
   font-size: 13px;
   border-radius: 3px 3px 0 0;
 }

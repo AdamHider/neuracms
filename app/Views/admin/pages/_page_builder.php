@@ -98,7 +98,7 @@ $('#toolbar').on('click', (e) => {
 
 
 <div class="modal modal-xl" id="pickerModal" tabindex="-1" aria-hidden="true"  aria-labelledby="imagePickerModalLabel">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="imagePickerModalLabel">Choose an image</h5>

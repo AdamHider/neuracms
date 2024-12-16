@@ -3,7 +3,7 @@
     "name": "Image",
     "code": "Image",
     "group": "modules",
-    "icon": "type",
+    "icon": "image",
     "properties": {
         "title": {
             "label": "Title",

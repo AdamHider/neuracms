@@ -1,5 +1,9 @@
 function createField(key, value, property) {
     var input = null;
+
+    const inputGroup = $('<div class="input-group">')
+    
+    const clearButton = $('<button class="btn btn-light border" type="button"><i class="bi bi-x-circle text-secondary"></i></button>');
     if (value.type == 'text.input') {
         input = $('<input>').attr({
             type: 'text',
@@ -9,6 +13,10 @@ function createField(key, value, property) {
             value: property || value.default,
             'data-key': key
         });
+        clearButton.on('click', (e) => {
+            $(e.delegateTarget).closest('.input-group').find('input').val(value.default).trigger("input")
+        })
+        inputGroup.append($(input),$(clearButton));
     } else if (value.type == 'number.input') {
         input = $('<input>').attr({
             type: 'number',
@@ -18,7 +26,10 @@ function createField(key, value, property) {
             value: property || value.default,
             'data-key': key
         });
-        $(input).attr('data-key', key);
+        clearButton.on('click', (e) => {
+            $(e.delegateTarget).closest('.input-group').find('input').val(value.default).trigger("input")
+        })
+        inputGroup.append($(input),$(clearButton));
     } else if (value.type == 'text.textarea') {
         input = $('<textarea>').attr({
             code: value.code,
@@ -26,7 +37,10 @@ function createField(key, value, property) {
             class: 'form-control form-control-sm',
             'data-key': key
         }).html(property || value.default);
-        $(input).attr('data-key', key);
+        clearButton.on('click', (e) => {
+            $(e.delegateTarget).closest('.input-group').find('input').val(value.default).trigger("input")
+        })
+        inputGroup.append($(input),$(clearButton));
     } else if (value.type == 'checkbox') {
         input = $('<input>').attr({
             type: 'checkbox',
@@ -36,7 +50,6 @@ function createField(key, value, property) {
             checked: property || value.default,
             'data-key': key
         });
-        $(input).attr('data-key', key);
     } else if (value.type == 'select') {
         input = $('<select>').attr({
             code: value.code,
@@ -57,21 +70,24 @@ function createField(key, value, property) {
         });
     } else if (value.type == 'color.picker') {
         input = $('<input>').attr({
-            type: 'text',
+            type: 'search',
             code: value.code,
             id: `component_${key}`,
             class: 'form-control form-control-sm',
             value: property || value.default,
             'data-key': key
         })
-        input.colorPicker({
-            renderCallback: function($elm, toggled) {
-                $($elm).val($elm._css.backgroundColor).trigger("input");
-            }
+        let callback = function($elm, toggled) {
+            $($elm).val($elm._css.backgroundColor).trigger("input");
+        }
+        input.colorPicker({renderCallback: callback})
+        clearButton.on('click', (e) => {
+            $(e.delegateTarget).closest('.input-group').find('input').val(value.default).trigger("input").colorPicker({renderCallback: callback})
         })
+        inputGroup.append($(input),$(clearButton));
     } else if (value.type == 'image.picker') {
         input = $('<input>').attr({
-            type: 'text',
+            type: 'search',
             code: value.code,
             id: `component_${key}`,
             class: 'form-control form-control-sm',
@@ -85,23 +101,22 @@ function createField(key, value, property) {
                 multipleMode: false,
                 pickerMode: true,
                 onPicked: (url) => {
-                    $(input).val('/image'+url).trigger("input");
+                    $(input).val(url).trigger("input");
                     modal.hide()
                 }
             });
             
             modal.show()
         })
-        
-  
-
+        clearButton.on('click', (e) => {
+            $(e.delegateTarget).closest('.input-group').find('input').val(value.default).trigger("input")
+        })
+        inputGroup.append($(input),$(clearButton));
     }
 
-    
-    
     return $(`<div class="col ${value?.class ?? 'col-12'}">`).append(
         $('<label>').attr('for', key).addClass('form-label').text(value.label),
-        $(input)
+        $(inputGroup)
     );
 }
 

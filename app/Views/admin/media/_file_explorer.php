@@ -18,9 +18,23 @@
             </ul>
         </nav>
         <div class="d-flex ms-auto">
-            <div id="selectedFiles" class="d-flex"></div>
-            <button class="btn btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="bi bi-upload"></i></button>
-            <button class="btn btn-secondary ms-2" data-bs-toggle="modal" data-bs-target="#createDirModal"><i class="bi bi-folder-plus"></i></button>
+            <div id="selectedFiles" class="d-flex invisible">
+                <b></b>
+                <button class="btn btn-success ms-2 select-file" data-file="">Select</button>
+                <button class="btn btn-primary ms-2" data-bs-toggle="dropdown" data-name="" data-dir="">Rename</button>
+                <div class="dropdown-menu px-4 py-3">
+                    <?= view('admin/media/rename_form', ['currentDir' => $currentDir]) ?>
+                </div>
+                <button class="btn btn-primary ms-2 delete-file" data-file="">Delete</button>
+            </div>
+            <button class="btn btn-primary ms-2" data-bs-toggle="dropdown"><i class="bi bi-upload"></i></button>
+            <div class="dropdown-menu px-4 py-3">
+                <?= view('admin/media/upload_form', ['currentDir' => $currentDir]) ?>
+            </div>
+            <button class="btn btn-secondary ms-2" data-bs-toggle="dropdown"><i class="bi bi-folder-plus"></i></button>
+            <div class="dropdown-menu px-4 py-3">
+                <?= view('admin/media/create_dir_form', ['currentDir' => $currentDir]) ?>
+            </div>
         </div>
     </div>
     <div class="card-body">
@@ -28,9 +42,4 @@
             <?= view('admin/media/_file_explorer_directory', ['files' => $files, 'currentDir' => $currentDir]) ?>
         </div>
     </div>
-</div>
-<div id="modals">
-    <?= view('admin/media/upload_form', ['currentDir' => $currentDir]) ?>
-    <?= view('admin/media/create_dir_form', ['currentDir' => $currentDir]) ?>
-    <?= view('admin/media/rename_form', ['currentDir' => $currentDir]) ?>
 </div>
