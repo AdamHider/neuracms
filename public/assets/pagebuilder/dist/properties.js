@@ -55,8 +55,6 @@ function makeInputable(field, component){
 
 function updateComponentProperty(component, key, value) {
     if(key == 'title') updateSidebarTitle(value || component.type);
-    const updatedElement = createComponent(component, templates, configs);
-    const targetElement = $(`[data-id="${component.id}"]`);
-    targetElement.replaceWith(updatedElement);
+    renderElement(component.id, pageData, true); // Render self without children
     highlightActive(component.id);
 }

@@ -50,6 +50,7 @@ function createField(key, value, property) {
             checked: property || value.default,
             'data-key': key
         });
+        inputGroup.append($(input));
     } else if (value.type == 'select') {
         input = $('<select>').attr({
             code: value.code,
@@ -57,7 +58,6 @@ function createField(key, value, property) {
             class: 'form-select form-control-sm',
             'data-key': key
         });
-        $(input).attr('data-key', key);
         value.options.forEach(option => {
             const optionElement = $('<option>').attr('value', option.value).text(option.label);
             if (option.value == property) {
@@ -68,6 +68,7 @@ function createField(key, value, property) {
             }
             input.append(optionElement);
         });
+        inputGroup.append($(input));
     } else if (value.type == 'color.picker') {
         input = $('<input>').attr({
             type: 'search',
@@ -78,7 +79,7 @@ function createField(key, value, property) {
             'data-key': key
         })
         let callback = function($elm, toggled) {
-            $($elm).val($elm._css.backgroundColor).trigger("input");
+            $($elm).val($elm._css.backgroundColor);
         }
         input.colorPicker({renderCallback: callback})
         clearButton.on('click', (e) => {

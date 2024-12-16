@@ -239,7 +239,7 @@
         _$alpha_cursor.css(_$alpha_cursor._css);
 
         _options.doRender && _$trigger.css(_$trigger._css);
-        _$trigger.text && _$trigger.val(_$trigger.text);
+        _$trigger.text && _$trigger.val(_$trigger.text).trigger("input");;
 
         _options.renderCallback.call(
             _colorPicker,

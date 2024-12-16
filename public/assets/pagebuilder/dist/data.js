@@ -37,6 +37,7 @@ function moveComponent(elementId, parent, index = 0) {
             pageData.splice(index, 0, component);
         }
     }
+    return component
 }
 function cloneComponent(componentId, parent, index = 0) {
     const component = findComponentById(componentId, pageData);
@@ -61,14 +62,20 @@ function cloneChildren(children) {
 }
 
 function loadDynamicContent(component, element) {
+    if(element.children().length > 0){
+        element.css('width', element.width())
+        element.css('height', element.height())
+    }
     $.ajax({
         url: '/component/getGeneratedContent',
         method: 'POST',
         data: JSON.stringify(component),
         contentType: 'application/json',
         success: function(response) {
+            element.css('width', 'initial')
+            element.css('height', 'initial')
             element.html(response.html);
-            element.append(createComponentControls(component));
+            element.append(createControls(component));
         },
         error: function() {
             console.error(`Failed to load dynamic content for component ${component.id}`);
@@ -99,4 +106,35 @@ function findComponentById(id, parent) {
         if (found) return found;
     }
     return null;
+}
+function findParentComponent(childId, data) {
+    for (const component of data) {
+        if (component.children) {
+            for (const child of component.children) {
+                if (child.id === childId) {
+                    return component;
+                }
+            }
+            const foundParent = findParentComponent(childId, component.children);
+            if (foundParent) return foundParent;
+        }
+    }
+    return null;
+}
+function getComponentAccept(component){
+    let accept = '.component-item, .workspace-component';
+    if(!component.accept){
+        return accept;
+    }
+    if(component.accept == 'none'){
+        return false
+    }
+    if(component.accept == 'all'){
+        return accept
+    }
+    accept = 'item';
+    for(const type of component.accept.split(',')){
+        accept += `, .${type}-component`
+    }
+    return accept
 }

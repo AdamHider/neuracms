@@ -57,18 +57,23 @@ function makeDroppable(target, accept) {
         greedy: true,
         accept: accept,
         drop: function(event, ui) {
+            const grabbed = ui.helper;
             const dropZoneIndex = $(this).data('index');
             resetDropzoneHighlighting();
-            const code = ui.helper.data('code');
+            const code = grabbed.data('code');
+            const elementId = grabbed.data('id');
             const parentId = $(this).closest('.container-component').data('id');
             const parentComponent = findComponentById(parentId, pageData);
+            let newComponent;
             if (code) {
-                addComponent(configs[code], parentComponent, dropZoneIndex);
+                newComponent = addComponent(configs[code], parentComponent, dropZoneIndex);
             } else {
-                const elementId = ui.helper.data('id');
-                moveComponent(elementId, parentComponent, dropZoneIndex);
+                const grabbedParent = findParentComponent(elementId, pageData)
+                newComponent = moveComponent(elementId, parentComponent, dropZoneIndex);
+                renderElement(grabbedParent.id, pageData, false, true); // Render source siblings without children
             }
-            renderWorkspace(pageData);
+            renderElement(parentId, pageData, false, true); // Render target siblings without children
+            renderElement(newComponent.id, pageData); // Render self with children
         },
         over: function(event, ui) {
             highlightDropzone(this);
