@@ -32,6 +32,9 @@ $routes->group('admin', ['filter' => 'auth'], function($routes) {
         $routes->post('update/(:num)', 'Admin\Page::update/$1');
         $routes->get('delete/(:num)', 'Admin\Page::delete/$1');
     });
+    $routes->group('components', function($routes) {
+        $routes->post('store', 'Admin\Component::store');
+    });
     $routes->group('menus', function($routes) {
         $routes->get('', 'Admin\Menu::index');
         $routes->get('create', 'Admin\Menu::create');

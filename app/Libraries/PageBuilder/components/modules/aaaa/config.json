@@ -1,0 +1,92 @@
+{
+    "code": "aaaa",
+    "icon": "layout-split",
+    "name": "aaaa",
+    "type": "template",
+    "group": null,
+    "accept": "none",
+    "children": [
+        {
+            "code": "Row",
+            "name": "Row",
+            "type": "container",
+            "group": "layout",
+            "accept": "container",
+            "children": [
+                {
+                    "code": "Column",
+                    "name": "Column",
+                    "type": "container",
+                    "group": "layout",
+                    "accept": "content,template",
+                    "children": [
+                        {
+                            "code": "Heading",
+                            "icon": "type-h2",
+                            "name": "Heading",
+                            "type": "content",
+                            "group": "modules",
+                            "children": [],
+                            "properties": {
+                                "class": "",
+                                "title": "Heading",
+                                "header_tag": "h2",
+                                "header_text": "Header text",
+                                "subheader_tag": "h4",
+                                "subheader_text": "Subheader text"
+                            }
+                        }
+                    ],
+                    "properties": {
+                        "class": "col-6",
+                        "title": "Column"
+                    }
+                },
+                {
+                    "code": "Column",
+                    "name": "Column",
+                    "type": "container",
+                    "group": "layout",
+                    "accept": "content,template",
+                    "children": [
+                        {
+                            "code": "PagesList",
+                            "icon": "list",
+                            "name": "Pages List",
+                            "type": "content",
+                            "group": "modules",
+                            "method": "getPagesHtml",
+                            "children": [],
+                            "controller": "App\\Libraries\\PageBuilder\\Components\\Modules\\PagesList\\PagesListController",
+                            "properties": {
+                                "class": "",
+                                "title": "Pages List",
+                                "page_count": 5
+                            }
+                        }
+                    ],
+                    "properties": {
+                        "class": "col-6",
+                        "title": "Column"
+                    }
+                }
+            ],
+            "properties": {
+                "class": "",
+                "title": "Row"
+            }
+        }
+    ],
+    "properties": {
+        "title": {
+            "label": "Title",
+            "type": "text.input",
+            "default": "aaaa"
+        },
+        "class": {
+            "label": "Class Name",
+            "type": "text.input",
+            "default": ""
+        }
+    }
+}

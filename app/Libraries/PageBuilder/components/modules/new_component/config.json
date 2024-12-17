@@ -1,0 +1,90 @@
+{
+    "id": "id-6yn2wrgs2d6",
+    "code": "new_component",
+    "icon": "layout-split",
+    "name": "New Component",
+    "type": "template",
+    "group": null,
+    "accept": "none",
+    "children": [
+        {
+            "id": "id-towz4x95sjn",
+            "code": "Row",
+            "name": "Row",
+            "type": "container",
+            "group": "layout",
+            "accept": "container",
+            "children": [
+                {
+                    "id": "id-c3w4zmp4gf",
+                    "code": "Column",
+                    "name": "Column",
+                    "type": "container",
+                    "group": "layout",
+                    "accept": "content,template",
+                    "children": [
+                        {
+                            "id": "id-mmm68waxkf",
+                            "code": "Heading",
+                            "icon": "type-h2",
+                            "name": "Heading",
+                            "type": "content",
+                            "group": "modules",
+                            "children": [],
+                            "properties": {
+                                "class": "",
+                                "title": "Heading",
+                                "header_tag": "h2",
+                                "header_text": "Header text",
+                                "subheader_tag": "h4",
+                                "subheader_text": "Subheader text"
+                            }
+                        }
+                    ],
+                    "properties": {
+                        "class": "col-6",
+                        "title": "Column"
+                    }
+                },
+                {
+                    "id": "id-v8zlceelb0e",
+                    "code": "Column",
+                    "name": "Column",
+                    "type": "container",
+                    "group": "layout",
+                    "accept": "content,template",
+                    "children": [
+                        {
+                            "id": "id-fsa24cupae6",
+                            "code": "PagesList",
+                            "icon": "list",
+                            "name": "Pages List",
+                            "type": "content",
+                            "group": "modules",
+                            "method": "getPagesHtml",
+                            "children": [],
+                            "controller": "App\\Libraries\\PageBuilder\\Components\\Modules\\PagesList\\PagesListController",
+                            "properties": {
+                                "class": "",
+                                "title": "Pages List",
+                                "page_count": 5
+                            }
+                        }
+                    ],
+                    "properties": {
+                        "class": "col-6",
+                        "title": "Column"
+                    }
+                }
+            ],
+            "properties": {
+                "class": "",
+                "title": "Row"
+            }
+        }
+    ],
+    "properties": {
+        "class": "",
+        "title": "Two Columns"
+    }
+}

@@ -24,13 +24,15 @@
                 <input type="hidden" name="json_content" id="json_content">
             </div>
             <div id="sidebar" class="col-3 d-flex flex-column flex-shrink-0">
-                    <div class="card sticky-top sticky-offset border overflow-auto">
+                    <div class="card sticky-top sticky-offset border">
                         <div class="card-header">
-                            <h4 id="sidebar-title" class="card-title">Element Properties</h4>
+                            <div class="d-flex justify-content-between">
+                                <h4 id="sidebar-title" class="card-title">Element Properties</h4>
+                                <a class="btn invisible" id="addToFavourites" role="button" data-bs-toggle="modal" href="#addToFavouritesModal"><i class="bi bi-star"></i></a>
+                            </div>
+
                         </div>
-                        <div class="card-body p-0" id="properties-container">
-                            <!-- Поля свойств будут добавляться здесь -->
-                        </div>
+                        <div class="card-body p-0" id="properties-container"></div>
                     </div>
             </div>
     </div>
@@ -65,6 +67,8 @@
         </div>
     </div>
 </div>
+
+<?= view('admin/pages/_add_to_favourites_modal') ?>
 
 <link rel="stylesheet" href="<?php echo base_url('assets/jquery-ui/jquery-ui.min.css')?>" type="text/css">
 <script type="text/javascript" src="<?php echo base_url('assets/jquery-ui/jquery-ui.min.js')?>"></script>

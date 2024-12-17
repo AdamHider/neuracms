@@ -1,6 +1,41 @@
 function openProperties(component) {
     updateSidebarTitle(component.properties.title || component.type);
     renderProperties(component);
+    renderFavouritesTrigger(component)
+}
+function renderFavouritesTrigger(component){
+    component = JSON.parse(JSON.stringify(component)) 
+    component.properties = configs[component.code].properties;
+    $('#addToFavourites').removeClass('invisible')
+    $('#addToFavouritesModal [name="new-template-json"]').val(JSON.stringify(component));
+    
+    $('#addToFavouritesModal button[type="submit"]').off('click')
+    $('#addToFavouritesModal button[type="submit"]').on('click', async (e) => {
+        e.preventDefault()
+        const data = {
+            name: $('[name="new-template-name"]').val(),
+            group: $('[name="new-template-group"]').val(),
+            json_content: $('[name="new-template-json"]').val()
+        }
+        createComponentFromTemplate(data)
+    })
+}
+function createComponentFromTemplate(data){
+    $.ajax({
+        url: '/admin/components/store',
+        type: 'POST',
+        data: JSON.stringify(data),
+        dataType: 'json',
+        contentType: false,
+        processData: false,
+        success: function(response) {
+            $('#addToFavouritesModal .alert').addClass('invisible')
+            $('#addToFavouritesModal').modal('hide');
+        },
+        error: function(err) {
+            $('#addToFavouritesModal .alert').removeClass('invisible').html(err.responseJSON.message)
+        },
+    });
 }
 
 function updateSidebarTitle(title) {
@@ -12,7 +47,6 @@ function renderProperties(component) {
     if(!configs[component.code]) return;
     const config = configs[component.code].properties;
     const groups = {};
-
     // Группировка свойств по их группам
     for (const [key, value] of Object.entries(config)) {
         const group = value.group || 'General';
