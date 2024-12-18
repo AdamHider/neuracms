@@ -1,17 +1,19 @@
 {
-    "code": "custom_template",
+    "code": "zzz",
     "icon": "layout-split",
-    "name": "Custom template",
+    "name": "zzz",
     "type": "template",
     "group": null,
     "accept": "none",
     "children": [
         {
             "code": "Row",
+            "lock": true,
             "name": "Row",
             "type": "container",
+            "ghost": true,
             "group": "layout",
-            "accept": "container",
+            "accept": "none",
             "children": [
                 {
                     "code": "Column",
@@ -35,11 +37,26 @@
                                 "subheader_tag": "h4",
                                 "subheader_text": "Subheader text"
                             }
+                        },
+                        {
+                            "code": "PagesList",
+                            "icon": "list",
+                            "name": "Pages List",
+                            "type": "content",
+                            "group": "modules",
+                            "method": "getPagesHtml",
+                            "children": [],
+                            "controller": "App\\Components\\PagesList\\PagesListController",
+                            "properties": {
+                                "class": "",
+                                "title": "Pages List",
+                                "page_count": "5"
+                            }
                         }
                     ],
                     "properties": {
-                        "class": "col-6",
-                        "title": "Column"
+                        "title": "Column",
+                        "width": "col-6"
                     }
                 },
                 {
@@ -50,24 +67,23 @@
                     "accept": "content,template",
                     "children": [
                         {
-                            "code": "PagesList",
-                            "icon": "list",
-                            "name": "Pages List",
+                            "code": "Image",
+                            "icon": "image",
+                            "name": "Image",
                             "type": "content",
                             "group": "modules",
-                            "method": "getPagesHtml",
                             "children": [],
-                            "controller": "App\\Libraries\\PageBuilder\\Components\\Modules\\PagesList\\PagesListController",
                             "properties": {
                                 "class": "",
-                                "title": "Pages List",
-                                "page_count": 5
+                                "image": "\/image\/344e7dad342bb8e6102f2e9b92a82322f.jpg",
+                                "title": "Image",
+                                "width": ""
                             }
                         }
                     ],
                     "properties": {
-                        "class": "col-6",
-                        "title": "Column"
+                        "title": "Column",
+                        "width": "col-6"
                     }
                 }
             ],
@@ -78,7 +94,15 @@
         }
     ],
     "properties": {
-        "class": "",
-        "title": "Custom template"
+        "title": {
+            "label": "Title",
+            "type": "text.input",
+            "default": "zzz"
+        },
+        "class": {
+            "label": "Class Name",
+            "type": "text.input",
+            "default": ""
+        }
     }
 }

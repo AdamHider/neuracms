@@ -8,15 +8,16 @@ class PageBuilder
 {
     private $handler;
 
+    private $basePath = APPPATH . "Components";
     public function __construct()
     {
         $this->handler = new ComponentHandler();
     }
     
-    public function getComponent($type, $group)
+    public function getComponent($code)
     {
-        $configPath = APPPATH . "Libraries/PageBuilder/components/$group/$type/config.json";
-        $templatePath = APPPATH . "Libraries/PageBuilder/components/$group/$type/template.html";
+        $configPath = "$this->basePath/$code/config.json";
+        $templatePath = "$this->basePath/$code/template.html";
 
         if (file_exists($configPath) && file_exists($templatePath)) {
             $config = json_decode(file_get_contents($configPath), true);
@@ -30,23 +31,12 @@ class PageBuilder
 
     public function listComponents()
     {
-        $componentsPath = APPPATH . "Libraries/PageBuilder/components/";
-        $componentGroupDirs = array_diff(scandir($componentsPath), ['..', '.']);
+        $componentDirs = array_diff(scandir($this->basePath), ['..', '.']);
         $components = [];
-
-        foreach ($componentGroupDirs as $key => $group) {
-            if (is_dir($componentsPath . $group)) {
-                $componentGroup = [
-                    'title' => $group,
-                    'children' => []
-                ];
-                $componentDirs = array_diff(scandir($componentsPath . $group), ['..', '.']);
-                foreach ($componentDirs as $dir) {
-                    if (is_dir($componentsPath . $group .'/'. $dir)) {
-                        $componentGroup['children'][] = $this->getComponent($dir, $group);
-                    }
-                }
-                $components[] = $componentGroup;
+        foreach ($componentDirs as $code) {
+            if (is_dir($this->basePath.'/'.$code)) {
+                $component = $this->getComponent($code);
+                $components[$component['config']['group']??'default'][] = $component;
             }
         }
         return $components;
@@ -67,7 +57,7 @@ class PageBuilder
 
     private function buildComponentHtml($component)
     {
-        $componentData = $this->getComponent($component['code'], $component['group']);
+        $componentData = $this->getComponent($component['code']);
         $template = $componentData['template'];
 
         foreach ($component['properties'] as $key => $value) {

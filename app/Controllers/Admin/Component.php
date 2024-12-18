@@ -57,10 +57,10 @@ class Component extends BaseController
         file_put_contents($componentDir . '/config.json', json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
         // Сохранение template.html
-        $template = $jsonContent['template'] ?? '<div></div>';
+        $template = '<div></div>';
         file_put_contents($componentDir . '/template.html', $template);
 
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Component created successfully.']);
+        return $this->response->setJSON(['status' => 'error', 'data' => $config]);
     }
 
     // Функция для рекурсивного удаления всех полей id

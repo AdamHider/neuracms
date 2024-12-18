@@ -82,6 +82,21 @@ function loadDynamicContent(component, element) {
         }
     });
 }
+function loadComponents(callback) {
+    $.ajax({
+        url: '/admin/pages/getComponents',
+        method: 'POST',
+        contentType: 'application/json',
+        success: function(response) {
+            $('#offcanvasComponents').html(response.data.html);
+            initializeDraggableComponents()
+            return callback(response.data.components)
+        },
+        error: function() {
+            console.error(`Failed to load content for components`);
+        }
+    });
+}
 function removeComponent(id, parent = pageData) {
     $('#properties-container').empty();
     componentIndex = parent.findIndex(component => component.id === id);

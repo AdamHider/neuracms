@@ -36,36 +36,7 @@
                     </div>
             </div>
     </div>
-    <div class="offcanvas offcanvas-end" tabindex="-1" data-bs-scroll="true"   data-bs-backdrop="false"  id="offcanvasComponents" aria-labelledby="offcanvasComponentsLabel">
-        <div class="offcanvas-header">
-            <h5 id="offcanvasComponentsLabel">Offcanvas right</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-            <div id="available-components-container">
-                <div id="available-components" class="d-flex flex-column">
-                    <?php foreach ($components as $componentGroup): ?>
-                        <div class="mb-4">
-                            <h5><?= ucfirst($componentGroup['title']) ?></h5>   
-                            <div class="row g-2">
-                                <?php foreach ($componentGroup['children'] as $component): ?>
-                                <?php if(isset($component['config']['is_private']) && $component['config']['is_private']) { continue; } ?>
-                                <div class="col-6">
-                                    <div class="card text-center component-item <?= $component['config']['type'] ?>-component" data-type="<?= $component['config']['type'] ?>" data-code="<?= $component['config']['code'] ?>">
-                                        <div class="card-body px-1 py-2">
-                                            <h4><i class="bi bi-<?= $component['config']['icon'] ?>"></i></h4>
-                                            <span><?= ucfirst($component['config']['name']) ?></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="offcanvas offcanvas-end" tabindex="-1" data-bs-scroll="true" data-bs-backdrop="false" id="offcanvasComponents" aria-labelledby="offcanvasComponentsLabel"></div>
 </div>
 
 <?= view('admin/pages/_add_to_favourites_modal') ?>
@@ -81,7 +52,6 @@
 
 <script>
 var pageData = <?= isset($page['json_content']) ? json_encode(json_decode($page['json_content']), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) : '[]' ?>;
-const components = <?= isset($components) ? json_encode($components) : '[]' ?>;
 let isChanged = false
 
 $('#workspace_marked_toggle').on('change', (e) => {

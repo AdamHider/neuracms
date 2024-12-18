@@ -14,8 +14,8 @@ function renderElement(componentId, data, preserveChildren = false, preserveGran
         const targetElement = $(`[data-id="${componentId}"]`);
         targetElement.replaceWith(componentElement);
     }
+    $('#json_content').val(JSON.stringify(pageData));
 }
-
 
 function createElement(component, preserveChildren = false, preserveGrandchildren = false) {
     let elementHtml;
@@ -106,6 +106,7 @@ function createDropzone(index, component = {}, element = {}){
         cloneComponent(activeElementId, parentComponent, index)
         resetActiveHighlighting()
         renderElement(parentId, pageData, false, true); // Render siblings without children
+        $('#json_content').trigger('change');
     });
     makeDroppable(dropZone, accept);
     return dropZone;

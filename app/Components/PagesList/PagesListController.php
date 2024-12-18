@@ -1,5 +1,5 @@
 <?php 
-namespace App\Libraries\PageBuilder\Components\Modules\PagesList;
+namespace App\Components\PagesList;
 
 use App\Models\PageModel;
 

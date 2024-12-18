@@ -1,19 +1,19 @@
 
 let templates = {}
 let configs = {}
-function composeComponents() {
-    components.forEach(componentGroup => {
-        componentGroup.children.forEach(component => {
+function composeComponents(componentGroups) {
+    Object.keys(componentGroups).forEach((group) => {
+        componentGroups[group].forEach(component => {
             templates[component.config.code] = component.template;
             configs[component.config.code] = component.config;
         });
     });
 }
 function initWorkspace() {
-    composeComponents()
-    initializeDraggableComponents()
-    renderWorkspace(pageData);
-
+    loadComponents((componentGroups) => {
+        composeComponents(componentGroups)
+        renderWorkspace(pageData);
+    })
 }
 function initializeDraggableComponents() {
     $('.component-item').each(function() {
@@ -74,6 +74,7 @@ function makeDroppable(target, accept) {
             }
             renderElement(parentId, pageData, false, true); // Render target siblings without children
             renderElement(newComponent.id, pageData); // Render self with children
+            $('#json_content').trigger('change');
         },
         over: function(event, ui) {
             highlightDropzone(this);

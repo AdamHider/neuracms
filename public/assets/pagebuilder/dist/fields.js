@@ -106,7 +106,6 @@ function createField(key, value, property) {
                     modal.hide()
                 }
             });
-            
             modal.show()
         })
         clearButton.on('click', (e) => {

@@ -15,6 +15,10 @@
                     <label for="newTemplateGroup" class="form-label">Group</label>
                     <input type="text" class="form-control"  name="new-template-group" id="newTemplateGroup" placeholder="">
                 </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" name="new-template-is-global" type="checkbox" value="" id="isGlobal">
+                    <label class="form-check-label" for="isGlobal">Is global</label>
+                </div>
                 <input type="hidden" name="new-template-json">
                 <div class="alert alert-danger invisible" role="alert"></div>
             </div>

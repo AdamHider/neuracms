@@ -126,7 +126,6 @@ function renderSelected() {
             selectedFiles.find('.select-file').on('click', function(e) {
                 e.preventDefault();
                 const file = $(this).data('file');
-                console.log(currentDir)
                 if(currentDir == '') {
                     currentDir = '/image'
                 }  else {

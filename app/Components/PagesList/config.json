@@ -21,6 +21,6 @@
             "default": 5
         }
     },
-    "controller": "App\\Libraries\\PageBuilder\\Components\\Modules\\PagesList\\PagesListController",
+    "controller": "App\\Components\\PagesList\\PagesListController",
     "method": "getPagesHtml"
 }

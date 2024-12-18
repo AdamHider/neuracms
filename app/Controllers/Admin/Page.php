@@ -26,7 +26,6 @@ class Page extends BaseController
     public function form($id = null)
     {
         $pageModel = new PageModel();
-        $pageBuilder = new PageBuilder();
         $languageModel = new LanguageModel();
 
         $data['languages'] = $languageModel->findAll();
@@ -40,8 +39,6 @@ class Page extends BaseController
             ],
             'path' => '/admin/pages/form'
         ];
-
-        $data['components'] = $pageBuilder->listComponents();
 
         if ($id) {
             $data['page'] = $pageModel->find($id);
@@ -72,6 +69,21 @@ class Page extends BaseController
             ]]);
         }
         return view('admin/pages/form', $data);
+    }
+
+    public function getComponents()
+    {
+        $pageBuilder = new PageBuilder();
+        $components = $pageBuilder->listComponents();
+        $componentsHTML = view('admin/pages/_component_list', ['components' => $components]);
+        return $this->response->setJSON([
+            'status' => 'success', 
+            'data' => [
+                'components' => $components,
+                'html' => $componentsHTML
+            ]
+        ]);
+         
     }
 
     public function store()
