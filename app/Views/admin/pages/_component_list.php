@@ -14,7 +14,7 @@
                         <div class="col-6">
                             <div class="card text-center component-item <?= $component['config']['type'] ?>-component" data-type="<?= $component['config']['type'] ?>" data-code="<?= $component['config']['code'] ?>">
                                 <div class="card-body px-1 py-2">
-                                    <h4><i class="bi bi-<?= $component['config']['icon'] ?>"></i></h4>
+                                    <h4><i class="bi bi-<?= $component['config']['icon'] ?? 'puzzle' ?>"></i></h4>
                                     <span><?= $component['config']['name'] ?></span>
                                 </div>
                             </div>

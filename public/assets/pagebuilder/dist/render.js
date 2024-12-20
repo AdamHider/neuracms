@@ -1,10 +1,10 @@
-function renderWorkspace(data) {createElement
+function renderWorkspace() {
     $('#workspace').empty();
-    data.forEach((component, index) => {
+    pageData.forEach((component, index) => {
         const componentElement = createElement(component);
         if (componentElement) $('#workspace').append(componentElement);
     });
-    $('#json_content').val(JSON.stringify(data)).trigger('change');
+    $('#json_content').val(JSON.stringify(pageData));
 }
 
 function renderElement(componentId, data, preserveChildren = false, preserveGrandchildren = false) {
@@ -24,6 +24,7 @@ function createElement(component, preserveChildren = false, preserveGrandchildre
     } else {
         elementHtml = renderMarkup(templates[component.code], component.properties);
     }
+
     const element = $(elementHtml).attr('data-id', component.id).addClass('workspace-component '+component.type+'-component');
 
     if(component.lock)  element.addClass('locked-component');
@@ -69,7 +70,7 @@ function createElement(component, preserveChildren = false, preserveGrandchildre
 function renderMarkup(template, properties) {
     let renderedTemplate = template;
     for (const [key, value] of Object.entries(properties)) {
-        renderedTemplate = renderedTemplate.replace(new RegExp(`{{${key}}}`, 'g'), value);
+        renderedTemplate = renderedTemplate.replace(new RegExp(`{{${key}}}`, 'g'), value.value);
         renderedTemplate = renderedTemplate.replace(new RegExp(`{{children}}`, 'g'), '');
     }
     return renderedTemplate;
@@ -81,12 +82,13 @@ function createControls(component) {
     if(!component.lock){
         controls.append($('<span class="btn btn-sm move-handle rounded-0 rounded-top text-white"><i class="bi bi-grip-vertical"></i></span>'));
     }
-    controls.append($(`<span class="component-title move-handle px-2 py-1 rounded-top text-white">${component.properties.title || component.type}</span>`))
+    controls.append($(`<span class="component-title move-handle px-2 py-1 rounded-top text-white">${component.properties.title.value || component.type}</span>`))
     if(!component.lock){
         controls.append($('<span class="btn btn-sm rounded-0 rounded-top text-white"><i class="bi bi-x"></i></span>').on('click', function(event) {
             const parentId = $(this).closest('.workspace-component').parent().data('id')
             removeComponent(component.id, pageData);
             renderElement(parentId, pageData, false, true); // Render siblings without children
+            $('#json_content').trigger('change');
         }));
     }
 

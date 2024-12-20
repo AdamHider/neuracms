@@ -8,6 +8,7 @@ function composeComponents(componentGroups) {
             configs[component.config.code] = component.config;
         });
     });
+    pageData = [addComponent(pageData[0], null)]
 }
 function initWorkspace() {
     loadComponents((componentGroups) => {
@@ -74,6 +75,7 @@ function makeDroppable(target, accept) {
             }
             renderElement(parentId, pageData, false, true); // Render target siblings without children
             renderElement(newComponent.id, pageData); // Render self with children
+            checkGlobalChanges(newComponent.id)
             $('#json_content').trigger('change');
         },
         over: function(event, ui) {

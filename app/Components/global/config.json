@@ -1,0 +1,246 @@
+{
+    "code": "global",
+    "icon": "layout-split",
+    "name": "global",
+    "type": "template",
+    "group": "",
+    "accept": "none",
+    "children": [
+        {
+            "code": "Row",
+            "lock": true,
+            "name": "Row",
+            "type": "container",
+            "ghost": true,
+            "group": "layout",
+            "accept": "none",
+            "children": [
+                {
+                    "code": "Column",
+                    "name": "Column",
+                    "type": "container",
+                    "group": "layout",
+                    "accept": "content,template",
+                    "children": [
+                        {
+                            "code": "Paragraph",
+                            "icon": "type",
+                            "name": "Paragraph",
+                            "type": "content",
+                            "group": "modules",
+                            "children": [],
+                            "properties": {
+                                "text": {
+                                    "type": "text.textarea",
+                                    "label": "Text",
+                                    "value": "Sample text"
+                                },
+                                "class": {
+                                    "type": "text.input",
+                                    "label": "Class",
+                                    "value": ""
+                                },
+                                "title": {
+                                    "type": "text.input",
+                                    "label": "Title",
+                                    "value": "Paragraph"
+                                }
+                            }
+                        },
+                        {
+                            "code": "Paragraph",
+                            "icon": "type",
+                            "name": "Paragraph",
+                            "type": "content",
+                            "group": "modules",
+                            "children": [],
+                            "properties": {
+                                "text": {
+                                    "type": "text.textarea",
+                                    "label": "Text",
+                                    "value": "Sample text"
+                                },
+                                "class": {
+                                    "type": "text.input",
+                                    "label": "Class",
+                                    "value": ""
+                                },
+                                "title": {
+                                    "type": "text.input",
+                                    "label": "Title",
+                                    "value": "Paragraph"
+                                }
+                            }
+                        }
+                    ],
+                    "properties": {
+                        "class": {
+                            "class": {
+                                "type": "text.input",
+                                "label": "Class Name",
+                                "default": ""
+                            },
+                            "title": {
+                                "type": "text.input",
+                                "label": "Title",
+                                "default": "Column"
+                            },
+                            "width": {
+                                "type": "select",
+                                "label": "Width",
+                                "default": "",
+                                "options": [
+                                    {
+                                        "label": "Please select",
+                                        "value": ""
+                                    },
+                                    {
+                                        "label": "100%",
+                                        "value": "col-12"
+                                    },
+                                    {
+                                        "label": "50%",
+                                        "value": "col-6"
+                                    },
+                                    {
+                                        "label": "25%",
+                                        "value": "col-3"
+                                    }
+                                ]
+                            }
+                        },
+                        "title": {
+                            "value": "Column"
+                        },
+                        "width": {
+                            "value": "col-6"
+                        }
+                    }
+                },
+                {
+                    "code": "Column",
+                    "name": "Column",
+                    "type": "container",
+                    "group": "layout",
+                    "accept": "content,template",
+                    "children": [
+                        {
+                            "code": "Paragraph",
+                            "icon": "type",
+                            "name": "Paragraph",
+                            "type": "content",
+                            "group": "modules",
+                            "children": [],
+                            "properties": {
+                                "text": {
+                                    "type": "text.textarea",
+                                    "label": "Text",
+                                    "value": "Sample text"
+                                },
+                                "class": {
+                                    "type": "text.input",
+                                    "label": "Class",
+                                    "value": ""
+                                },
+                                "title": {
+                                    "type": "text.input",
+                                    "label": "Title",
+                                    "value": "Paragraph"
+                                }
+                            }
+                        },
+                        {
+                            "type": "content",
+                            "name": "Paragraph",
+                            "code": "Paragraph",
+                            "group": "modules",
+                            "icon": "type",
+                            "properties": {
+                                "title": {
+                                    "label": "Title",
+                                    "type": "text.input",
+                                    "value": "Paragraph"
+                                },
+                                "class": {
+                                    "label": "Class",
+                                    "type": "text.input",
+                                    "value": ""
+                                },
+                                "text": {
+                                    "label": "Text",
+                                    "type": "text.textarea",
+                                    "value": "Sample text"
+                                }
+                            },
+                            "children": []
+                        }
+                    ],
+                    "properties": {
+                        "title": {
+                            "value": "Column"
+                        },
+                        "width": {
+                            "value": "col-6"
+                        },
+                        "class": {
+                            "title": {
+                                "label": "Title",
+                                "type": "text.input",
+                                "default": "Column"
+                            },
+                            "class": {
+                                "label": "Class Name",
+                                "type": "text.input",
+                                "default": ""
+                            },
+                            "width": {
+                                "type": "select",
+                                "label": "Width",
+                                "default": "",
+                                "options": [
+                                    {
+                                        "value": "",
+                                        "label": "Please select"
+                                    },
+                                    {
+                                        "value": "col-12",
+                                        "label": "100%"
+                                    },
+                                    {
+                                        "value": "col-6",
+                                        "label": "50%"
+                                    },
+                                    {
+                                        "value": "col-3",
+                                        "label": "25%"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            ],
+            "properties": {
+                "class": {
+                    "value": ""
+                },
+                "title": {
+                    "value": "Row"
+                }
+            }
+        }
+    ],
+    "is_global": true,
+    "properties": {
+        "class": {
+            "type": "text.input",
+            "label": "Class Name",
+            "value": ""
+        },
+        "title": {
+            "type": "text.input",
+            "label": "Title",
+            "value": "global"
+        }
+    }
+}

@@ -10,11 +10,11 @@ function createField(key, value, property) {
             code: value.code,
             id: `component_${key}`,
             class: 'form-control form-control-sm',
-            value: property || value.default,
+            value: property || value.value,
             'data-key': key
         });
         clearButton.on('click', (e) => {
-            $(e.delegateTarget).closest('.input-group').find('input').val(value.default).trigger("input")
+            $(e.delegateTarget).closest('.input-group').find('input').val(value.value).trigger("input")
         })
         inputGroup.append($(input),$(clearButton));
     } else if (value.type == 'number.input') {
@@ -23,11 +23,11 @@ function createField(key, value, property) {
             code: value.code,
             id: `component_${key}`,
             class: 'form-control form-control-sm',
-            value: property || value.default,
+            value: property || value.value,
             'data-key': key
         });
         clearButton.on('click', (e) => {
-            $(e.delegateTarget).closest('.input-group').find('input').val(value.default).trigger("input")
+            $(e.delegateTarget).closest('.input-group').find('input').val(value.value).trigger("input")
         })
         inputGroup.append($(input),$(clearButton));
     } else if (value.type == 'text.textarea') {
@@ -36,9 +36,9 @@ function createField(key, value, property) {
             id: `component_${key}`,
             class: 'form-control form-control-sm',
             'data-key': key
-        }).html(property || value.default);
+        }).html(property || value.value);
         clearButton.on('click', (e) => {
-            $(e.delegateTarget).closest('.input-group').find('input').val(value.default).trigger("input")
+            $(e.delegateTarget).closest('.input-group').find('input').val(value.value).trigger("input")
         })
         inputGroup.append($(input),$(clearButton));
     } else if (value.type == 'checkbox') {
@@ -47,7 +47,7 @@ function createField(key, value, property) {
             code: value.code,
             id: `component_${key}`,
             class: 'form-check-input form-control-sm',
-            checked: property || value.default,
+            checked: property || value.value,
             'data-key': key
         });
         inputGroup.append($(input));
@@ -63,7 +63,7 @@ function createField(key, value, property) {
             if (option.value == property) {
                 optionElement.attr('selected', 'selected');
             }
-            if (option.value == value.default) {
+            if (option.value == value.value) {
                 optionElement.attr('selected', 'selected');
             }
             input.append(optionElement);
@@ -75,7 +75,7 @@ function createField(key, value, property) {
             code: value.code,
             id: `component_${key}`,
             class: 'form-control form-control-sm',
-            value: property || value.default,
+            value: property || value.value,
             'data-key': key
         })
         let callback = function($elm, toggled) {
@@ -83,7 +83,7 @@ function createField(key, value, property) {
         }
         input.colorPicker({renderCallback: callback})
         clearButton.on('click', (e) => {
-            $(e.delegateTarget).closest('.input-group').find('input').val(value.default).trigger("input").colorPicker({renderCallback: callback})
+            $(e.delegateTarget).closest('.input-group').find('input').val(value.value).trigger("input").colorPicker({renderCallback: callback})
         })
         inputGroup.append($(input),$(clearButton));
     } else if (value.type == 'image.picker') {
@@ -92,7 +92,7 @@ function createField(key, value, property) {
             code: value.code,
             id: `component_${key}`,
             class: 'form-control form-control-sm',
-            value: property || value.default,
+            value: property || value.value,
             'data-key': key
         })
         input.on('click', () => {
@@ -109,7 +109,7 @@ function createField(key, value, property) {
             modal.show()
         })
         clearButton.on('click', (e) => {
-            $(e.delegateTarget).closest('.input-group').find('input').val(value.default).trigger("input")
+            $(e.delegateTarget).closest('.input-group').find('input').val(value.value).trigger("input")
         })
         inputGroup.append($(input),$(clearButton));
     }

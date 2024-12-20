@@ -11,32 +11,32 @@
             "label": "Title",
             "type": "text.input",
             "group": "Main",
-            "default": "Workspace"
+            "value": "Workspace"
         },
         "class": {
             "label": "Class Name",
             "type": "text.input",
             "group": "Main",
-            "default": ""
+            "value": ""
         },
         "color": { 
             "label": "Text", 
             "type": "color.picker", 
-            "default": "#212529",
+            "value": "#212529",
             "group": "Theme",
             "class": "col-6"
         },
         "backgroundColor": { 
             "label": "Background", 
             "type": "color.picker", 
-            "default": "#ffffff",
+            "value": "#ffffff",
             "group": "Theme",
             "class": "col-6"
         },
         "backgroundImage": {
             "label": "Background Image",
             "type": "image.picker",
-            "default": "",
+            "value": "",
             "group": "Theme",
             "class": ""
         }

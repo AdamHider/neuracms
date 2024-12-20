@@ -9,12 +9,12 @@
         "title": {
             "label": "Title",
             "type": "text.input",
-            "default": "Two Columns"
+            "value": "Two Columns"
         },
         "class": {
             "label": "Class Name",
             "type": "text.input",
-            "default": ""
+            "value": ""
         }
     },
     "children": [
@@ -22,7 +22,7 @@
             "name": "Row",
             "code": "Row",
             "group": "layout",
-            "properties": { "class": "", "title": "Row" },
+            "properties": { "class": {"value": ""}, "title": {"value": "Row"} },
             "type": "container",
             "accept": "none",
             "lock": true,
@@ -32,7 +32,7 @@
                     "name": "Column",
                     "code": "Column",
                     "group": "layout",
-                    "properties": { "width": "col-6", "title": "Column" },
+                    "properties": { "width": {"value": "col-6"}, "title": {"value": "Column"}},
                     "type": "container",
                     "accept": "content,template"
                 },
@@ -40,7 +40,7 @@
                     "name": "Column",
                     "code": "Column",
                     "group": "layout",
-                    "properties": { "width": "col-6", "title": "Column" },
+                    "properties": { "width": {"value": "col-6"}, "title": {"value": "Column"}},
                     "type": "container",
                     "accept": "content,template"
                 }

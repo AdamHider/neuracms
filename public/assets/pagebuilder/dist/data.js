@@ -2,10 +2,12 @@ function generateUniqueId() {
     return 'id-' + Math.random().toString(36).substr(2, 16);
 }
 function addComponent(component, parent, index = 0) {
+    if(component.is_global){
+        component = configs[component.code]
+    }
     const newComponent = JSON.parse(JSON.stringify(component));
     newComponent.id = generateUniqueId()
     newComponent.children = []
-
     for (const [key, value] of Object.entries(component.properties)) {
         newComponent.properties[key] = value.default ?? value;
     }
@@ -25,6 +27,38 @@ function addComponent(component, parent, index = 0) {
     }
     return newComponent;
 }
+function replaceComponent(component, parent, index) {
+    if (component.is_global) {
+        component = configs[component.code];
+    }
+    const newComponent = JSON.parse(JSON.stringify(component));
+    newComponent.id = generateUniqueId();
+    newComponent.children = [];
+    for (const [key, value] of Object.entries(component.properties)) {
+        newComponent.properties[key] = value.default ?? value;
+    }
+    if (component.children) {
+        component.children.forEach((child, childIndex) => {
+            if (component.lock && component.lock === 'all') {
+                child.lock = component.lock;
+            }
+            const newChild = addComponent(child, newComponent, childIndex);
+            newComponent.children[childIndex] = newChild;
+        });
+    }
+
+    if (parent) {
+        parent.children[index] = newComponent;
+    } else {
+        pageData[index] = newComponent;
+    }
+    return newComponent;
+}
+
+
+
+
+
 function moveComponent(elementId, parent, index = 0) {
     const component = findComponentById(elementId, pageData);
     if (component) {
@@ -97,6 +131,22 @@ function loadComponents(callback) {
         }
     });
 }
+function saveComponent(data, component, callback){
+    return $.ajax({
+        url: '/admin/components/store',
+        type: 'POST',
+        data: JSON.stringify(data),
+        dataType: 'json',
+        contentType: false,
+        processData: false,
+        success: function(response) {
+            callback(true, response)
+        },
+        error: function(err) {
+            callback(false, err)
+        },
+    });
+}
 function removeComponent(id, parent = pageData) {
     $('#properties-container').empty();
     componentIndex = parent.findIndex(component => component.id === id);
@@ -136,6 +186,75 @@ function findParentComponent(childId, data) {
     }
     return null;
 }
+function findChildrenByProperty(components, property) {
+    const childrenWithProperty = [];
+    function traverse(components) {
+        for (const component of components) {
+            if (component[property]) {
+                childrenWithProperty.push(component);
+            }
+
+            if (component.children && component.children.length > 0) {
+                traverse(component.children);
+            }
+        }
+    }
+
+    traverse(components);
+    return childrenWithProperty;
+}
+
+
+function checkGlobalChanges(componentId){                            
+    const globalComponentsChanged = findParentsByProperty(pageData, componentId, 'is_global')
+    if(globalComponentsChanged.length > 0){
+        globalComponentsChanged.forEach((component) => {
+            //replaceComponentById()
+            updateGlobalComponents(pageData, component.code, component)
+            //renderElement(component.id, pageData);
+        })
+        renderWorkspace()
+    }
+}
+function updateGlobalComponents(components, targetCode, updateData) {
+    function traverse(components) {
+        for (const component of components) {
+            if (component.is_global && component.code === targetCode) {
+                replaceComponentById(updateData, component.id, components)
+            }
+
+            if (component.children && component.children.length > 0) {
+                traverse(component.children);
+            }
+        }
+    }
+    traverse(components);
+    return components;
+}
+function findParentsByProperty(components, targetId, property) {
+    const parents = [];
+    function traverse(components, parentChain) {
+        for (const component of components) {
+            const newParentChain = [...parentChain, component];
+
+            if (component.id === targetId) {
+                // Найден целевой компонент, добавляем всех родителей с указанным свойством в массив родителей
+                parents.push(...newParentChain.filter(parent => parent[property]));
+            }
+
+            if (component.children && component.children.length > 0) {
+                traverse(component.children, newParentChain);
+            }
+        }
+    }
+    traverse(components, []);
+    return parents;
+}
+
+
+
+
+
 function getComponentAccept(component){
     let accept = '.component-item, .workspace-component';
     if(!component.accept){

@@ -26,6 +26,7 @@ class Page extends BaseController
     public function form($id = null)
     {
         $pageModel = new PageModel();
+        $PageBuilder = new PageBuilder();
         $languageModel = new LanguageModel();
 
         $data['languages'] = $languageModel->findAll();
@@ -54,19 +55,10 @@ class Page extends BaseController
             $data['action'] = 'store';
             $data['button_text'] = 'Create';
             $data['settings']['title'] = 'New page';
-            $data['page']['json_content'] = json_encode([[
-                'id' => 'page_holder',
-                'type' => 'container',
-                'code' => 'workspace',
-                'group' => 'layout',
-                'lock' => 'self',
-                'accept' => 'all',
-                'properties' => [
-                    'title' => 'My Workspace',
-                    'class' => ''
-                ],
-                'children' => []
-            ]]);
+            $workspace = $PageBuilder->getComponent('workspace');
+            $workspace['config']['children'] = [];
+            $workspace['config']['id'] = 'page_container';
+            $data['page']['json_content'] = json_encode([$workspace['config']]);
         }
         return view('admin/pages/form', $data);
     }

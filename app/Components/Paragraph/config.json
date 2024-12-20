@@ -8,17 +8,17 @@
         "title": {
             "label": "Title",
             "type": "text.input",
-            "default": "Paragraph"
+            "value": "Paragraph"
         },
         "class": {
             "label": "Class",
             "type": "text.input",
-            "default": ""
+            "value": ""
         },
         "text": {
             "label": "Text",
             "type": "text.textarea",
-            "default": "Sample text"
+            "value": "Sample text"
         }
     }
 }
