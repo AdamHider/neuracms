@@ -1,0 +1,8 @@
+name: visiting-card
+title: Сайт-визитка
+description: Небольшой сайт о студии — главная с блоками, услуги, о нас и форма связи.
+theme: default
+modules:
+  builder: { enabled: true }
+  contact-form: { enabled: true }
+  admin: { enabled: true }

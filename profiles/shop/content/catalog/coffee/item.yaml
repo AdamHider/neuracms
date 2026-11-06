@@ -1,0 +1,8 @@
+type: product
+title: Кофе в зёрнах, 1 кг
+price: 1800
+sku: COFFEE-1
+stock: 20
+tags: [coffee]
+order: 2
+published: true

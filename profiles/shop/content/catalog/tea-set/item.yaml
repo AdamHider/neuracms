@@ -1,0 +1,8 @@
+type: product
+title: Чайный набор
+price: 2400
+sku: TEASET-1
+stock: 3
+tags: [tea, gift]
+order: 3
+published: true

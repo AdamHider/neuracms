@@ -1,0 +1,8 @@
+name: corporate
+title: Корпоративный сайт
+description: Многостраничный корпоративный сайт — услуги, команда, новости и контакты.
+theme: default
+modules:
+  builder: { enabled: true }
+  contact-form: { enabled: true }
+  admin: { enabled: true }

@@ -8,10 +8,12 @@ declare(strict_types=1);
  *   php bin/flatcms user:add <login> <password> [role]
  *   php bin/flatcms user:list
  *   php bin/flatcms index:build
+ *   php bin/flatcms site:install <profile> [--force]
  */
 
 use FlatCms\App;
 use FlatCms\Modules\Admin\UserRepository;
+use FlatCms\Support\Fs;
 
 if (PHP_SAPI !== 'cli') {
     exit('This script runs on the command line only.');
@@ -62,9 +64,58 @@ switch ($command) {
         echo "Index rebuilt.\n";
         break;
 
+    case 'site:install':
+        $name = $argv[2] ?? '';
+        $force = in_array('--force', $argv, true);
+        exit(siteInstall($app->fs, $name, $force));
+
     default:
         echo "Commands:\n";
         echo "  user:add <login> <password> [admin|editor]\n";
         echo "  user:list\n";
         echo "  index:build\n";
+        echo "  site:install <profile> [--force]\n";
+        echo "\nProfiles:\n";
+        foreach (glob(FLATCMS_ROOT . '/profiles/*/profile.yaml') ?: [] as $file) {
+            echo '  ' . basename(dirname($file)) . "\n";
+        }
+}
+
+/**
+ * Copy a site profile (config plus content) into the project. Existing content is
+ * kept unless --force is passed.
+ */
+function siteInstall(Fs $fs, string $name, bool $force): int
+{
+    $name = basename($name);
+    $base = 'profiles/' . $name;
+    if (!is_file(FLATCMS_ROOT . '/' . $base . '/profile.yaml')) {
+        fwrite(STDERR, "Unknown profile: {$name}\n");
+        fwrite(STDERR, "Available: " . implode(', ', array_map(
+            static fn (string $f): string => basename(dirname($f)),
+            glob(FLATCMS_ROOT . '/profiles/*/profile.yaml') ?: []
+        )) . "\n");
+
+        return 1;
+    }
+
+    $hasContent = is_dir($fs->path('content')) && $fs->listDir('content') !== [];
+    if ($hasContent && !$force) {
+        fwrite(STDERR, "content/ is not empty. Re-run with --force to overwrite it.\n");
+
+        return 1;
+    }
+
+    if ($hasContent) {
+        $fs->deleteDir('content');
+    }
+    $fs->copyDir($base . '/content', 'content');
+
+    if (is_file(FLATCMS_ROOT . '/' . $base . '/site.yaml')) {
+        $fs->copy($base . '/site.yaml', 'config/site.yaml');
+    }
+
+    echo "Profile \"{$name}\" installed. Run \"php bin/flatcms index:build\" next.\n";
+
+    return 0;
 }

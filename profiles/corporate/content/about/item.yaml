@@ -1,0 +1,11 @@
+type: page
+title: О компании
+order: 1
+published: true
+layout:
+  blocks:
+    - type: heading
+      settings: {text: 'О компании', level: h2}
+    - type: text
+      settings:
+        body: 'Более 120 реализованных проектов и 300 сотрудников в четырёх регионах.'

@@ -1,0 +1,13 @@
+site:
+  title: ГК «Северный Ветер»
+  base_url: http://localhost:8000
+  theme: default
+cache:
+  enabled: true
+  check: true
+debug: true
+modules:
+  shop: { enabled: false }
+  builder: { enabled: true }
+  contact-form: { enabled: true }
+  admin: { enabled: true }

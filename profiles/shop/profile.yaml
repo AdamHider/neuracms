@@ -1,0 +1,9 @@
+name: shop
+title: Простой магазин
+description: Каталог товаров, корзина, оформление заказа и страница заказа.
+theme: default
+modules:
+  builder: { enabled: true }
+  shop: { enabled: true }
+  contact-form: { enabled: true }
+  admin: { enabled: true }

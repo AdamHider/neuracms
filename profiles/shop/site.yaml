@@ -1,0 +1,13 @@
+site:
+  title: Магазин «Чай и Кофе»
+  base_url: http://localhost:8000
+  theme: default
+cache:
+  enabled: true
+  check: true
+debug: true
+modules:
+  builder: { enabled: true }
+  shop: { enabled: true }
+  contact-form: { enabled: true }
+  admin: { enabled: true }

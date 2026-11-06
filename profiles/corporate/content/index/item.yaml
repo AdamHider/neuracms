@@ -1,0 +1,13 @@
+type: page
+title: Главная
+order: 0
+published: true
+layout:
+  blocks:
+    - type: heading
+      settings: {text: 'ГК «Северный Ветер»', level: h1}
+    - type: text
+      settings:
+        body: 'Проектируем и строим логистические комплексы с 2004 года.'
+    - type: products
+      settings: {title: 'Наши услуги', limit: 3}

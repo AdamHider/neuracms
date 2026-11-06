@@ -1,0 +1,15 @@
+type: page
+title: Главная
+order: 0
+published: true
+layout:
+  blocks:
+    - type: heading
+      settings: {text: 'Чай и Кофе', level: h1}
+    - type: text
+      settings:
+        body: 'Свежая обжарка и листовой чай с доставкой по городу.'
+    - type: products
+      settings: {title: 'Хиты продаж', limit: 3}
+    - type: button
+      settings: {text: 'Весь каталог', url: /catalog, style: outline}

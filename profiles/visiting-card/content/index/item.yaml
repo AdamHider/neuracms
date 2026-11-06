@@ -1,0 +1,22 @@
+type: page
+title: Главная
+order: 0
+published: true
+layout:
+  blocks:
+    - type: heading
+      settings: {text: 'Студия «Верста»', level: h1}
+    - type: text
+      settings:
+        body: 'Делаем сайты, которые быстро открываются и легко правятся.'
+    - type: columns
+      settings:
+        ratio: '6-6'
+        left:
+          - {type: heading, settings: {text: 'Сайты', level: h3}}
+          - {type: text, settings: {body: 'Лендинги и корпоративные сайты под ключ.'}}
+        right:
+          - {type: heading, settings: {text: 'Поддержка', level: h3}}
+          - {type: text, settings: {body: 'Обновляем и сопровождаем запущенные проекты.'}}
+    - type: button
+      settings: {text: 'Обсудить проект', url: /contact, style: primary}
