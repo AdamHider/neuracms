@@ -1,0 +1,70 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Small CLI for FlatCMS maintenance tasks. Run from the project root:
+ *   php bin/flatcms user:add <login> <password> [role]
+ *   php bin/flatcms user:list
+ *   php bin/flatcms index:build
+ */
+
+use FlatCms\App;
+use FlatCms\Modules\Admin\UserRepository;
+
+if (PHP_SAPI !== 'cli') {
+    exit('This script runs on the command line only.');
+}
+
+define('FLATCMS_ROOT', dirname(__DIR__));
+require FLATCMS_ROOT . '/vendor/autoload.php';
+
+$argv = $_SERVER['argv'] ?? [];
+$command = $argv[1] ?? 'help';
+
+$app = new App(FLATCMS_ROOT);
+$app->boot();
+
+switch ($command) {
+    case 'user:add':
+        $login = $argv[2] ?? '';
+        $password = $argv[3] ?? '';
+        $role = in_array($argv[4] ?? 'admin', ['admin', 'editor'], true) ? ($argv[4] ?? 'admin') : 'admin';
+
+        if ($login === '' || $password === '') {
+            fwrite(STDERR, "Usage: php bin/flatcms user:add <login> <password> [admin|editor]\n");
+            exit(1);
+        }
+        if (strlen($password) < 8) {
+            fwrite(STDERR, "Password must be at least 8 characters.\n");
+            exit(1);
+        }
+
+        $users = new UserRepository($app->fs);
+        if (!$users->create($login, $password, $role)) {
+            fwrite(STDERR, "Could not create user (invalid or existing login).\n");
+            exit(1);
+        }
+
+        echo "User \"{$login}\" created with role \"{$role}\".\n";
+        break;
+
+    case 'user:list':
+        $users = new UserRepository($app->fs);
+        foreach ($users->all() as $login => $user) {
+            echo $login . ' (' . ($user['role'] ?? 'editor') . ")\n";
+        }
+        break;
+
+    case 'index:build':
+        $app->build();
+        echo "Index rebuilt.\n";
+        break;
+
+    default:
+        echo "Commands:\n";
+        echo "  user:add <login> <password> [admin|editor]\n";
+        echo "  user:list\n";
+        echo "  index:build\n";
+}

@@ -9,5 +9,6 @@ debug: true
 admin:
   enabled: true
 modules:
+  admin: { enabled: true }
   contact-form: { enabled: true }
   shop: { enabled: true }

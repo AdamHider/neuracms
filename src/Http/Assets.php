@@ -58,7 +58,15 @@ final class Assets implements Subsystem
             return new Response('Not Found', 404);
         }
 
-        return $this->send('themes/' . $theme . '/assets', (string) $params['path']);
+        $relative = (string) $params['path'];
+
+        // A theme and a module may share the /assets/<name>/ space; the theme wins.
+        $response = $this->send('themes/' . $theme . '/assets', $relative);
+        if ($response->status() !== 404) {
+            return $response;
+        }
+
+        return $this->send('modules/' . $theme . '/assets', $relative);
     }
 
     private function media(array $params): Response

@@ -1,0 +1,7 @@
+name: admin
+title: Администрирование
+description: Вход, управление контентом, медиа, история версий, пользователи и инструменты.
+version: 1.0.0
+enabled: true
+namespace: FlatCms\Modules\Admin
+class: FlatCms\Modules\Admin\AdminModule
