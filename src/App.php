@@ -13,6 +13,8 @@ use FlatCms\Contracts\Subsystem;
 use FlatCms\Core\Config;
 use FlatCms\Core\Events;
 use FlatCms\Core\Request;
+use FlatCms\Core\Session;
+use FlatCms\Core\SessionStore;
 use FlatCms\Core\Response;
 use FlatCms\Http\Assets;
 use FlatCms\Http\Renderer;
@@ -37,6 +39,8 @@ final class App
     public readonly Renderer $renderer;
     public readonly Assets $assets;
 
+    private SessionStore $session;
+
     /** @var array<string, Module> */
     private array $modules = [];
 
@@ -45,16 +49,30 @@ final class App
 
     private bool $booted = false;
 
-    public function __construct(private readonly string $root)
+    public function __construct(private readonly string $root, ?SessionStore $session = null)
     {
         $this->fs = new Fs($root);
         $this->events = new Events();
         $this->config = new Config($this->fs);
+        $this->session = $session ?? new Session();
+
+        // Module classes must be loadable before boot, for example when a test
+        // instantiates a module service directly.
+        $this->registerModuleAutoloaders();
     }
 
     public function root(): string
     {
         return $this->root;
+    }
+
+    /**
+     * Session used by modules for carts and other per-visitor state. Replaced in
+     * tests so no real PHP session is started.
+     */
+    public function session(): SessionStore
+    {
+        return $this->session;
     }
 
     /**
@@ -239,11 +257,6 @@ final class App
                 continue;
             }
 
-            $namespace = $manifest['namespace'] ?? null;
-            if (is_string($namespace) && $namespace !== '') {
-                $this->registerModuleAutoload($namespace, $base . '/src');
-            }
-
             if (!class_exists($class)) {
                 continue;
             }
@@ -256,6 +269,27 @@ final class App
             $this->modules[$name] = $module;
             $this->moduleTemplatePaths[] = $this->fs->path($base);
             $module->boot($this);
+        }
+    }
+
+    /**
+     * Register a PSR-4 autoloader for every module that declares a namespace.
+     * Runs in the constructor so module classes are available at any time.
+     */
+    private function registerModuleAutoloaders(): void
+    {
+        $modulesDir = $this->fs->path('modules');
+        if (!is_dir($modulesDir)) {
+            return;
+        }
+
+        foreach ($this->fs->listDir('modules', true) as $name) {
+            $base = 'modules/' . $name;
+            $manifest = $this->fs->readYaml($base . '/module.yaml', []);
+            $namespace = $manifest['namespace'] ?? null;
+            if (is_string($namespace) && $namespace !== '') {
+                $this->registerModuleAutoload($namespace, $base . '/src');
+            }
         }
     }
 

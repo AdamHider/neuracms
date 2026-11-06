@@ -1,0 +1,13 @@
+shop:
+  currency: RUB
+  currency_symbol: "₽"
+  provider: manual
+  catalog_url: /products
+  order_prefix: ORD
+providers:
+  manual:
+    enabled: true
+    title: Оплата при получении
+  cash:
+    enabled: true
+    title: Наличные курьеру

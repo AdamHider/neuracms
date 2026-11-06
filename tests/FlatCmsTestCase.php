@@ -15,10 +15,13 @@ abstract class FlatCmsTestCase extends TestCase
 {
     protected string $root;
 
+    protected FakeSession $session;
+
     protected function setUp(): void
     {
         parent::setUp();
 
+        $this->session = new FakeSession();
         $this->root = sys_get_temp_dir() . '/flatcms-test-' . bin2hex(random_bytes(6));
         mkdir($this->root, 0775, true);
         $this->seed();
@@ -32,7 +35,9 @@ abstract class FlatCmsTestCase extends TestCase
 
     protected function app(): App
     {
-        $app = new App($this->root);
+        $this->session ??= new FakeSession();
+
+        $app = new App($this->root, $this->session);
         $app->boot();
         $app->build();
 
@@ -42,6 +47,20 @@ abstract class FlatCmsTestCase extends TestCase
     protected function write(string $path, string $contents): void
     {
         (new Fs($this->root))->write($path, $contents);
+    }
+
+    /**
+     * Copy a folder from the real project into the fixture root. Used by tests
+     * that exercise modules and themes.
+     */
+    protected function copyFromProject(string $relative): void
+    {
+        $source = dirname(__DIR__) . '/' . $relative;
+        if (!is_dir($source)) {
+            return;
+        }
+
+        (new Fs($this->root))->copyDir($source, $relative);
     }
 
     private function seed(): void

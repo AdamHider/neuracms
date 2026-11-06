@@ -17,6 +17,9 @@
             <?php foreach (($site['nav'] ?? []) as $link): ?>
                 <a href="<?= $this->e($this->url($link['url'])) ?>"><?= $this->e($link['title']) ?></a>
             <?php endforeach; ?>
+            <?php if (($site['cart_count'] ?? 0) > 0): ?>
+                <span class="site-nav__cart"><?= (int) $site['cart_count'] ?></span>
+            <?php endif; ?>
         </nav>
     </div>
 </header>

@@ -1,0 +1,7 @@
+name: shop
+title: Магазин
+description: Каталог, корзина, оформление заказа и подключаемые платёжные провайдеры.
+version: 1.0.0
+enabled: true
+namespace: FlatCms\Modules\Shop
+class: FlatCms\Modules\Shop\ShopModule
