@@ -11,7 +11,7 @@ namespace FlatCms\Content;
 final class Item
 {
     public const RESERVED = [
-        'type', 'title', 'slug', 'order', 'published', 'template', 'date', 'inherit',
+        'type', 'title', 'slug', 'order', 'published', 'template', 'date', 'inherit', 'layout',
     ];
 
     private ?string $html = null;

@@ -25,6 +25,9 @@ ob_start();
             <td class="actions">
                 <a href="<?= $this->e($this->url('/admin/content/edit?id=' . rawurlencode($item->id()))) ?>">Изменить</a>
                 <a href="<?= $this->e($this->url('/admin/content/history?id=' . rawurlencode($item->id()))) ?>">История</a>
+                <?php if ($app->module('builder') !== null): ?>
+                    <a href="<?= $this->e($this->url('/admin/builder?id=' . rawurlencode($item->id()))) ?>">Конструктор</a>
+                <?php endif; ?>
                 <form method="post" action="<?= $this->e($this->url('/admin/content/delete')) ?>"
                       onsubmit="return confirm('Удалить элемент?');">
                     <input type="hidden" name="id" value="<?= $this->e($item->id()) ?>">

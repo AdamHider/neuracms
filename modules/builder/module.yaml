@@ -1,0 +1,7 @@
+name: builder
+title: Конструктор страниц
+description: Блочный редактор страниц — блоки, сетка, шаблоны и API типов блоков.
+version: 1.0.0
+enabled: true
+namespace: FlatCms\Modules\Builder
+class: FlatCms\Modules\Builder\BuilderModule
