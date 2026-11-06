@@ -1,0 +1,10 @@
+# Fallback rewrite for shared hosting where the document root cannot be changed
+# to public/. Every request that is not a real file is forwarded to index.php.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>

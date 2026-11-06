@@ -1,0 +1,8 @@
+type: product
+title: Чайник
+price: 1200
+sku: TEAPOT-1
+stock: 5
+tags: [tea, kitchen]
+order: 1
+published: true

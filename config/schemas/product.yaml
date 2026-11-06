@@ -1,0 +1,28 @@
+type: product
+fields:
+  title:
+    type: string
+    required: true
+    label: Название
+  price:
+    type: float
+    required: true
+    label: Цена
+  sku:
+    type: string
+    label: Артикул
+  stock:
+    type: int
+    default: 0
+    label: Остаток
+  tags:
+    type: list
+    label: Теги
+  images:
+    type: list
+    label: Изображения
+  published:
+    type: bool
+    default: true
+    label: Опубликовано
+indexed: [price, sku, tags]

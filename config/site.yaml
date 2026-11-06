@@ -1,0 +1,13 @@
+site:
+  title: FlatCMS
+  base_url: http://localhost:8000
+  theme: default
+cache:
+  enabled: true
+  check: true
+debug: true
+admin:
+  enabled: true
+modules:
+  contact-form: { enabled: true }
+  shop: { enabled: false }

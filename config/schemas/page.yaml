@@ -1,0 +1,18 @@
+type: page
+fields:
+  title:
+    type: string
+    required: true
+    label: Заголовок
+  date:
+    type: date
+    label: Дата
+  template:
+    type: select
+    options: [page, section]
+    label: Шаблон
+  published:
+    type: bool
+    default: true
+    label: Опубликовано
+indexed: []

@@ -1,0 +1,11 @@
+type: section
+fields:
+  title:
+    type: string
+    required: true
+    label: Заголовок раздела
+  order:
+    type: int
+    default: 0
+    label: Порядок
+indexed: []

@@ -1,0 +1,6 @@
+name: Default
+author: FlatCMS
+description: Минимальная тема по умолчанию
+version: 0.1.0
+settings:
+  accent: "#2f6fed"

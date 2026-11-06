@@ -1,56 +1,28 @@
 <?php
 
-/*
- *---------------------------------------------------------------
- * CHECK PHP VERSION
- *---------------------------------------------------------------
+declare(strict_types=1);
+
+/**
+ * Single entry point of FlatCMS. Everything outside public/ stays unreachable.
  */
 
-$minPhpVersion = '8.1'; // If you update this, don't forget to update `spark`.
-if (version_compare(PHP_VERSION, $minPhpVersion, '<')) {
-    $message = sprintf(
-        'Your PHP version must be %s or higher to run CodeIgniter. Current version: %s',
-        $minPhpVersion,
-        PHP_VERSION
-    );
+use FlatCms\App;
 
-    header('HTTP/1.1 503 Service Unavailable.', true, 503);
-    echo $message;
+define('FLATCMS_ROOT', dirname(__DIR__));
+define('FLATCMS_START', microtime(true));
 
-    exit(1);
+$autoload = FLATCMS_ROOT . '/vendor/autoload.php';
+if (!is_file($autoload)) {
+    http_response_code(500);
+    echo 'Dependencies are missing. Run "composer install" or upload the release archive that includes vendor/.';
+    exit;
 }
 
-/*
- *---------------------------------------------------------------
- * SET THE CURRENT DIRECTORY
- *---------------------------------------------------------------
- */
+require $autoload;
 
-// Path to the front controller (this file)
-define('FCPATH', __DIR__ . DIRECTORY_SEPARATOR);
+$app = new App(FLATCMS_ROOT);
 
-// Ensure the current directory is pointing to the front controller's directory
-if (getcwd() . DIRECTORY_SEPARATOR !== FCPATH) {
-    chdir(FCPATH);
-}
+// Templates get the $app variable.
+$GLOBALS['flatcms'] = $app;
 
-/*
- *---------------------------------------------------------------
- * BOOTSTRAP THE APPLICATION
- *---------------------------------------------------------------
- * This process sets up the path constants, loads and registers
- * our autoloader, along with Composer's, loads our constants
- * and fires up an environment-specific bootstrapping.
- */
-
-// LOAD OUR PATHS CONFIG FILE
-// This is the line that might need to be changed, depending on your folder structure.
-require FCPATH . '../app/Config/Paths.php';
-// ^^^ Change this line if you move your application folder
-
-$paths = new Config\Paths();
-
-// LOAD THE FRAMEWORK BOOTSTRAP FILE
-require $paths->systemDirectory . '/Boot.php';
-
-exit(CodeIgniter\Boot::bootWeb($paths));
+$app->run();
