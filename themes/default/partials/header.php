@@ -14,6 +14,9 @@
             <?php foreach (($navigation ?? []) as $navItem): ?>
                 <a href="<?= $this->e($this->url($navItem->url())) ?>"><?= $this->e($navItem->title()) ?></a>
             <?php endforeach; ?>
+            <?php foreach (($site['nav'] ?? []) as $link): ?>
+                <a href="<?= $this->e($this->url($link['url'])) ?>"><?= $this->e($link['title']) ?></a>
+            <?php endforeach; ?>
         </nav>
     </div>
 </header>

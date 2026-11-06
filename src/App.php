@@ -14,6 +14,7 @@ use FlatCms\Core\Config;
 use FlatCms\Core\Events;
 use FlatCms\Core\Request;
 use FlatCms\Core\Response;
+use FlatCms\Http\Assets;
 use FlatCms\Http\Renderer;
 use FlatCms\Http\Route;
 use FlatCms\Http\Router;
@@ -34,6 +35,7 @@ final class App
     public readonly Index $index;
     public readonly Router $router;
     public readonly Renderer $renderer;
+    public readonly Assets $assets;
 
     /** @var array<string, Module> */
     private array $modules = [];
@@ -81,6 +83,9 @@ final class App
 
         $this->renderer = new Renderer($this->events);
         $this->bootSubsystem($this->renderer);
+
+        $this->assets = new Assets();
+        $this->bootSubsystem($this->assets);
 
         $this->loadModules();
 
@@ -230,7 +235,16 @@ final class App
             }
 
             $class = $manifest['class'] ?? null;
-            if (!is_string($class) || $class === '' || !class_exists($class)) {
+            if (!is_string($class) || $class === '') {
+                continue;
+            }
+
+            $namespace = $manifest['namespace'] ?? null;
+            if (is_string($namespace) && $namespace !== '') {
+                $this->registerModuleAutoload($namespace, $base . '/src');
+            }
+
+            if (!class_exists($class)) {
                 continue;
             }
 
@@ -243,6 +257,28 @@ final class App
             $this->moduleTemplatePaths[] = $this->fs->path($base);
             $module->boot($this);
         }
+    }
+
+    /**
+     * Register a PSR-4 autoloader for a module so its classes do not need to be
+     * listed in the root composer.json.
+     */
+    private function registerModuleAutoload(string $namespace, string $srcDir): void
+    {
+        $prefix = rtrim($namespace, '\\') . '\\';
+        $base = $this->fs->path($srcDir);
+
+        spl_autoload_register(static function (string $class) use ($prefix, $base): void {
+            if (!str_starts_with($class, $prefix)) {
+                return;
+            }
+
+            $relative = substr($class, strlen($prefix));
+            $file = $base . '/' . str_replace('\\', '/', $relative) . '.php';
+            if (is_file($file)) {
+                require $file;
+            }
+        });
     }
 
     /**

@@ -1,0 +1,10 @@
+name: contact-form
+title: Форма обратной связи
+description: Добавляет страницу контактов с формой и сохраняет заявки в файлы.
+version: 1.0.0
+enabled: true
+namespace: FlatCms\Modules\ContactForm
+class: FlatCms\Modules\ContactForm\ContactFormModule
+routes:
+  - { method: GET, path: /contact, handler: contactPage }
+  - { method: POST, path: /contact, handler: contactSubmit }

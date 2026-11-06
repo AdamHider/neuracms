@@ -1,10 +1,22 @@
 # Fallback rewrite for shared hosting where the document root cannot be changed
 # to public/. Every request that is not a real file is forwarded to index.php.
+#
+# Everything that must never be served over HTTP is denied below. Prefer pointing
+# the document root at public/ instead of relying on this file.
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
 
+    RewriteRule ^(?:var|vendor|tests|src|config|modules|content|bin)(?:/|$) - [F,L]
+
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^ index.php [L]
+</IfModule>
+
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(?:ya?ml|json|lock|md|log|sql|bak)$">
+        Require all denied
+    </FilesMatch>
 </IfModule>

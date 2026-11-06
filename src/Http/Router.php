@@ -124,8 +124,13 @@ final class Router implements Subsystem
         }
 
         $regex = preg_replace_callback(
-            '#\{([a-zA-Z_][a-zA-Z0-9_]*)\}#',
-            static fn (array $m): string => '(?P<' . $m[1] . '>[^/]+)',
+            '#\{([a-zA-Z_][a-zA-Z0-9_]*)(?::([^}]+))?\}#',
+            static function (array $m): string {
+                $name = $m[1];
+                $inner = $m[2] ?? '[^/]+';
+
+                return '(?P<' . $name . '>' . $inner . ')';
+            },
             $pattern
         );
         $regex = '#^' . $regex . '$#';

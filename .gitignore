@@ -14,3 +14,4 @@
 /.phpunit.result.cache
 /config/users.yaml
 /.phpunit.cache/
+/var/messages/*

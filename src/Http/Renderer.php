@@ -16,9 +16,6 @@ use FlatCms\Core\Events;
  */
 final class Renderer implements Subsystem
 {
-    /** @var list<string> */
-    private array $moduleTemplatePaths = [];
-
     private ?string $theme = null;
 
     private ?\FlatCms\App $app = null;
@@ -34,7 +31,17 @@ final class Renderer implements Subsystem
     {
         $this->app = $app;
         $this->theme = (string) ($app->config->get('site.theme', 'default'));
-        $this->moduleTemplatePaths = $app->moduleTemplatePaths();
+    }
+
+    /**
+     * Module template folders are resolved on demand because modules boot after
+     * the renderer does.
+     *
+     * @return list<string>
+     */
+    private function modulePaths(): array
+    {
+        return $this->app?->moduleTemplatePaths() ?? [];
     }
 
     public function build(): void
@@ -118,7 +125,7 @@ final class Renderer implements Subsystem
             return $this->abs($themeFile);
         }
 
-        foreach ($this->moduleTemplatePaths as $base) {
+        foreach ($this->modulePaths() as $base) {
             $file = $base . '/' . $relative;
             if (is_file($file)) {
                 return $file;
@@ -142,7 +149,7 @@ final class Renderer implements Subsystem
             return $this->renderFile($themeFile, $data);
         }
 
-        foreach ($this->moduleTemplatePaths as $base) {
+        foreach ($this->modulePaths() as $base) {
             $file = $base . '/' . $relative;
             if (is_file($file)) {
                 return $this->renderFile($file, $data);
