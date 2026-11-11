@@ -12,7 +12,7 @@ declare(strict_types=1);
  */
 
 use FlatCms\App;
-use FlatCms\Modules\Admin\UserRepository;
+use FlatCms\Admin\UserRepository;
 use FlatCms\Support\Fs;
 
 if (PHP_SAPI !== 'cli') {

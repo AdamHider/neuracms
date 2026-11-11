@@ -12,7 +12,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Вход — FlatCMS</title>
-    <link rel="stylesheet" href="<?= $this->e($this->asset('admin/css/admin.css')) ?>">
+    <link rel="stylesheet" href="<?= $this->e($this->ownerAsset('admin', 'css/admin.css')) ?>">
 </head>
 <body class="admin admin--login">
 <main class="login">

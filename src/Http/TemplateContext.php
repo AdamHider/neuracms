@@ -29,6 +29,14 @@ final class TemplateContext
         return $this->renderer->asset($path);
     }
 
+    /**
+     * Asset owned by a module or core subsystem, served at /assets/<owner>/<path>.
+     */
+    public function ownerAsset(string $owner, string $path): string
+    {
+        return $this->renderer->ownerAsset($owner, $path);
+    }
+
     public function e(mixed $value): string
     {
         return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');

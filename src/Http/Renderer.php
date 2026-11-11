@@ -44,6 +44,17 @@ final class Renderer implements Subsystem
         return $this->app?->moduleTemplatePaths() ?? [];
     }
 
+    /**
+     * Core owned template folders (the admin panel). Resolved after the theme but
+     * before modules, so a theme may override core views if it wants to.
+     *
+     * @return list<string>
+     */
+    private function corePaths(): array
+    {
+        return $this->app?->coreTemplatePaths() ?? [];
+    }
+
     public function build(): void
     {
     }
@@ -106,6 +117,15 @@ final class Renderer implements Subsystem
         return '/assets/' . $this->theme() . '/' . ltrim($path, '/');
     }
 
+    /**
+     * Path of an asset owned by a named provider (a module or a core subsystem),
+     * served at /assets/<owner>/<path>.
+     */
+    public function ownerAsset(string $owner, string $path): string
+    {
+        return '/assets/' . $owner . '/' . ltrim($path, '/');
+    }
+
     public function url(string $path): string
     {
         return '/' . ltrim($path, '/');
@@ -123,6 +143,13 @@ final class Renderer implements Subsystem
         $themeFile = 'themes/' . $this->theme() . '/' . $relative;
         if (is_file($this->abs($themeFile))) {
             return $this->abs($themeFile);
+        }
+
+        foreach ($this->corePaths() as $base) {
+            $file = $base . '/' . $relative;
+            if (is_file($file)) {
+                return $file;
+            }
         }
 
         foreach ($this->modulePaths() as $base) {
@@ -147,6 +174,13 @@ final class Renderer implements Subsystem
         $themeFile = $this->abs('themes/' . $this->theme() . '/' . $relative);
         if (is_file($themeFile)) {
             return $this->renderFile($themeFile, $data);
+        }
+
+        foreach ($this->corePaths() as $base) {
+            $file = $base . '/' . $relative;
+            if (is_file($file)) {
+                return $this->renderFile($file, $data);
+            }
         }
 
         foreach ($this->modulePaths() as $base) {

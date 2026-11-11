@@ -10,4 +10,3 @@ modules:
   builder: { enabled: true }
   shop: { enabled: true }
   contact-form: { enabled: true }
-  admin: { enabled: true }

@@ -10,6 +10,5 @@ admin:
   enabled: true
 modules:
   builder: { enabled: true }
-  admin: { enabled: true }
   contact-form: { enabled: true }
   shop: { enabled: true }

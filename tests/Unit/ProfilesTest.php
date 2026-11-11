@@ -19,9 +19,10 @@ final class ProfilesTest extends FlatCmsTestCase
     {
         parent::setUp();
 
-        foreach (['builder', 'shop', 'contact-form', 'admin'] as $module) {
+        foreach (['builder', 'shop', 'contact-form'] as $module) {
             $this->copyFromProject('modules/' . $module);
         }
+        $this->copyFromProject('src/Admin');
         $this->copyFromProject('themes/default');
         $this->copyFromProject('profiles');
         $this->copyFromProject('config/schemas');

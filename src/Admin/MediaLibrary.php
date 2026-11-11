@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace FlatCms\Modules\Admin;
+namespace FlatCms\Admin;
 
 use FlatCms\Support\Fs;
 

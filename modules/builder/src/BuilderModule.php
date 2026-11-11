@@ -230,9 +230,7 @@ final class BuilderModule implements Module
 
     private function isAdmin(): bool
     {
-        $admin = $this->app?->module('admin');
-
-        return $admin !== null && method_exists($admin, 'auth') && ($admin->auth()?->isAdmin() ?? false);
+        return $this->app?->admin->auth()?->isAdmin() ?? false;
     }
 
     private function requireApp(): App
