@@ -281,6 +281,23 @@ final class BuilderTest extends FlatCmsTestCase
         self::assertSame('/admin/login', $response->headers()['Location']);
     }
 
+    public function testEditorPayloadSerializesTypesAsAList(): void
+    {
+        $app = $this->appWithBuilder(true);
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $body = $app->handle(new Request('GET', '/admin/builder', ['id' => 'about'], [], [], [], []))->body();
+
+        self::assertSame(1, preg_match("/data-builder='(.*?)'/s", $body, $m), 'Editor must embed a data-builder payload');
+        $payload = json_decode(html_entity_decode($m[1], ENT_QUOTES), true, 512, JSON_THROW_ON_ERROR);
+
+        // The editor JS iterates types with forEach, so this must be a JSON list.
+        self::assertArrayHasKey('types', $payload);
+        self::assertTrue(array_is_list($payload['types']), 'types must serialize as a JSON array');
+        self::assertNotEmpty($payload['types']);
+    }
+
     public function testSaveSanitizesUnknownTypesAndPersists(): void
     {
         $app = $this->appWithBuilder(true);

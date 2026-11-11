@@ -18,7 +18,7 @@
  */
 $payload = [
     'layout' => $layout->toArray(),
-    'types' => array_map(static fn ($t): array => $t->toArray(), $types),
+    'types' => array_values(array_map(static fn ($t): array => $t->toArray(), $types)),
     'categories' => $categories,
     'presets' => $presets,
     'columns' => $columns,
@@ -90,11 +90,10 @@ ob_start();
     </div>
 </form>
 
-<script src="<?= $this->e($this->ownerAsset('admin', 'vendor/bootstrap/js/bootstrap.bundle.min.js')) ?>"></script>
-<script src="<?= $this->e($this->url('/assets/builder/js/builder.js')) ?>"></script>
+<script src="<?= $this->e($this->ownerAsset('builder', 'js/builder.js')) ?>"></script>
 <?php
 $content = ob_get_clean();
-$head = '<link rel="stylesheet" href="' . $this->e($this->url('/assets/builder/css/builder.css')) . '">';
+$head = '<link rel="stylesheet" href="' . $this->e($this->ownerAsset('builder', 'css/builder.css')) . '">';
 echo $this->partial('admin/layout', [
     'content' => $content,
     'title' => 'Конструктор: ' . $item->title(),

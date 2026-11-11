@@ -114,7 +114,10 @@ final class Renderer implements Subsystem
      */
     public function asset(string $path): string
     {
-        return '/assets/' . $this->theme() . '/' . ltrim($path, '/');
+        $relative = ltrim($path, '/');
+        $url = '/assets/' . $this->theme() . '/' . $relative;
+
+        return $this->versioned($url, ['themes/' . $this->theme() . '/assets/' . $relative]);
     }
 
     /**
@@ -123,7 +126,29 @@ final class Renderer implements Subsystem
      */
     public function ownerAsset(string $owner, string $path): string
     {
-        return '/assets/' . $owner . '/' . ltrim($path, '/');
+        $relative = ltrim($path, '/');
+        $url = '/assets/' . $owner . '/' . $relative;
+        $base = $this->app?->coreAssetPath($owner) ?? 'modules/' . $owner . '/assets';
+
+        return $this->versioned($url, [$base . '/' . $relative]);
+    }
+
+    /**
+     * Append a ?v=<mtime> query so browsers refetch an asset after it changes.
+     * Assets are served with a one-day cache, which otherwise hides edits.
+     *
+     * @param list<string> $candidates paths relative to the project root
+     */
+    private function versioned(string $url, array $candidates): string
+    {
+        foreach ($candidates as $candidate) {
+            $file = $this->abs($candidate);
+            if (is_file($file)) {
+                return $url . '?v=' . filemtime($file);
+            }
+        }
+
+        return $url;
     }
 
     public function url(string $path): string

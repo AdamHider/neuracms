@@ -33,7 +33,16 @@
     }
 
     var types = {};
-    (config.types || []).forEach(function (t) { types[t.name] = t; });
+    // The payload may send types as a list or as a name-keyed object.
+    var typeList = config.types || [];
+    if (Array.isArray(typeList)) {
+        typeList.forEach(function (t) { types[t.name] = t; });
+    } else {
+        Object.keys(typeList).forEach(function (key) {
+            var t = typeList[key];
+            types[t.name || key] = t;
+        });
+    }
 
     var grid = config.columns || 12;
     var selection = null;
