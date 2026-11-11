@@ -1,4 +1,0 @@
-admin:
-  enabled: true
-  # Create the first user from the command line:
-  #   php bin/flatcms user:add admin 'a-strong-password' admin

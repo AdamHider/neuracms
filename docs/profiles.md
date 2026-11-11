@@ -30,18 +30,18 @@ new tree.
 ### visiting-card
 
 A small site for a studio. One page of builder blocks, plus about, services and a
-contact page. Modules: `builder`, `contact-form`, `admin`.
+contact page. Modules: `builder`, `contact-form`. The core admin panel is on.
 
 ### corporate
 
 A multi-page company site. A section of services whose children are product-like
-items with prices, a team page and contacts. Modules: `builder`, `contact-form`,
-`admin`.
+items with prices, a team page and contacts. Modules: `builder`, `contact-form`.
+The core admin panel is on.
 
 ### shop
 
 A storefront. A catalog section with three products, a cart, checkout and order
-pages. Modules: `builder`, `shop`, `contact-form`, `admin`.
+pages. Modules: `builder`, `shop`, `contact-form`. The core admin panel is on.
 
 ## Writing your own profile
 

@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
-namespace FlatCms\Modules\Admin;
+namespace FlatCms\Admin;
 
 use FlatCms\App;
 use FlatCms\Content\Item;
-use FlatCms\Contracts\Module;
+use FlatCms\Contracts\Subsystem;
 use FlatCms\Core\Request;
 use FlatCms\Core\Response;
 
 /**
- * Admin module: login, content CRUD, media uploads, revision history and a small
- * tools page. Everything lives under /admin.
+ * The admin panel. Part of the core rather than a module: login, content CRUD,
+ * media uploads, revision history and a small tools page, all under /admin.
+ * It can be switched off with "admin.enabled: false" in config/site.yaml.
  */
-final class AdminModule implements Module
+final class AdminPanel implements Subsystem
 {
     private ?App $app = null;
 
@@ -29,12 +30,20 @@ final class AdminModule implements Module
     public function boot(App $app): void
     {
         $this->app = $app;
-        $app->config->mergeFile('modules/admin/config/config.yaml');
 
         $this->users = new UserRepository($app->fs);
         $this->auth = new Auth($this->users, $app->session());
         $this->writer = new ContentWriter($app->fs);
         $this->media = new MediaLibrary($app->fs);
+
+        // The panel owns its templates, partials and CSS; they live in the core
+        // tree and are served at /assets/admin/... .
+        $app->addCoreTemplates('src/Admin');
+        $app->addCoreAssets('admin', 'src/Admin/assets');
+
+        if (!$this->isEnabled()) {
+            return;
+        }
 
         $router = $app->router;
         $router->add('GET', '/admin', fn (Request $r) => $this->dashboard($r));
@@ -74,6 +83,16 @@ final class AdminModule implements Module
     public function users(): ?UserRepository
     {
         return $this->users;
+    }
+
+    public function contentWriter(): ?ContentWriter
+    {
+        return $this->writer;
+    }
+
+    public function media(): ?MediaLibrary
+    {
+        return $this->media;
     }
 
     private function dashboard(Request $request): Response
@@ -505,9 +524,14 @@ final class AdminModule implements Module
     private function requireApp(): App
     {
         if ($this->app === null) {
-            throw new \RuntimeException('Admin module is not booted');
+            throw new \RuntimeException('Admin panel is not booted');
         }
 
         return $this->app;
+    }
+
+    private function isEnabled(): bool
+    {
+        return (bool) ($this->app?->config->get('admin.enabled', true) ?? true);
     }
 }

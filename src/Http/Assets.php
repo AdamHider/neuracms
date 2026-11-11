@@ -39,9 +39,12 @@ final class Assets implements Subsystem
 
     private ?Fs $fs = null;
 
+    private ?\FlatCms\App $app = null;
+
     public function boot(\FlatCms\App $app): void
     {
         $this->fs = $app->fs;
+        $this->app = $app;
 
         $app->router->add('GET', '/assets/{theme}/{path:.+}', fn (Request $r, array $p): Response => $this->theme($p));
         $app->router->add('GET', '/media/{id:.+}/{file}', fn (Request $r, array $p): Response => $this->media($p));
@@ -60,10 +63,19 @@ final class Assets implements Subsystem
 
         $relative = (string) $params['path'];
 
-        // A theme and a module may share the /assets/<name>/ space; the theme wins.
+        // A theme, a core subsystem and a module may share the /assets/<name>/
+        // space; the theme wins, then the core, then the module.
         $response = $this->send('themes/' . $theme . '/assets', $relative);
         if ($response->status() !== 404) {
             return $response;
+        }
+
+        $core = $this->app?->coreAssetPath($theme);
+        if ($core !== null) {
+            $response = $this->send($core, $relative);
+            if ($response->status() !== 404) {
+                return $response;
+            }
         }
 
         return $this->send('modules/' . $theme . '/assets', $relative);

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace FlatCms\Tests\Unit;
 
+use FlatCms\Admin\Auth;
+use FlatCms\Admin\ContentWriter;
+use FlatCms\Admin\UserRepository;
 use FlatCms\Core\Request;
-use FlatCms\Modules\Admin\Auth;
-use FlatCms\Modules\Admin\ContentWriter;
-use FlatCms\Modules\Admin\UserRepository;
 use FlatCms\Support\Fs;
 use FlatCms\Tests\FakeSession;
 use FlatCms\Tests\FlatCmsTestCase;
@@ -17,15 +17,43 @@ final class AdminTest extends FlatCmsTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->copyFromProject('modules/admin');
+        $this->copyFromProject('src/Admin');
         $this->copyFromProject('themes/default');
     }
 
     private function appWithAdmin(): \FlatCms\App
     {
-        $this->write('config/site.yaml', "site:\n  title: Test\n  theme: default\nmodules:\n  admin: { enabled: true }\n");
+        $this->write('config/site.yaml', "site:\n  title: Test\n  theme: default\nadmin:\n  enabled: true\n");
 
         return $this->app();
+    }
+
+    public function testAdminIsCoreAndNeedsNoModuleEntry(): void
+    {
+        $app = $this->appWithAdmin();
+
+        self::assertSame([], array_filter(array_keys($app->modules()), static fn (string $name): bool => $name === 'admin'));
+        self::assertSame(302, $app->handle(new Request('GET', '/admin', [], [], [], [], []))->status());
+        self::assertSame(200, $app->handle(new Request('GET', '/admin/login', [], [], [], [], []))->status());
+    }
+
+    public function testAdminCanBeDisabled(): void
+    {
+        $this->write('config/site.yaml', "site:\n  title: Test\n  theme: default\nadmin:\n  enabled: false\n");
+        $app = $this->app();
+
+        self::assertSame(404, $app->handle(new Request('GET', '/admin', [], [], [], [], []))->status());
+        self::assertSame(404, $app->handle(new Request('GET', '/admin/login', [], [], [], [], []))->status());
+    }
+
+    public function testAdminCssIsServedFromCore(): void
+    {
+        $app = $this->appWithAdmin();
+
+        $response = $app->handle(new Request('GET', '/assets/admin/css/admin.css', [], [], [], [], []));
+
+        self::assertSame(200, $response->status());
+        self::assertStringContainsString('text/css', $response->headers()['Content-Type']);
     }
 
     public function testUserRepositoryHashesPasswordAndVerifies(): void

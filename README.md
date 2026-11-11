@@ -40,7 +40,7 @@ refuses to touch a non-empty content tree.
 ```
 config/       site.yaml, redirects.yaml and per-type schemas
 content/      the site content: one folder per item
-modules/      self-contained modules (admin, builder, shop, contact-form)
+modules/      self-contained modules (builder, shop, contact-form)
 profiles/     ready-made sites (config + content)
 src/          the CMS core
 tests/        PHPUnit tests
@@ -65,9 +65,11 @@ Reserved keys are `type`, `title`, `slug`, `order`, `published`, `template`,
 
 ## Modules
 
+The admin panel is part of the core (not a module) and is on for every site; see
+[docs/admin.md](docs/admin.md). The remaining modules are:
+
 | Module | What it adds |
 | --- | --- |
-| `admin` | Login, content CRUD, media uploads, history, users and tools |
 | `builder` | Block-based page builder and the `/admin/builder` editor |
 | `shop` | Catalog, cart, checkout, orders and payment providers |
 | `contact-form` | A contact form and message storage |
@@ -124,4 +126,4 @@ vendor/bin/phpunit
 ## Documentation
 
 See [docs/](docs/) for the architecture, the content format, the builder, the
-admin module and the site profiles.
+admin panel and the site profiles.

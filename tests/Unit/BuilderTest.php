@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace FlatCms\Tests\Unit;
 
+use FlatCms\Admin\UserRepository;
 use FlatCms\Core\Request;
-use FlatCms\Modules\Admin\UserRepository;
 use FlatCms\Modules\Builder\Block;
 use FlatCms\Modules\Builder\BuilderModule;
 use FlatCms\Modules\Builder\Layout;
@@ -19,17 +19,15 @@ final class BuilderTest extends FlatCmsTestCase
     {
         parent::setUp();
         $this->copyFromProject('modules/builder');
-        $this->copyFromProject('modules/admin');
+        $this->copyFromProject('src/Admin');
         $this->copyFromProject('themes/default');
     }
 
     private function appWithBuilder(bool $withAdmin = false): \FlatCms\App
     {
         $modules = "modules:\n  builder: { enabled: true }\n";
-        if ($withAdmin) {
-            $modules .= "  admin: { enabled: true }\n";
-        }
-        $this->write('config/site.yaml', "site:\n  title: Test\n  theme: default\n" . $modules);
+        $admin = 'admin: { enabled: ' . ($withAdmin ? 'true' : 'false') . " }\n";
+        $this->write('config/site.yaml', "site:\n  title: Test\n  theme: default\n" . $admin . $modules);
 
         return $this->app();
     }

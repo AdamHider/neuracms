@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FlatCms;
 
+use FlatCms\Admin\AdminPanel;
 use FlatCms\Content\Index;
 use FlatCms\Content\Query;
 use FlatCms\Content\Schema;
@@ -38,6 +39,7 @@ final class App
     public readonly Router $router;
     public readonly Renderer $renderer;
     public readonly Assets $assets;
+    public readonly AdminPanel $admin;
 
     private SessionStore $session;
 
@@ -46,6 +48,12 @@ final class App
 
     /** @var list<string> */
     private array $moduleTemplatePaths = [];
+
+    /** @var list<string> */
+    private array $coreTemplatePaths = [];
+
+    /** @var array<string, string> */
+    private array $coreAssetPaths = [];
 
     private bool $booted = false;
 
@@ -105,6 +113,9 @@ final class App
         $this->assets = new Assets();
         $this->bootSubsystem($this->assets);
 
+        $this->admin = new AdminPanel();
+        $this->bootSubsystem($this->admin);
+
         $this->loadModules();
 
         $this->events->emit('app.booted', $this);
@@ -121,6 +132,47 @@ final class App
     public function moduleTemplatePaths(): array
     {
         return $this->moduleTemplatePaths;
+    }
+
+    /**
+     * Template folders owned by the core itself. Resolved before modules so the
+     * core can ship views (for example the admin panel) without a theme.
+     *
+     * @return list<string>
+     */
+    public function coreTemplatePaths(): array
+    {
+        return $this->coreTemplatePaths;
+    }
+
+    /**
+     * Register a folder the renderer may look into for templates/ and partials/.
+     */
+    public function addCoreTemplates(string $relative): void
+    {
+        $this->coreTemplatePaths[] = $this->fs->path($relative);
+    }
+
+    /**
+     * Register an asset folder under an owner name, served at
+     * /assets/<name>/<path> next to theme and module assets.
+     */
+    public function addCoreAssets(string $name, string $relative): void
+    {
+        $this->coreAssetPaths[$name] = $relative;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function coreAssetPaths(): array
+    {
+        return $this->coreAssetPaths;
+    }
+
+    public function coreAssetPath(string $name): ?string
+    {
+        return $this->coreAssetPaths[$name] ?? null;
     }
 
     /**

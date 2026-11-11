@@ -9,8 +9,9 @@ folders under `content/`; everything else is generated into `var/`.
 
 1. The constructor builds `Fs`, `Events`, `Config`, the session and registers a
    PSR-4 autoloader per module.
-2. `boot()` runs every subsystem and then loads the enabled modules. Each module
-   registers routes, listens to events and adds its template folder.
+2. `boot()` runs every subsystem — including the core admin panel — and then
+   loads the enabled modules. Each module registers routes, listens to events and
+   adds its template folder.
 3. `build()` (or the request itself) refreshes the content index and the cache.
 4. `handle(Request)` asks the router to match. A match is either a handler, a
    redirect or a content item; the renderer turns the result into HTML.
@@ -29,15 +30,17 @@ folders under `content/`; everything else is generated into `var/`.
 | `Content\Schema` | Field descriptions per content type, used by the editor |
 | `Http\Router` | Pattern routes, redirects and content fallback |
 | `Http\Renderer` | Template lookup, partials and the layout resolver |
-| `Http\Assets` | Serves theme and module assets and item media |
+| `Http\Assets` | Serves theme, core and module assets and item media |
+| `Admin\AdminPanel` | Core admin subsystem: auth, content, media, users, tools |
 | `Support\Fs` | All file access, with path safety |
 
 ## Rendering
 
 `Renderer` looks up a template in this order: the item `template` property, the
 item `type` (`templates/<type>.php`), then `templates/page.php`. A theme's
-`templates/` and `partials/` are searched first, then each enabled module's
-`templates/`. Theme and module assets are served at `/assets/<name>/...`.
+`templates/` and `partials/` are searched first, then the core's own folders
+(`src/Admin`), then each enabled module's `templates/`. Assets are served at
+`/assets/<name>/...`: the theme wins, then a core subsystem, then a module.
 
 Templates receive `$item` (or the current data), `$app` and `$this`, a
 `TemplateContext` with `e()`, `url()`, `asset()`, `partial()` and `layout()`.
@@ -58,7 +61,7 @@ only, so `indexed` must list any field used in `where()`.
 
 `Fs` resolves every path below the project root and refuses anything that escapes
 it. `Storage` treats a folder name as the item id, so an id like `products/teapot`
-maps to `content/products/teapot`. Writes go through the admin module's
+maps to `content/products/teapot`. Writes go through the admin panel's
 `ContentWriter`, which keeps a copy of every previous version under
 `var/history/<type>__<id>/<timestamp>/`.
 

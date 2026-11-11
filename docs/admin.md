@@ -1,7 +1,18 @@
-# Admin module
+# Admin panel
 
-The admin module adds authentication, content management, media, history, users
-and maintenance tools under `/admin`.
+The admin panel is part of the **core**, not a module. It ships authentication,
+content management, media, history, users and maintenance tools under `/admin`,
+and its classes live in `src/Admin/` (`FlatCms\Admin`).
+
+Because it is core, every site gets it without listing it under `modules:`. It is
+switched on by default and can be turned off in `config/site.yaml`:
+
+```yaml
+admin:
+  enabled: false
+```
+
+With the panel disabled, the `/admin` routes are not registered and return 404.
 
 ## Access
 
