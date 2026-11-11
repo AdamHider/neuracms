@@ -57,6 +57,8 @@ final class AdminPanel implements Subsystem
         $router->add('POST', '/admin/logout', fn (Request $r) => $this->logout($r));
 
         $router->add('GET', '/admin/content', fn (Request $r) => $this->contentList($r));
+        $router->add('GET', '/admin/pages', fn (Request $r) => $this->contentList($r, Schema::KIND_PAGE));
+        $router->add('GET', '/admin/elements', fn (Request $r) => $this->contentList($r, Schema::KIND_ELEMENT));
         $router->add('GET', '/admin/content/new', fn (Request $r) => $this->contentNew($r));
         $router->add('POST', '/admin/content/new', fn (Request $r) => $this->contentCreate($r));
         $router->add('GET', '/admin/content/edit', fn (Request $r) => $this->contentEdit($r));
@@ -122,8 +124,15 @@ final class AdminPanel implements Subsystem
         $items = $app->query()->withUnpublished()->find();
         $orders = $app->module('shop')?->orders()?->all(5) ?? [];
 
+        $counts = $this->typeCounts($items);
+        $kinds = [];
+        foreach (array_keys($counts) as $type) {
+            $kinds[$type] = $app->schema->kind($type);
+        }
+
         return $this->page('admin/dashboard', 'Панель', [
-            'counts' => $this->typeCounts($items),
+            'counts' => $counts,
+            'kinds' => $kinds,
             'recent' => array_slice($items, 0, 10),
             'orders' => $orders,
         ]);
@@ -157,7 +166,7 @@ final class AdminPanel implements Subsystem
         return Response::redirect('/admin/login', 302);
     }
 
-    private function contentList(Request $request): Response
+    private function contentList(Request $request, ?string $kind = null): Response
     {
         if (!$this->requireAuth()) {
             return Response::redirect('/admin/login', 302);
@@ -167,15 +176,28 @@ final class AdminPanel implements Subsystem
         $type = trim((string) $request->query('type', ''));
 
         $query = $app->query()->withUnpublished();
+        if ($kind !== null) {
+            $query = $query->kind($kind);
+        }
         if ($type !== '') {
             $query = $query->type($type);
         }
 
-        return $this->page('admin/content-list', 'Контент', [
+        return $this->page('admin/content-list', $this->listTitle($kind), [
             'items' => $query->sort('id')->find(),
             'type' => $type,
-            'types' => $this->typeOptions(),
+            'kind' => $kind,
+            'types' => $this->typeOptions($kind),
         ]);
+    }
+
+    private function listTitle(?string $kind): string
+    {
+        return match ($kind) {
+            Schema::KIND_PAGE => 'Страницы',
+            Schema::KIND_ELEMENT => 'Элементы',
+            default => 'Контент',
+        };
     }
 
     private function contentNew(Request $request): Response
@@ -184,9 +206,31 @@ final class AdminPanel implements Subsystem
             return Response::redirect('/admin/login', 302);
         }
 
-        $type = (string) $request->query('type', 'page');
+        $kind = $this->normalizeKind((string) $request->query('kind', ''));
+        $requested = (string) $request->query('type', '');
+        $type = $requested !== '' ? $requested : $this->defaultType($kind);
+        $isPage = $this->requireApp()->schema->isPage($type);
 
-        return $this->page('admin/content-edit', 'Новый элемент', $this->editData(null, '', $type, []));
+        return $this->page('admin/content-edit', $isPage ? 'Новая страница' : 'Новый элемент', $this->editData(null, '', $type, []));
+    }
+
+    /**
+     * Default type when creating an item of a kind: the core "page" for pages,
+     * otherwise the first element type.
+     */
+    private function defaultType(string $kind): string
+    {
+        $types = $this->typeOptions($kind);
+        if ($kind === Schema::KIND_PAGE && isset($types['page'])) {
+            return 'page';
+        }
+
+        return array_key_first($types) ?? 'page';
+    }
+
+    private function normalizeKind(string $kind): string
+    {
+        return $kind === Schema::KIND_ELEMENT ? Schema::KIND_ELEMENT : Schema::KIND_PAGE;
     }
 
     private function contentCreate(Request $request): Response
@@ -279,10 +323,17 @@ final class AdminPanel implements Subsystem
             return Response::redirect('/admin/login', 302);
         }
 
-        $this->writer?->delete((string) $request->input('id', ''));
+        $id = (string) $request->input('id', '');
+        $item = $this->writer?->load($id);
+        $list = '/admin/content';
+        if ($item !== null) {
+            $list = $this->requireApp()->schema->isPage($item->type()) ? '/admin/pages' : '/admin/elements';
+        }
+
+        $this->writer?->delete($id);
         $this->requireApp()->build();
 
-        return Response::redirect('/admin/content', 303);
+        return Response::redirect($list, 303);
     }
 
     private function contentMove(Request $request): Response
@@ -536,11 +587,13 @@ final class AdminPanel implements Subsystem
         array $extra = [],
     ): array {
         $type = $type !== '' ? $type : 'page';
+        $kind = $this->requireApp()->schema->kind($type);
 
         return array_merge([
             'item' => $item,
             'id' => $id,
-            'types' => $this->typeOptions(),
+            'types' => $this->typeOptions($kind),
+            'kind' => $kind,
             'type' => $type,
             'data' => $data ?? $item?->all() ?? [],
             'body' => $body ?? $item?->body() ?? '',
@@ -554,14 +607,20 @@ final class AdminPanel implements Subsystem
     }
 
     /**
-     * Type name => human label, for the type picker.
+     * Type name => human label, for the type picker. When a kind is given only
+     * types of that kind are offered.
      *
      * @return array<string, string>
      */
-    private function typeOptions(): array
+    private function typeOptions(?string $kind = null): array
     {
+        $all = $this->requireApp()->schema->all();
+        if ($kind !== null) {
+            $all = array_filter($all, static fn (array $schema): bool => $schema['kind'] === $kind);
+        }
+
         $options = [];
-        foreach ($this->requireApp()->schema->all() as $name => $schema) {
+        foreach ($all as $name => $schema) {
             $options[$name] = $schema['label'];
         }
 
@@ -609,6 +668,7 @@ final class AdminPanel implements Subsystem
         foreach ($app->schema->all() as $name => $schema) {
             $types[$name] = [
                 'label' => $schema['label'],
+                'kind' => $schema['kind'],
                 'builtin' => $schema['builtin'],
                 'fields' => $schema['fields'],
                 'indexed' => $schema['indexed'],
@@ -635,6 +695,7 @@ final class AdminPanel implements Subsystem
         return $this->page('admin/types-edit', 'Новый тип', [
             'name' => '',
             'label' => '',
+            'kind' => $this->normalizeKind((string) $request->query('kind', '')),
             'fields' => [],
             'indexed' => [],
             'builtin' => false,
@@ -654,20 +715,21 @@ final class AdminPanel implements Subsystem
         $repository = $this->types;
         $name = $repository?->normalizeName((string) $request->input('name', ''));
         $label = trim((string) $request->input('label', ''));
+        $kind = $this->normalizeKind((string) $request->input('kind', ''));
 
         if ($repository === null || $name === null) {
-            return $this->typesFormError('', $label, $request, ['Недопустимое имя типа. Используйте латиницу, цифры, дефис.']);
+            return $this->typesFormError('', $label, $kind, $request, ['Недопустимое имя типа. Используйте латиницу, цифры, дефис.']);
         }
         if ($repository->exists($name)) {
-            return $this->typesFormError($name, $label, $request, ['Тип с таким именем уже существует.']);
+            return $this->typesFormError($name, $label, $kind, $request, ['Тип с таким именем уже существует.']);
         }
 
         $parsed = $repository->parseRows($this->fieldRows($request));
         if ($parsed['errors'] !== []) {
-            return $this->typesFormError($name, $label, $request, $parsed['errors']);
+            return $this->typesFormError($name, $label, $kind, $request, $parsed['errors']);
         }
 
-        $repository->save($name, $parsed['fields'], $parsed['indexed'], $label);
+        $repository->save($name, $parsed['fields'], $parsed['indexed'], $label, $kind);
         $this->requireApp()->build();
 
         return Response::redirect('/admin/types?created=' . rawurlencode($name), 303);
@@ -688,6 +750,7 @@ final class AdminPanel implements Subsystem
         return $this->page('admin/types-edit', 'Тип: ' . $loaded['label'], [
             'name' => $name,
             'label' => $loaded['label'],
+            'kind' => $loaded['kind'],
             'fields' => $loaded['fields'],
             'indexed' => $loaded['indexed'],
             'builtin' => $this->types?->isBuiltin($name) ?? false,
@@ -707,6 +770,7 @@ final class AdminPanel implements Subsystem
         $repository = $this->types;
         $name = (string) $request->input('name', '');
         $label = trim((string) $request->input('label', ''));
+        $kind = $this->normalizeKind((string) $request->input('kind', ''));
 
         if ($repository === null || !$repository->exists($name)) {
             return $this->notFound();
@@ -714,10 +778,10 @@ final class AdminPanel implements Subsystem
 
         $parsed = $repository->parseRows($this->fieldRows($request));
         if ($parsed['errors'] !== []) {
-            return $this->typesFormError($name, $label, $request, $parsed['errors']);
+            return $this->typesFormError($name, $label, $kind, $request, $parsed['errors']);
         }
 
-        $repository->save($name, $parsed['fields'], $parsed['indexed'], $label);
+        $repository->save($name, $parsed['fields'], $parsed['indexed'], $label, $kind);
         $this->requireApp()->build();
 
         return Response::redirect('/admin/types?created=' . rawurlencode($name), 303);
@@ -750,11 +814,12 @@ final class AdminPanel implements Subsystem
      *
      * @param list<string> $errors
      */
-    private function typesFormError(string $name, string $label, Request $request, array $errors): Response
+    private function typesFormError(string $name, string $label, string $kind, Request $request, array $errors): Response
     {
         return $this->page('admin/types-edit', $name === '' ? 'Новый тип' : 'Тип: ' . $name, [
             'name' => $name,
             'label' => $label,
+            'kind' => $this->normalizeKind($kind),
             'fields' => $this->submittedFields($request),
             'indexed' => $this->submittedIndexed($request),
             'builtin' => $name !== '' && ($this->types?->isBuiltin($name) ?? false),

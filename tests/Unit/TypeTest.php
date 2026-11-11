@@ -51,6 +51,52 @@ final class TypeTest extends FlatCmsTestCase
         self::assertTrue($relations['related']['multiple']);
     }
 
+    public function testSchemaSeparatesPagesFromElements(): void
+    {
+        $schema = new Schema(new Fs($this->root));
+
+        // Core page-like types are pages; custom data types are elements.
+        self::assertSame(Schema::KIND_PAGE, $schema->kind('page'));
+        self::assertSame(Schema::KIND_PAGE, $schema->kind('section'));
+        self::assertSame(Schema::KIND_PAGE, $schema->kind('menu-item'));
+        self::assertSame(Schema::KIND_ELEMENT, $schema->kind('product'));
+        self::assertTrue($schema->isPage('page'));
+        self::assertFalse($schema->isPage('product'));
+        self::assertTrue($schema->isElement('product'));
+
+        self::assertArrayHasKey('page', $schema->pages());
+        self::assertArrayNotHasKey('product', $schema->pages());
+        self::assertArrayHasKey('product', $schema->elements());
+        self::assertArrayNotHasKey('page', $schema->elements());
+    }
+
+    public function testSchemaHonoursExplicitKind(): void
+    {
+        $this->write('config/schemas/landing.yaml', "type: landing\nkind: page\nlabel: Лендинг\n");
+        $this->write('config/schemas/note.yaml', "type: note\nkind: element\nlabel: Заметка\n");
+        $schema = new Schema(new Fs($this->root));
+
+        self::assertTrue($schema->isPage('landing'));
+        self::assertTrue($schema->isElement('note'));
+    }
+
+    public function testQueryFiltersByKind(): void
+    {
+        $this->write('content/services/site/item.yaml', "type: service\ntitle: Сайт\n");
+        $app = $this->app();
+
+        $pages = $app->query()->kind(Schema::KIND_PAGE)->withUnpublished()->find();
+        $elements = $app->query()->kind(Schema::KIND_ELEMENT)->withUnpublished()->find();
+
+        $pageIds = array_map(static fn ($i) => $i->id(), $pages);
+        $elementIds = array_map(static fn ($i) => $i->id(), $elements);
+
+        self::assertContains('index', $pageIds);
+        self::assertContains('products/teapot', $elementIds);
+        self::assertNotContains('products/teapot', $pageIds);
+        self::assertNotContains('index', $elementIds);
+    }
+
     public function testSchemaReferencedByListsDependents(): void
     {
         $schema = new Schema(new Fs($this->root));
@@ -253,10 +299,11 @@ final class TypeTest extends FlatCmsTestCase
 
         $response = $app->handle(new Request('GET', '/admin/content/new', [], [], [], [], []));
         self::assertSame(200, $response->status());
-        self::assertStringContainsString('Новый элемент', $response->body());
+        self::assertStringContainsString('Новая страница', $response->body());
 
         $typed = $app->handle(new Request('GET', '/admin/content/new', ['type' => 'product'], [], [], [], [], []));
         self::assertSame(200, $typed->status());
+        self::assertStringContainsString('Новый элемент', $typed->body());
         self::assertStringContainsString('fields[price]', $typed->body());
     }
 

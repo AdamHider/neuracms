@@ -52,6 +52,7 @@ final class Index implements Subsystem
             $this->entries[$id] = [
                 'id' => $item->id(),
                 'type' => $item->type(),
+                'kind' => $this->schema->kind($item->type()),
                 'url' => $item->url(),
                 'title' => $item->title(),
                 'slug' => $item->slug(),

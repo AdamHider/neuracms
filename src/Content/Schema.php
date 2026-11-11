@@ -22,8 +22,20 @@ final class Schema implements Subsystem
     /** Types that ship with the core; they can be edited but never deleted. */
     public const BUILTIN = ['page', 'section', 'menu-item'];
 
+    /** Kind: a routable page whose appearance is defined in the builder. */
+    public const KIND_PAGE = 'page';
+
+    /** Kind: a structured data element (no page of its own, shown by particles). */
+    public const KIND_ELEMENT = 'element';
+
     /**
-     * @var array<string, array{fields: array<string, array>, indexed: list<string>, label: string, builtin: bool}>
+     * Kinds of the core page-like types. Any other type is an element unless its
+     * schema file sets "kind" explicitly.
+     */
+    private const PAGE_KINDS = ['page', 'section', 'menu-item'];
+
+    /**
+     * @var array<string, array{fields: array<string, array>, indexed: list<string>, label: string, builtin: bool, kind: string}>
      */
     private array $cache = [];
 
@@ -90,7 +102,24 @@ final class Schema implements Subsystem
             'builtin' => array_key_exists('builtin', $raw)
                 ? (bool) $raw['builtin']
                 : in_array($type, self::BUILTIN, true),
+            'kind' => $this->readKind($type, $raw),
         ];
+    }
+
+    /**
+     * Page or element. A schema may set "kind" explicitly; otherwise the core
+     * page types are pages and everything else is an element.
+     *
+     * @param array<string, mixed> $raw
+     */
+    private function readKind(string $type, array $raw): string
+    {
+        $kind = $raw['kind'] ?? null;
+        if ($kind === self::KIND_PAGE || $kind === self::KIND_ELEMENT) {
+            return $kind;
+        }
+
+        return in_array($type, self::PAGE_KINDS, true) ? self::KIND_PAGE : self::KIND_ELEMENT;
     }
 
     /**
@@ -133,6 +162,51 @@ final class Schema implements Subsystem
     public function isBuiltin(string $type): bool
     {
         return $this->get($type)['builtin'];
+    }
+
+    public function kind(string $type): string
+    {
+        return $this->get($type)['kind'];
+    }
+
+    public function isPage(string $type): bool
+    {
+        return $this->kind($type) === self::KIND_PAGE;
+    }
+
+    public function isElement(string $type): bool
+    {
+        return $this->kind($type) === self::KIND_ELEMENT;
+    }
+
+    /**
+     * Types of one kind, name => schema.
+     *
+     * @return array<string, array{fields: array<string, array>, indexed: list<string>, label: string, builtin: bool, kind: string}>
+     */
+    public function ofKind(string $kind): array
+    {
+        return array_filter($this->all(), static fn (array $schema): bool => $schema['kind'] === $kind);
+    }
+
+    /**
+     * Page types (the core "pages" list).
+     *
+     * @return array<string, array>
+     */
+    public function pages(): array
+    {
+        return $this->ofKind(self::KIND_PAGE);
+    }
+
+    /**
+     * Element types (the custom content elements).
+     *
+     * @return array<string, array>
+     */
+    public function elements(): array
+    {
+        return $this->ofKind(self::KIND_ELEMENT);
     }
 
     public function label(string $type): string

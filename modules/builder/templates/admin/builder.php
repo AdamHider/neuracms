@@ -11,6 +11,8 @@
  * @var array<string, \FlatCms\Modules\Builder\BlockType> $types
  * @var array<string, list<array>> $categories
  * @var list<array{name: string, title: string, widths: list<int>}> $presets
+ * @var array<string, array{label: string, fields: list<string>}> $elements
+ * @var list<string> $media
  * @var int $columns
  * @var bool $saved
  * @var string $error
@@ -21,6 +23,10 @@ $payload = [
     'types' => array_values(array_map(static fn ($t): array => $t->toArray(), $types)),
     'categories' => $categories,
     'presets' => $presets,
+    'elements' => $elements ?? [],
+    'media' => array_values($media ?? []),
+    'uploadUrl' => '/admin/builder/media',
+    'pageId' => $id,
     'columns' => $columns,
 ];
 ob_start();
@@ -97,7 +103,7 @@ $head = '<link rel="stylesheet" href="' . $this->e($this->ownerAsset('builder', 
 echo $this->partial('admin/layout', [
     'content' => $content,
     'title' => 'Конструктор: ' . $item->title(),
-    'active' => 'content',
+    'active' => 'pages',
     'head' => $head,
     'admin_user' => $admin_user ?? null,
 ]);

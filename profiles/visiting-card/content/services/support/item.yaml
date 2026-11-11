@@ -1,0 +1,7 @@
+type: service
+title: Поддержка
+description: Обновляем и сопровождаем запущенные проекты каждый месяц.
+price: 5000
+link: /contact
+order: 3
+published: true

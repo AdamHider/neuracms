@@ -36,6 +36,41 @@ missing. Any other file in the folder is an attachment.
 Every other key is a free-form property. The CMS never requires a schema; a
 schema only describes fields for the admin editor.
 
+## Pages and elements
+
+Content is split into two logical groups, both stored the same way under
+`content/`:
+
+- **Pages** are the core: the routable, navigable content of the site. A page's
+  appearance is defined **only** in the page builder (its `layout` property), so
+  the admin panel shows pages in their own list (**Страницы**, `/admin/pages`)
+  and links each one to the builder.
+- **Elements** are everything else: structured data with no appearance of its own
+  (products, categories, services, …). They live in the **Элементы** list
+  (`/admin/elements`) and are edited as plain properties. Pages display them with
+  the builder's `elements` particle.
+
+A type's group is its `kind`, set in the schema file:
+
+```yaml
+type: service
+label: Услуга
+kind: element      # "page" or "element"
+```
+
+`kind` defaults to `page` for the core page-like types (`page`, `section`,
+`menu-item`) and to `element` for every other type, so existing sites keep
+working without changes. The admin type editor writes it back as a "Назначение"
+selector. In code:
+
+```php
+$app->schema->isPage('page');       // true
+$app->schema->isElement('product'); // true
+$app->schema->pages();              // page-like types
+$app->schema->elements();           // element types
+$app->query()->kind('element')->find();
+```
+
 ## Content types
 
 A content type is a file in `config/schemas/<type>.yaml`. It describes the fields

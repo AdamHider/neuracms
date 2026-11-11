@@ -127,3 +127,20 @@ form input[type="text"], form input[type="email"], form textarea { width: 100%; 
 .block--quote { margin: 1.5rem 0; padding: .5rem 0 .5rem 1.25rem; border-left: 3px solid var(--accent); }
 .block--quote p { margin: 0 0 .4rem; font-style: italic; font-size: 1.1rem; }
 .block--quote cite { color: var(--muted); font-style: normal; font-size: .9rem; }
+
+/* Media particle */
+.block--media { margin: 0 auto 1.25rem; width: var(--width, 100%); max-width: 100%; }
+.block--media img { max-width: 100%; height: auto; display: block; border-radius: 8px; }
+.block--media figcaption { color: var(--muted); font-size: .85rem; margin-top: .4rem; }
+
+/* Element list particle (cards over custom elements) */
+.block--elements { margin: 1.5rem 0; }
+.element-grid { display: grid; grid-template-columns: repeat(var(--columns, 3), 1fr); gap: 1.25rem; }
+@media (max-width: 760px) { .element-grid { grid-template-columns: 1fr; } }
+.element-card { border: 1px solid var(--border); border-radius: 10px; padding: 1rem; display: flex; flex-direction: column; gap: .4rem; }
+.element-card__media img { width: 100%; height: auto; border-radius: 6px; display: block; }
+.element-card__title { margin: 0; font-size: 1.05rem; }
+.element-card__title a { color: var(--text); text-decoration: none; }
+.element-card__title a:hover { color: var(--accent); }
+.element-card__description { margin: 0; color: var(--muted); font-size: .92rem; }
+.element-card__price { margin: 0; font-weight: 600; color: var(--accent); }

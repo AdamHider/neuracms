@@ -85,7 +85,20 @@ final class ProfilesTest extends FlatCmsTestCase
 
         self::assertStringContainsString('Студия «Верста»', $body);
         self::assertStringContainsString('block--columns', $body);
+        self::assertStringContainsString('block--media', $body);
+        self::assertStringContainsString('/media/index/logo.svg', $body);
         self::assertStringContainsString('/contact', $body);
+    }
+
+    public function testVisitingCardServicesRenderAsElementCards(): void
+    {
+        $app = $this->install('visiting-card');
+
+        $body = $this->get($app, '/services')->body();
+
+        self::assertStringContainsString('element-card', $body);
+        self::assertStringContainsString('Сайт-визитка', $body);
+        self::assertStringContainsString('30000', $body);
     }
 
     public function testCorporateProfileDisablesTheShop(): void

@@ -3,6 +3,7 @@
  * @var \FlatCms\Content\Item|null $item
  * @var string $id
  * @var array<string, string> $types
+ * @var string $kind
  * @var string $type
  * @var array<string, mixed> $data
  * @var string $body
@@ -22,6 +23,8 @@ $isNew = $item === null;
 $data = $data ?? [];
 $fields = $fields ?? [];
 $type = $type ?? ($data['type'] ?? 'page');
+$kind = $kind ?? ($app->schema->kind($type));
+$isPage = $kind === \FlatCms\Content\Schema::KIND_PAGE;
 $propFields = array_diff_key($data, array_flip(\FlatCms\Content\Item::RESERVED), $fields);
 ob_start();
 ?>
@@ -31,17 +34,20 @@ ob_start();
     <p class="error"><?= $this->e($error) ?></p>
 <?php endforeach; ?>
 
+<?php if (!$isNew && $isPage && $app->module('builder') !== null): ?>
+    <div class="panel">
+        <p class="muted">Внешний вид страницы задаётся в конструкторе: секции, колонки и частицы.</p>
+        <a class="btn btn-primary" href="<?= $this->e($this->url('/admin/builder?id=' . rawurlencode($id))) ?>"><?= $this->icon('builder') ?> Открыть в конструкторе</a>
+    </div>
+<?php endif; ?>
+
 <form method="post" action="<?= $this->e($this->url($isNew ? '/admin/content/new' : '/admin/content/edit')) ?>">
     <input type="hidden" name="id" value="<?= $this->e($id) ?>">
 
-    <?php if (!$isNew && $app->module('builder') !== null): ?>
-        <p><a class="btn btn-sm btn-outline-secondary" href="<?= $this->e($this->url('/admin/builder?id=' . rawurlencode($id))) ?>"><?= $this->icon('builder') ?> Открыть в конструкторе</a></p>
-    <?php endif; ?>
-
     <?php if ($isNew): ?>
         <label>Путь (id)
-            <input type="text" name="id" value="<?= $this->e($id) ?>" placeholder="blog/second-post" required>
-            <small>Папка внутри content/. Например: blog/second-post</small>
+            <input type="text" name="id" value="<?= $this->e($id) ?>" placeholder="<?= $isPage ? 'about' : 'catalog/teapot' ?>" required>
+            <small>Папка внутри content/. Например: <?= $isPage ? 'about' : 'catalog/teapot' ?></small>
         </label>
     <?php else: ?>
         <p class="muted">ID: <code><?= $this->e($id) ?></code></p>
@@ -153,8 +159,11 @@ ob_start();
         </div>
     </fieldset>
 
-    <label>Текст (Markdown)
-        <textarea name="body" rows="16"><?= $this->e($body ?? '') ?></textarea>
+    <label><?= $isPage ? 'Содержимое (запасной вариант)' : 'Описание (Markdown)' ?>
+        <textarea name="body" rows="<?= $isPage ? 8 : 12 ?>"><?= $this->e($body ?? '') ?></textarea>
+        <?php if ($isPage): ?>
+            <small>Показывается только если в конструкторе не задан макет. Основной вид страницы задаётся в конструкторе.</small>
+        <?php endif; ?>
     </label>
 
     <button type="submit" class="btn btn-primary"><?= $this->icon('save') ?> Сохранить</button>
@@ -197,7 +206,7 @@ ob_start();
 $content = ob_get_clean();
 echo $this->partial('admin/layout', [
     'content' => $content,
-    'title' => $isNew ? 'Новый элемент' : 'Редактирование',
-    'active' => 'content',
+    'title' => $isNew ? ($isPage ? 'Новая страница' : 'Новый элемент') : 'Редактирование',
+    'active' => $isPage ? 'pages' : 'elements',
     'admin_user' => $admin_user ?? null,
 ]);

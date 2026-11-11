@@ -46,7 +46,7 @@ final class TypeRepository
     }
 
     /**
-     * @return array{label: string, fields: array<string, array>, indexed: list<string>}|null
+     * @return array{label: string, fields: array<string, array>, indexed: list<string>, kind: string}|null
      */
     public function load(string $type): ?array
     {
@@ -60,6 +60,7 @@ final class TypeRepository
             'label' => $schema['label'],
             'fields' => $schema['fields'],
             'indexed' => $schema['indexed'],
+            'kind' => $schema['kind'],
         ];
     }
 
@@ -69,7 +70,7 @@ final class TypeRepository
      * @param array<string, array> $fields
      * @param list<string>         $indexed
      */
-    public function save(string $type, array $fields, array $indexed, string $label = ''): bool
+    public function save(string $type, array $fields, array $indexed, string $label = '', ?string $kind = null): bool
     {
         $type = $this->normalizeName($type);
         if ($type === null) {
@@ -92,6 +93,9 @@ final class TypeRepository
         $payload = ['type' => $type];
         if ($label !== '') {
             $payload['label'] = $label;
+        }
+        if ($kind === Schema::KIND_PAGE || $kind === Schema::KIND_ELEMENT) {
+            $payload['kind'] = $kind;
         }
         $payload['fields'] = $clean;
         $payload['indexed'] = $indexed;

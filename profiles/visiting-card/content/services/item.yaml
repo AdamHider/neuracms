@@ -2,3 +2,20 @@ type: page
 title: Услуги
 order: 2
 published: true
+layout:
+  sections:
+    - columns:
+        - width: 12
+          blocks:
+            - type: heading
+              settings: {text: 'Что мы делаем', level: h1}
+            - type: elements
+              settings:
+                element_type: service
+                columns: '3'
+                sort: order
+                direction: asc
+                map_title: title
+                map_description: description
+                map_price: price
+                map_link: link

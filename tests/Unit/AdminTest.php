@@ -204,4 +204,67 @@ final class AdminTest extends FlatCmsTestCase
         self::assertSame(422, $response->status());
         self::assertFileDoesNotExist($this->root . '/content/blog/bad/item.yaml');
     }
+
+    public function testNewContentFormDefaultsTypeToKind(): void
+    {
+        $app = $this->appWithAdmin();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $page = $app->handle(new Request('GET', '/admin/content/new', ['kind' => 'page'], [], [], [], [], []))->body();
+        self::assertMatchesRegularExpression('/<option value="page"[^>]*selected/', $page);
+
+        $element = $app->handle(new Request('GET', '/admin/content/new', ['kind' => 'element'], [], [], [], [], []))->body();
+        self::assertMatchesRegularExpression('/<option value="product"[^>]*selected/', $element);
+    }
+
+    public function testPagesListShowsOnlyPages(): void
+    {
+        $app = $this->appWithAdmin();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $body = $app->handle(new Request('GET', '/admin/pages', [], [], [], [], []))->body();
+
+        self::assertStringContainsString('Страницы', $body);
+        self::assertStringContainsString('<code>about</code>', $body);
+        self::assertStringNotContainsString('<code>products/teapot</code>', $body);
+    }
+
+    public function testElementsListShowsOnlyElements(): void
+    {
+        $app = $this->appWithAdmin();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $body = $app->handle(new Request('GET', '/admin/elements', [], [], [], [], []))->body();
+
+        self::assertStringContainsString('Элементы', $body);
+        self::assertStringContainsString('<code>products/teapot</code>', $body);
+        self::assertStringNotContainsString('<code>about</code>', $body);
+    }
+
+    public function testDeletingAPageReturnsToPagesList(): void
+    {
+        $app = $this->appWithAdmin();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $response = $app->handle(new Request('POST', '/admin/content/delete', [], ['id' => 'about'], [], [], []));
+
+        self::assertSame(303, $response->status());
+        self::assertSame('/admin/pages', $response->headers()['Location']);
+    }
+
+    public function testDeletingAnElementReturnsToElementsList(): void
+    {
+        $app = $this->appWithAdmin();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $response = $app->handle(new Request('POST', '/admin/content/delete', [], ['id' => 'products/teapot'], [], [], []));
+
+        self::assertSame(303, $response->status());
+        self::assertSame('/admin/elements', $response->headers()['Location']);
+    }
 }

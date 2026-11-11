@@ -13,6 +13,8 @@ final class Query
 {
     private ?string $type = null;
 
+    private ?string $kind = null;
+
     /** @var list<array{field: string, op: string, value: mixed}> */
     private array $wheres = [];
 
@@ -41,6 +43,17 @@ final class Query
     {
         $clone = clone $this;
         $clone->type = $type;
+
+        return $clone;
+    }
+
+    /**
+     * Restrict to page or element items (see Schema::KIND_*).
+     */
+    public function kind(string $kind): self
+    {
+        $clone = clone $this;
+        $clone->kind = $kind;
 
         return $clone;
     }
@@ -158,6 +171,9 @@ final class Query
                 return false;
             }
             if ($this->type !== null && ($entry['type'] ?? 'page') !== $this->type) {
+                return false;
+            }
+            if ($this->kind !== null && ($entry['kind'] ?? 'page') !== $this->kind) {
                 return false;
             }
             if ($this->parent !== null && ($entry['parent'] ?? '') !== $this->parent) {

@@ -5,6 +5,7 @@
  * @var array<string, array> $fields
  * @var list<string> $indexed
  * @var bool $builtin
+ * @var string $kind
  * @var bool $isNew
  * @var array<string, string> $typeNames
  * @var list<string> $errors
@@ -62,6 +63,14 @@ ob_start();
 
     <label>Название (для людей)
         <input type="text" name="label" value="<?= $this->e($label) ?>" placeholder="Товар">
+    </label>
+
+    <label>Назначение
+        <select name="kind">
+            <option value="page" <?= ($kind ?? 'element') === 'page' ? 'selected' : '' ?>>Страница — маршрутизируемая, вид задаётся конструктором</option>
+            <option value="element" <?= ($kind ?? 'element') === 'element' ? 'selected' : '' ?>>Элемент — данные, выводятся частицами (карточки, списки)</option>
+        </select>
+        <small>Страницы имеют собственный URL и открываются в конструкторе. Элементы — это структурированные данные без страницы.</small>
     </label>
 
     <fieldset>

@@ -1,0 +1,20 @@
+type: service
+label: Услуга
+fields:
+  title:
+    type: string
+    required: true
+    label: Название
+  description:
+    type: text
+    label: Описание
+  price:
+    type: float
+    label: Цена
+  link:
+    type: string
+    label: Ссылка
+  image:
+    type: string
+    label: Изображение
+indexed: [price]

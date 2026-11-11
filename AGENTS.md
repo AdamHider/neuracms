@@ -32,6 +32,35 @@ php -S localhost:8000 -t public   # dev server
 - Tests: `FlatCmsTestCase` gives an isolated root; add project folders with
   `copyFromProject()`. No mocks — real code paths only.
 
+## Pages vs elements (added feature)
+
+- Every content type has a `kind`: `page` (core, routable, look set in the
+  builder) or `element` (structured data with no look of its own).
+- `Schema::kind()/isPage()/isElement()/pages()/elements()`. Defaults: `page`,
+  `section`, `menu-item` are pages; every other type is an element unless its
+  schema sets `kind:` explicitly. `TypeRepository::save()` persists `kind`.
+- `Index` stores `kind` per row; `Query::kind($kind)` filters by it.
+- Admin has two lists: **Страницы** (`/admin/pages`) and **Элементы**
+  (`/admin/elements`); `/admin/content` still exists as an unfiltered list. The
+  nav highlights `pages`/`elements`. Page rows link to the builder; element rows
+  do not, and deleting returns to the matching list.
+- The builder is page-only: `/admin/builder` and `/admin/builder/save` redirect
+  element items to `/admin/content/edit`. Page appearance is the builder layout;
+  `page.php` still falls back to `$item->html()` only when there is no layout.
+
+## Builder particles (added feature)
+
+- `media` particle (`Types/MediaType.php`): an uploaded image. Its `src` is a
+  `file` field; the editor uploads to `POST /admin/builder/media`, which stores
+  the file via the core `MediaLibrary` and returns `/media/<page id>/<file>`.
+- `elements` particle (`Types/ElementsType.php`): lists a chosen element type as
+  cards. `map_*` settings map element properties onto card fields
+  (title/description/price/link/image); `element_type`, `limit`, `sort`,
+  `direction`, `columns`. The editor builds the mapping dropdowns from the
+  `elements` map in the builder payload (`BuilderModule::elementTypes()`).
+- The builder payload also carries `media`, `uploadUrl` and `pageId` for the
+  media particle.
+
 ## Content types & relations (added feature)
 
 - `Content\Schema` reads `config/schemas/<type>.yaml`: `label`, `builtin`,

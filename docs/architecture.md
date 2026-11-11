@@ -27,7 +27,7 @@ folders under `content/`; everything else is generated into `var/`.
 | `Content\Storage` | Loads an item folder into an `Item` |
 | `Content\Index` | Cached list of items with the fields that queries need |
 | `Content\Query` | Fluent filtering and sorting over the index |
-| `Content\Schema` | Field descriptions and relations per content type, used by the editor and validation |
+| `Content\Schema` | Field descriptions, relations and `kind` (page vs element) per content type |
 | `Content\TypeRepository` | Creates, updates and deletes content types (writes `config/schemas/`) |
 | `Http\Router` | Pattern routes, redirects and content fallback |
 | `Http\Renderer` | Template lookup, partials and the layout resolver |
@@ -54,10 +54,11 @@ an empty string, so themes can call it unconditionally.
 ## Content index
 
 The index is a PHP file in `var/cache/` holding one row per item with its `type`,
-`title`, `url`, `order`, `published`, parent and the fields listed in the type
-schema's `indexed` key. `Index::isStale()` compares folder timestamps, and a
+`kind`, `title`, `url`, `order`, `published`, parent and the fields listed in the
+type schema's `indexed` key. `Index::isStale()` compares folder timestamps, and a
 stamp file guards against a build racing another request. Queries read the index
-only, so `indexed` must list any field used in `where()`.
+only, so `indexed` must list any field used in `where()`. `Query::kind()` filters
+rows by `kind`, which is how the admin separates pages from elements.
 
 ## Storage and safety
 

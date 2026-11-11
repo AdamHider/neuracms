@@ -46,9 +46,107 @@ final class BuilderTest extends FlatCmsTestCase
         $types = $this->builder($app)->types();
 
         self::assertInstanceOf(TypeRegistry::class, $types);
-        foreach (['heading', 'text', 'image', 'button', 'quote', 'columns', 'products', 'divider', 'spacer', 'html'] as $name) {
+        foreach (['heading', 'text', 'image', 'button', 'quote', 'columns', 'products', 'elements', 'media', 'divider', 'spacer', 'html'] as $name) {
             self::assertTrue($types->has($name), "Missing block type: {$name}");
         }
+    }
+
+    public function testMediaBlockRendersImage(): void
+    {
+        $app = $this->appWithBuilder();
+        $renderer = $this->builder($app)->renderer();
+        self::assertNotNull($renderer);
+
+        $html = $renderer->renderBlock(new Block('media', ['src' => '/media/index/logo.svg', 'alt' => 'Лого']));
+
+        self::assertStringContainsString('block--media', $html);
+        self::assertStringContainsString('src="/media/index/logo.svg"', $html);
+        self::assertStringContainsString('alt="Лого"', $html);
+    }
+
+    public function testMediaBlockWithoutSourceRendersNothing(): void
+    {
+        $app = $this->appWithBuilder();
+        $renderer = $this->builder($app)->renderer();
+        self::assertNotNull($renderer);
+
+        self::assertSame('', trim($renderer->renderBlock(new Block('media', []))));
+    }
+
+    public function testElementsBlockListsElementsWithPropertyMapping(): void
+    {
+        $this->write('config/schemas/service.yaml', "type: service\nlabel: Услуга\nfields:\n  description: { type: text }\n  price: { type: float }\n  link: { type: string }\nindexed: [price]\n");
+        $this->write('content/services/site/item.yaml', "type: service\ntitle: Сайт\ndescription: Описание\nprice: 30000\nlink: /contact\norder: 1\n");
+        $this->write('content/services/support/item.yaml', "type: service\ntitle: Поддержка\nprice: 5000\nlink: /contact\norder: 2\n");
+        $app = $this->appWithBuilder();
+        $renderer = $this->builder($app)->renderer();
+        self::assertNotNull($renderer);
+
+        $html = $renderer->renderBlock(new Block('elements', [
+            'element_type' => 'service',
+            'map_title' => 'title',
+            'map_description' => 'description',
+            'map_price' => 'price',
+            'map_link' => 'link',
+        ]));
+
+        self::assertStringContainsString('element-card', $html);
+        self::assertStringContainsString('Сайт', $html);
+        self::assertStringContainsString('Описание', $html);
+        self::assertStringContainsString('30000', $html);
+        self::assertStringContainsString('href="/contact"', $html);
+    }
+
+    public function testElementsBlockWithoutTypeRendersNothing(): void
+    {
+        $app = $this->appWithBuilder();
+        $renderer = $this->builder($app)->renderer();
+        self::assertNotNull($renderer);
+
+        self::assertSame('', trim($renderer->renderBlock(new Block('elements', []))));
+    }
+
+    public function testEditorRejectsElementItems(): void
+    {
+        $app = $this->appWithBuilder(true);
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        // products/teapot is a "product" type, i.e. an element, not a page.
+        $response = $app->handle(new Request('GET', '/admin/builder', ['id' => 'products/teapot'], [], [], [], []));
+
+        self::assertSame(303, $response->status());
+        self::assertStringStartsWith('/admin/content/edit', (string) $response->headers()['Location']);
+    }
+
+    public function testBuilderMediaUploadRequiresAdmin(): void
+    {
+        $app = $this->appWithBuilder(true);
+
+        $response = $app->handle(new Request('POST', '/admin/builder/media', [], ['id' => 'about'], [], [], []));
+
+        self::assertSame(403, $response->status());
+    }
+
+    public function testBuilderMediaUploadRejectsNonPages(): void
+    {
+        $app = $this->appWithBuilder(true);
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $response = $app->handle(new Request('POST', '/admin/builder/media', [], ['id' => 'products/teapot'], [], [], []));
+
+        self::assertSame(404, $response->status());
+    }
+
+    public function testMediaLibraryListsAndDeletesUploads(): void
+    {
+        $library = new \FlatCms\Admin\MediaLibrary($this->app()->fs);
+        $this->write('content/about/logo.svg', '<svg/>');
+
+        self::assertContains('logo.svg', $library->list('about'));
+        self::assertTrue($library->delete('about', 'logo.svg'));
+        self::assertNotContains('logo.svg', $library->list('about'));
     }
 
     public function testLegacyGridUpgradesToSections(): void

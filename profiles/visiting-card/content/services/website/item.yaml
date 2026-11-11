@@ -1,0 +1,7 @@
+type: service
+title: Сайт-визитка
+description: 'Небольшой сайт о компании: главная, услуги, контакты и форма связи.'
+price: 30000
+link: /contact
+order: 1
+published: true

@@ -1,8 +1,12 @@
 # Page builder
 
-The builder module lets a page describe its body as a layout instead of
-Markdown. The layout lives in the reserved `layout` property of an item, so a
-page with a layout and a page with Markdown are the same kind of item.
+The builder module defines how **pages** look. Pages are the core, routable
+content; their appearance is set exclusively here, as a layout instead of
+Markdown. The layout lives in the reserved `layout` property of an item.
+
+Every other content type is an **element**: structured data with no look of its
+own. Elements are shown on pages by the `elements` particle (see below), and the
+builder refuses to open them (the editor redirects to the property form).
 
 The structure follows Gantry 5: a page is a list of **sections**, a section is a
 row of **columns**, and a column holds a stack of **blocks** (the equivalent of
@@ -38,8 +42,8 @@ layout:
           blocks:
             - type: button
               settings:
-                label: Купить
-                href: /products
+                text: Купить
+                url: /products
                 style: primary
 ```
 
@@ -64,16 +68,53 @@ Saving a page from the editor always writes the new `sections` shape.
 | `heading` | `text`, `level` (`h1`/`h2`/`h3`) | A heading |
 | `text` | `body` (Markdown) | A paragraph of Markdown |
 | `image` | `src`, `alt`, `width` | An image |
-| `button` | `label`, `href`, `style` (`primary`/`outline`) | A link styled as a button |
+| `media` | `src`, `alt`, `caption`, `width` | An uploaded image; the editor uploads into the page's folder |
+| `button` | `text`, `url`, `style` (`primary`/`outline`) | A link styled as a button |
 | `quote` | `text`, `author` | A blockquote |
 | `divider` | `style` (`solid`/`dashed`/`dotted`) | A horizontal rule |
 | `spacer` | `size` (`sm`/`md`/`lg`/`xl`) | Vertical space |
 | `columns` | `ratio`, `left[]`, `right[]` | Two columns of nested blocks |
 | `products` | `title`, `limit` | A grid of products from the shop |
+| `elements` | `element_type`, `title`, `limit`, `sort`, `direction`, `map_*`, `columns` | Cards over a chosen element type |
 | `html` | `html` | Raw HTML, for the rare case nothing else fits |
 
 Each type also carries a `category` (used to group the particle picker) and an
 `icon` (a Bootstrap Icons name).
+
+## Media particle
+
+The `media` particle uploads a file without leaving the builder. Its `src` field
+is rendered by the editor as a text box, a file input and (when the page already
+has attachments) a picker of existing media. Choosing a file posts it to
+`POST /admin/builder/media`, which stores it in the page's own folder through the
+core `MediaLibrary` and returns the `/media/<page id>/<file>` URL, which the
+editor writes into `src`.
+
+## Element-list particle
+
+The `elements` particle references the custom elements created under **Элементы**.
+It picks one element type and maps that type's properties onto the card fields:
+
+```yaml
+- type: elements
+  settings:
+    element_type: service     # which element type to list
+    title: Наши услуги        # optional heading above the cards
+    limit: 6
+    sort: order               # order | title | date
+    direction: asc            # asc | desc
+    columns: '3'              # 2, 3 or 4
+    map_title: title          # element property -> card field
+    map_description: description
+    map_price: price
+    map_link: link
+    map_image: image
+```
+
+Each mapped field names an element property; leave it empty to omit that part of
+the card. When `map_link` is empty the card links to the element's own URL. The
+editor offers the available properties of the chosen type in a dropdown, so the
+mapping is set visually, not by hand.
 
 ## Rendering
 

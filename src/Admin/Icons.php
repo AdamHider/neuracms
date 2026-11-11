@@ -54,6 +54,8 @@ final class Icons
         'spacer' => 'arrows-expand-vertical',
         'divider' => 'dash-lg',
         'quote' => 'quote',
+        'elements' => 'collection',
+        'list' => 'list-ul',
     ];
 
     public static function name(string $key): string

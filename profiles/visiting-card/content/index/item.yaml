@@ -4,6 +4,8 @@ order: 0
 published: true
 layout:
   blocks:
+    - type: media
+      settings: {src: '/media/index/logo.svg', alt: 'Логотип студии «Верста»', width: 40}
     - type: heading
       settings: {text: 'Студия «Верста»', level: h1}
     - type: text

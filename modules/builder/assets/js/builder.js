@@ -271,6 +271,47 @@
                     ? settings[key]
                     : (field['default'] !== undefined ? field['default'] : '');
                 html += '<label class="builder__setting">' + esc(label);
+
+                if (key === 'element_type') {
+                    html += '<select data-setting="block:' + esc(key) + '">';
+                    html += option('', '— выберите тип —', value);
+                    Object.keys(config.elements || {}).forEach(function (name) {
+                        html += option(name, (config.elements[name].label || name), value);
+                    });
+                    html += '</select></label>';
+                    return;
+                }
+
+                if (key.indexOf('map_') === 0) {
+                    var chosen = settings.element_type || '';
+                    var fields = (config.elements && config.elements[chosen] && config.elements[chosen].fields) || [];
+                    html += '<select data-setting="block:' + esc(key) + '">';
+                    html += option('', '— не выводить —', value);
+                    fields.forEach(function (name) { html += option(name, name, value); });
+                    html += '</select>';
+                    if (fields.length === 0) {
+                        html += '<small class="muted">Сначала выберите тип элемента.</small>';
+                    }
+                    html += '</label>';
+                    return;
+                }
+
+                if (field.type === 'file') {
+                    html += '<input type="text" data-setting="block:' + esc(key) + '" value="' + esc(value) + '" placeholder="/media/…">';
+                    html += '<input type="file" data-upload="block:' + esc(key) + '">';
+                    var media = config.media || [];
+                    if (media.length) {
+                        html += '<select data-pick="block:' + esc(key) + '">';
+                        html += option('', '— выбрать из медиа —', '');
+                        media.forEach(function (name) {
+                            html += option('/media/' + config.pageId + '/' + name, name, '');
+                        });
+                        html += '</select>';
+                    }
+                    html += '</label>';
+                    return;
+                }
+
                 if (field.type === 'select' && Array.isArray(field.options)) {
                     html += '<select data-setting="block:' + esc(key) + '">';
                     field.options.forEach(function (opt) {
@@ -506,6 +547,56 @@
 
     settingsBody.addEventListener('input', onSettingChange);
     settingsBody.addEventListener('change', onSettingChange);
+
+    // Element-list particle: when the element type changes, rebuild the mapping
+    // selects so they list the properties of the newly chosen type.
+    settingsBody.addEventListener('change', function (event) {
+        var el = event.target.closest('[data-setting]');
+        if (el && el.getAttribute('data-setting') === 'block:element_type') {
+            renderSettings();
+        }
+    });
+
+    settingsBody.addEventListener('change', function (event) {
+        var pick = event.target.closest('[data-pick]');
+        if (!pick || !selection || selection.kind !== 'block') { return; }
+        if (pick.value === '') { return; }
+        setBlockSetting(pick.getAttribute('data-pick').split(':')[1], pick.value);
+    });
+
+    settingsBody.addEventListener('change', function (event) {
+        var input = event.target.closest('[data-upload]');
+        if (!input || !input.files || !input.files.length || !config.uploadUrl) { return; }
+        var key = input.getAttribute('data-upload').split(':')[1];
+        var data = new FormData();
+        data.append('id', config.pageId);
+        data.append('file', input.files[0]);
+
+        fetch(config.uploadUrl, { method: 'POST', body: data, credentials: 'same-origin' })
+            .then(function (response) { return response.json(); })
+            .then(function (result) {
+                if (result.error) {
+                    window.alert(result.error);
+                    return;
+                }
+                config.media = result.media || config.media;
+                setBlockSetting(key, result.url);
+                renderSettings();
+            })
+            .catch(function () { window.alert('Не удалось загрузить файл.'); });
+    });
+
+    function setBlockSetting(key, value) {
+        if (!selection || selection.kind !== 'block') { return; }
+        var column = columnAt(selection.path[0], selection.path[1]);
+        var block = column && column.blocks ? column.blocks[selection.path[2]] : null;
+        if (!block) { return; }
+        block.settings = block.settings || {};
+        block.settings[key] = value;
+        syncJson();
+        updateCardSummary();
+        renderSettings();
+    }
 
     function onSettingChange(event) {
         var el = event.target.closest('[data-setting]');

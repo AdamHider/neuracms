@@ -6,15 +6,18 @@ namespace FlatCms\Modules\Builder;
 
 use FlatCms\App;
 use FlatCms\Content\Item;
+use FlatCms\Content\Schema;
 use FlatCms\Contracts\Module;
 use FlatCms\Core\Request;
 use FlatCms\Core\Response;
 use FlatCms\Modules\Builder\Types\ButtonType;
 use FlatCms\Modules\Builder\Types\ColumnsType;
 use FlatCms\Modules\Builder\Types\DividerType;
+use FlatCms\Modules\Builder\Types\ElementsType;
 use FlatCms\Modules\Builder\Types\HeadingType;
 use FlatCms\Modules\Builder\Types\HtmlType;
 use FlatCms\Modules\Builder\Types\ImageType;
+use FlatCms\Modules\Builder\Types\MediaType;
 use FlatCms\Modules\Builder\Types\ProductsType;
 use FlatCms\Modules\Builder\Types\QuoteType;
 use FlatCms\Modules\Builder\Types\SpacerType;
@@ -53,6 +56,7 @@ final class BuilderModule implements Module
         $router = $app->router;
         $router->add('GET', '/admin/builder', fn (Request $r) => $this->editor($r));
         $router->add('POST', '/admin/builder/save', fn (Request $r) => $this->save($r));
+        $router->add('POST', '/admin/builder/media', fn (Request $r) => $this->uploadMedia($r));
         $router->add('GET', '/admin/builder/types', fn (Request $r) => $this->typesApi($r));
     }
 
@@ -81,10 +85,12 @@ final class BuilderModule implements Module
             new HeadingType(),
             new TextType(),
             new ImageType(),
+            new MediaType(),
             new ButtonType(),
             new QuoteType(),
             new ColumnsType(),
             new ProductsType(),
+            new ElementsType(),
             new DividerType(),
             new SpacerType(),
             new HtmlType(),
@@ -111,8 +117,31 @@ final class BuilderModule implements Module
             'types' => $types,
             'categories' => $this->categories(),
             'presets' => $this->presets(),
+            'elements' => $this->elementTypes(),
             'columns' => (int) $this->requireApp()->config->get('builder.grid_columns', 12),
         ]);
+    }
+
+    /**
+     * Element types (custom content) with their field names, so the element-list
+     * particle can offer a property picker.
+     *
+     * @return array<string, array{label: string, fields: list<string>}>
+     */
+    private function elementTypes(): array
+    {
+        $out = [];
+        foreach ($this->requireApp()->schema->elements() as $name => $schema) {
+            $out[$name] = [
+                'label' => $schema['label'],
+                'fields' => array_values(array_unique(array_merge(
+                    ['title'],
+                    array_keys($schema['fields']),
+                ))),
+            ];
+        }
+
+        return $out;
     }
 
     private function editor(Request $request): Response
@@ -124,12 +153,18 @@ final class BuilderModule implements Module
         $app = $this->requireApp();
         $id = (string) $request->query('id', '');
         if ($id === '') {
-            return Response::redirect('/admin/content', 302);
+            return Response::redirect('/admin/pages', 302);
         }
 
         $item = $app->storage->load($id);
         if ($item === null) {
             return Response::html($app->renderer->renderTemplate('admin/404', ['title' => 'Не найдено']), 404);
+        }
+
+        // The builder defines the look of pages only. Elements are data and are
+        // edited as properties, so send them back to the normal editor.
+        if (!$app->schema->isPage($item->type())) {
+            return Response::redirect('/admin/content/edit?id=' . rawurlencode($id), 303);
         }
 
         $layout = Layout::fromValue($item->get('layout'), (int) $app->config->get('builder.grid_columns', 12));
@@ -141,6 +176,8 @@ final class BuilderModule implements Module
             'types' => $this->types?->all() ?? [],
             'categories' => $this->categories(),
             'presets' => $this->presets(),
+            'elements' => $this->elementTypes(),
+            'media' => $app->admin->media()?->list($id) ?? [],
             'columns' => (int) $app->config->get('builder.grid_columns', 12),
             'saved' => $request->query('saved') === '1',
             'error' => (string) $request->query('error', ''),
@@ -191,6 +228,9 @@ final class BuilderModule implements Module
         if ($item === null) {
             return Response::redirect('/admin/builder?error=' . rawurlencode('Элемент не найден.'), 303);
         }
+        if (!$app->schema->isPage($item->type())) {
+            return Response::redirect('/admin/content/edit?id=' . rawurlencode($id), 303);
+        }
 
         $raw = $request->input('layout_json', null);
         if (is_string($raw) && $raw !== '') {
@@ -213,6 +253,39 @@ final class BuilderModule implements Module
         $app->build();
 
         return Response::redirect('/admin/builder?id=' . rawurlencode($id) . '&saved=1', 303);
+    }
+
+    /**
+     * Upload a file from the builder (media particle) into the page's folder and
+     * return its /media URL as JSON, so the editor can drop it into a setting.
+     */
+    private function uploadMedia(Request $request): Response
+    {
+        if (!$this->isAdmin()) {
+            return Response::json(['error' => 'forbidden'], 403);
+        }
+
+        $app = $this->requireApp();
+        $id = (string) $request->input('id', '');
+        $item = $app->storage->load($id);
+        if ($item === null || !$app->schema->isPage($item->type())) {
+            return Response::json(['error' => 'Элемент не найден.'], 404);
+        }
+
+        $file = $request->file('file') ?? [];
+        $library = $app->admin->media();
+        $error = $library?->upload($id, $file) ?? 'Модуль не загружен.';
+        if ($error !== '') {
+            return Response::json(['error' => $error], 422);
+        }
+
+        $name = basename((string) ($file['name'] ?? ''));
+
+        return Response::json([
+            'name' => $name,
+            'url' => '/media/' . $id . '/' . $name,
+            'media' => $library?->list($id) ?? [],
+        ]);
     }
 
     /**

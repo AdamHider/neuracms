@@ -1,0 +1,7 @@
+type: service
+title: Корпоративный сайт
+description: Многостраничный сайт с разделами, новостями и каталогом.
+price: 90000
+link: /contact
+order: 2
+published: true
