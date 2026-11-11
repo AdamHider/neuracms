@@ -246,6 +246,20 @@ final class TypeTest extends FlatCmsTestCase
         self::assertFileDoesNotExist($this->root . '/config/schemas/news.yaml');
     }
 
+    public function testNewContentFormRenders(): void
+    {
+        $app = $this->appWithAdmin();
+        $this->login($app);
+
+        $response = $app->handle(new Request('GET', '/admin/content/new', [], [], [], [], []));
+        self::assertSame(200, $response->status());
+        self::assertStringContainsString('Новый элемент', $response->body());
+
+        $typed = $app->handle(new Request('GET', '/admin/content/new', ['type' => 'product'], [], [], [], [], []));
+        self::assertSame(200, $typed->status());
+        self::assertStringContainsString('fields[price]', $typed->body());
+    }
+
     public function testContentEditorRendersTypedFields(): void
     {
         $app = $this->appWithAdmin();

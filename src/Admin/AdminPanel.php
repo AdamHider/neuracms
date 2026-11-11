@@ -185,15 +185,7 @@ final class AdminPanel implements Subsystem
 
         $type = (string) $request->query('type', 'page');
 
-        return $this->page('admin/content-edit', 'Новый элемент', [
-            'item' => null,
-            'id' => '',
-            'types' => $this->typeOptions(),
-            'type' => $type,
-            'fields' => $this->fieldMeta($type),
-            'relations' => $this->relationChoices($type),
-            'errors' => [],
-        ]);
+        return $this->page('admin/content-edit', 'Новый элемент', $this->editData(null, '', $type, []));
     }
 
     private function contentCreate(Request $request): Response
