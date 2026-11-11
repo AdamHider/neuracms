@@ -1,0 +1,20 @@
+type: category
+label: Категория
+fields:
+  title:
+    type: string
+    required: true
+    label: Название
+  description:
+    type: text
+    label: Описание
+  parent:
+    type: relation
+    to: category
+    multiple: false
+    label: Родительская категория
+  published:
+    type: bool
+    default: true
+    label: Опубликовано
+indexed: []

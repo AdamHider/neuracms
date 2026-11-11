@@ -1,4 +1,5 @@
 type: product
+label: Товар
 fields:
   title:
     type: string
@@ -15,6 +16,16 @@ fields:
     type: int
     default: 0
     label: Остаток
+  category:
+    type: relation
+    to: category
+    multiple: false
+    label: Категория
+  related:
+    type: relation
+    to: product
+    multiple: true
+    label: Похожие товары
   tags:
     type: list
     label: Теги
@@ -25,4 +36,4 @@ fields:
     type: bool
     default: true
     label: Опубликовано
-indexed: [price, sku, tags]
+indexed: [price, sku, category, tags]

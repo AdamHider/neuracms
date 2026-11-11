@@ -63,6 +63,30 @@ content/products/teapot/photo.jpg   # attachment, served at /media/products/teap
 Reserved keys are `type`, `title`, `slug`, `order`, `published`, `template`,
 `date`, `inherit` and `layout`. Everything else is a custom property.
 
+### Content types and relations
+
+A **content type** (`config/schemas/<type>.yaml`) describes the fields of items
+of that type, which of them the index stores, and relations to other types. Types
+are created and edited in the admin panel under **Типы контента**, which writes
+the same files. `page`, `section` and `menu-item` are built in and cannot be
+deleted; everything else is custom.
+
+A field of type `relation` attaches one content type to another — a product to a
+category, for example:
+
+```yaml
+type: product
+fields:
+  title:    { type: string, required: true, label: Название }
+  price:    { type: float, required: true, label: Цена }
+  category: { type: relation, to: category, label: Категория }
+  related:  { type: relation, to: product, multiple: true, label: Похожие }
+indexed: [price, category]
+```
+
+In the item editor a relation is a picker over the target type's items. See
+[docs/content.md](docs/content.md) for the full field list and semantics.
+
 ## Modules
 
 The admin panel is part of the core (not a module) and is on for every site; see

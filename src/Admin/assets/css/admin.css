@@ -123,3 +123,25 @@ button.danger { background: var(--danger); }
 .admin--login { display: grid; place-items: center; min-height: 100vh; }
 .login { width: 320px; padding: 1.5rem; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
 .login h1 { margin-top: 0; font-size: 1.25rem; }
+
+.tag {
+    display: inline-block;
+    margin-left: .4rem;
+    padding: .05rem .4rem;
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--muted);
+    background: #eef2ff;
+    border-radius: 999px;
+}
+
+.checkbox-inline { display: inline-flex; align-items: center; gap: .35rem; margin: 0 .5rem 0 0; }
+
+.field-row input[type="text"], .field-row select { max-width: 100%; }
+.field-row td { vertical-align: top; }
+.field-row .field-to, .field-row .field-options, .field-row .field-default { margin-bottom: .3rem; }
+
+fieldset#type-form, #type-form fieldset { max-width: none; }
+#fields-table { margin-bottom: .75rem; }
+

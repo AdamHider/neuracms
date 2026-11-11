@@ -37,6 +37,7 @@ $isAdmin = ($user['role'] ?? '') === 'admin';
             <a href="<?= $this->e($this->url('/admin')) ?>">Панель</a>
             <a href="<?= $this->e($this->url('/admin/content')) ?>">Контент</a>
             <a href="<?= $this->e($this->url('/admin/content/new')) ?>">Добавить элемент</a>
+            <a href="<?= $this->e($this->url('/admin/types')) ?>">Типы контента</a>
             <?php if ($isAdmin): ?>
                 <a href="<?= $this->e($this->url('/admin/users')) ?>">Пользователи</a>
                 <a href="<?= $this->e($this->url('/admin/tools')) ?>">Инструменты</a>

@@ -1,0 +1,16 @@
+type: menu-item
+label: Пункт меню
+builtin: true
+fields:
+  title:
+    type: string
+    required: true
+    label: Подпись
+  link:
+    type: string
+    label: Ссылка
+  order:
+    type: int
+    default: 0
+    label: Порядок
+indexed: [link]

@@ -2,8 +2,13 @@
 /**
  * @var \FlatCms\Content\Item|null $item
  * @var string $id
- * @var array $types
- * @var array $errors
+ * @var array<string, string> $types
+ * @var string $type
+ * @var array<string, mixed> $data
+ * @var string $body
+ * @var array<string, array> $fields
+ * @var array<string, list<array{id: string, title: string, type: string}>> $relations
+ * @var list<string> $errors
  * @var array $media
  * @var bool $saved
  * @var string $media_error
@@ -12,14 +17,16 @@
  */
 $media = $media ?? [];
 $saved = $saved ?? false;
+$relations = $relations ?? [];
 $isNew = $item === null;
-$data = $item?->all() ?? [];
-$props = $item?->props() ?? [];
-$mediaError = (string) ($media_error ?? '');
+$data = $data ?? [];
+$fields = $fields ?? [];
+$type = $type ?? ($data['type'] ?? 'page');
+$propFields = array_diff_key($data, array_flip(\FlatCms\Content\Item::RESERVED), $fields);
 ob_start();
 ?>
 <?php if ($saved): ?><p class="notice">Сохранено.</p><?php endif; ?>
-<?php if ($mediaError !== ''): ?><p class="error"><?= $this->e($mediaError) ?></p><?php endif; ?>
+<?php if (($media_error ?? '') !== ''): ?><p class="error"><?= $this->e($media_error) ?></p><?php endif; ?>
 <?php foreach (($errors ?? []) as $error): ?>
     <p class="error"><?= $this->e($error) ?></p>
 <?php endforeach; ?>
@@ -38,12 +45,13 @@ ob_start();
 
     <label>Тип
         <select name="type">
-            <?php foreach ($types as $type): ?>
-                <option value="<?= $this->e($type) ?>" <?= ($data['type'] ?? 'page') === $type ? 'selected' : '' ?>>
-                    <?= $this->e($type) ?>
+            <?php foreach ($types as $value => $label): ?>
+                <option value="<?= $this->e($value) ?>" <?= $type === $value ? 'selected' : '' ?>>
+                    <?= $this->e($label) ?>
                 </option>
             <?php endforeach; ?>
         </select>
+        <?php if (!$isNew): ?><small>Смена типа применяется при сохранении; поля берутся из нового типа.</small><?php endif; ?>
     </label>
 
     <label>Заголовок <input type="text" name="title" value="<?= $this->e($data['title'] ?? '') ?>" required></label>
@@ -53,11 +61,78 @@ ob_start();
         <input type="checkbox" name="published" value="1" <?= ($data['published'] ?? true) ? 'checked' : '' ?>> Опубликован
     </label>
 
+    <?php if ($fields !== []): ?>
+        <fieldset>
+            <legend>Поля типа «<?= $this->e($types[$type] ?? $type) ?>»</legend>
+            <?php foreach ($fields as $name => $field): ?>
+                <?php
+                $label = (string) ($field['label'] ?? $name);
+                $value = $data[$name] ?? ($field['default'] ?? null);
+                $inputName = 'fields[' . $name . ']';
+                $required = !empty($field['required']);
+                ?>
+                <label><?= $this->e($label) ?>
+                    <?php if (($field['type'] ?? '') === 'relation'): ?>
+                        <?php $options = $relations[$name] ?? []; ?>
+                        <?php if (!empty($field['multiple'])): ?>
+                            <select name="<?= $this->e($inputName) ?>[]" multiple size="<?= max(3, min(8, count($options))) ?>">
+                                <?php foreach ($options as $option): ?>
+                                    <option value="<?= $this->e($option['id']) ?>"
+                                        <?= in_array($option['id'], is_array($value) ? $value : [], true) ? 'selected' : '' ?>>
+                                        <?= $this->e($option['title']) ?> <small>(<?= $this->e($option['id']) ?>)</small>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <small>Можно выбрать несколько. Удерживайте Ctrl (Cmd) для выбора.</small>
+                        <?php else: ?>
+                            <select name="<?= $this->e($inputName) ?>">
+                                <option value="">— не выбрано —</option>
+                                <?php foreach ($options as $option): ?>
+                                    <option value="<?= $this->e($option['id']) ?>"
+                                        <?= (string) $value === $option['id'] ? 'selected' : '' ?>>
+                                        <?= $this->e($option['title']) ?> <small>(<?= $this->e($option['id']) ?>)</small>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <small>Тип-назначение: <?= $this->e($field['to'] ?? '—') ?></small>
+                        <?php endif; ?>
+                    <?php elseif (($field['type'] ?? '') === 'bool'): ?>
+                        <span class="checkbox-inline">
+                            <input type="checkbox" name="<?= $this->e($inputName) ?>" value="1" <?= $value ? 'checked' : '' ?>>
+                        </span>
+                    <?php elseif (($field['type'] ?? '') === 'select'): ?>
+                        <select name="<?= $this->e($inputName) ?>">
+                            <option value="">—</option>
+                            <?php foreach (($field['options'] ?? []) as $option): ?>
+                                <option value="<?= $this->e($option) ?>" <?= (string) $value === (string) $option ? 'selected' : '' ?>>
+                                    <?= $this->e($option) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    <?php elseif (($field['type'] ?? '') === 'text' || ($field['type'] ?? '') === 'markdown'): ?>
+                        <textarea name="<?= $this->e($inputName) ?>" rows="3"><?= $this->e(is_scalar($value) ? (string) $value : '') ?></textarea>
+                    <?php elseif (($field['type'] ?? '') === 'list'): ?>
+                        <input type="text" name="<?= $this->e($inputName) ?>"
+                               value="<?= $this->e(is_array($value) ? implode(', ', $value) : (string) $value) ?>"
+                               placeholder="через запятую">
+                    <?php elseif (($field['type'] ?? '') === 'int' || ($field['type'] ?? '') === 'float'): ?>
+                        <input type="number" step="<?= ($field['type'] ?? '') === 'float' ? 'any' : '1' ?>"
+                               name="<?= $this->e($inputName) ?>" value="<?= $this->e($value ?? '') ?>">
+                    <?php else: ?>
+                        <input type="text" name="<?= $this->e($inputName) ?>" value="<?= $this->e(is_scalar($value) ? (string) $value : '') ?>">
+                    <?php endif; ?>
+                    <?php if ($required): ?><small>Обязательное поле</small><?php endif; ?>
+                </label>
+            <?php endforeach; ?>
+        </fieldset>
+    <?php endif; ?>
+
     <fieldset>
-        <legend>Дополнительные свойства</legend>
+        <legend>Свободные свойства</legend>
+        <small>Любые дополнительные пары ключ-значение, не описанные в типе.</small>
         <div id="props">
             <?php $index = 0; ?>
-            <?php foreach ($props as $key => $value): ?>
+            <?php foreach ($propFields as $key => $value): ?>
                 <div class="prop-row">
                     <input type="text" name="props[<?= $index ?>][key]" value="<?= $this->e($key) ?>" placeholder="ключ">
                     <input type="text" name="props[<?= $index ?>][value]" value="<?= $this->e(is_scalar($value) ? (string) $value : json_encode($value, JSON_UNESCAPED_UNICODE)) ?>" placeholder="значение">
@@ -75,7 +150,7 @@ ob_start();
     </fieldset>
 
     <label>Текст (Markdown)
-        <textarea name="body" rows="16"><?= $this->e($item?->body() ?? '') ?></textarea>
+        <textarea name="body" rows="16"><?= $this->e($body ?? '') ?></textarea>
     </label>
 
     <button type="submit">Сохранить</button>

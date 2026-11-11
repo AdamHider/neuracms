@@ -27,7 +27,8 @@ folders under `content/`; everything else is generated into `var/`.
 | `Content\Storage` | Loads an item folder into an `Item` |
 | `Content\Index` | Cached list of items with the fields that queries need |
 | `Content\Query` | Fluent filtering and sorting over the index |
-| `Content\Schema` | Field descriptions per content type, used by the editor |
+| `Content\Schema` | Field descriptions and relations per content type, used by the editor and validation |
+| `Content\TypeRepository` | Creates, updates and deletes content types (writes `config/schemas/`) |
 | `Http\Router` | Pattern routes, redirects and content fallback |
 | `Http\Renderer` | Template lookup, partials and the layout resolver |
 | `Http\Assets` | Serves theme, core and module assets and item media |

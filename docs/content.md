@@ -36,13 +36,16 @@ missing. Any other file in the folder is an attachment.
 Every other key is a free-form property. The CMS never requires a schema; a
 schema only describes fields for the admin editor.
 
-## Schemas
+## Content types
 
-A schema in `config/schemas/<type>.yaml` lists fields and which of them the index
-stores:
+A content type is a file in `config/schemas/<type>.yaml`. It describes the fields
+of items of that type, which of them the index stores, and any relations to other
+types. Types are created and edited from the admin panel under **Типы контента**
+(`/admin/types`), which writes the same files.
 
 ```yaml
 type: product
+label: Товар
 fields:
   title: { type: string, required: true, label: Название }
   price: { type: float, required: true, label: Цена }
@@ -51,8 +54,49 @@ fields:
 indexed: [price, sku, tags]
 ```
 
-Field types are `string`, `text`, `int`, `float`, `bool`, `date`, `select` and
-`list`. If a schema has no `fields`, the editor falls back to a generic list.
+Field types are `string`, `text`, `markdown`, `int`, `float`, `bool`, `date`,
+`select`, `list`, `file` and `relation`. A field may also set `required`,
+`default` and `label`. If a type has no `fields`, the editor falls back to a
+generic list of free-form properties.
+
+### Built-in types
+
+`page`, `section` and `menu-item` ship with the core and are marked
+`builtin: true`. They can be edited but not deleted from the admin panel, so a
+site always keeps the types the core itself relies on. Any other type is
+custom and can be removed.
+
+### Relations between types
+
+A field of type `relation` points at items of another type. It carries `to` (the
+target type) and an optional `multiple` flag. This is how one content type is
+attached to another:
+
+```yaml
+type: product
+fields:
+  title:    { type: string, required: true, label: Название }
+  price:    { type: float, required: true, label: Цена }
+  category: { type: relation, to: category, label: Категория }          # one
+  related:  { type: relation, to: product, multiple: true, label: Похожие } # many
+indexed: [price, category]
+```
+
+In the item editor a single relation renders as a dropdown of the target type's
+items, and a `multiple` relation as a multi-select. Saving stores the referenced
+item **ids** (paths such as `categories/tea`). The relation target must exist and
+match the declared type, otherwise validation fails with an error.
+
+A type can also relate to itself (`to: product` above, or a category tree via
+`to: category`). Relation fields are only queryable when listed under `indexed`,
+like any other field.
+
+```php
+$app->query()->type('product')->where('category', '=', 'categories/tea')->find();
+$app->schema->relations('product');       // ['category' => ['to' => 'category', ...]]
+$app->schema->referencedBy('category');   // ['product']
+```
+
 
 ## Querying
 

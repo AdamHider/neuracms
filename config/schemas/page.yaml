@@ -1,4 +1,6 @@
 type: page
+label: Страница
+builtin: true
 fields:
   title:
     type: string

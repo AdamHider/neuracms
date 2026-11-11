@@ -46,10 +46,34 @@ Passwords are stored with `password_hash()`. Users live in `var/users/`.
 | POST | `/admin/content/delete` | Delete (to `var/trash/`) |
 | POST | `/admin/content/move` | Rename or move an item |
 | GET | `/admin/content/history` | Versions of an item |
+| GET | `/admin/types` | List content types |
+| GET, POST | `/admin/types/new` | Create a type |
+| GET, POST | `/admin/types/edit` | Edit a type's fields and relations |
+| POST | `/admin/types/delete` | Delete a custom type (admin only) |
 | POST | `/admin/media/upload` | Upload an attachment |
 | POST | `/admin/media/delete` | Remove an attachment |
 | GET | `/admin/users` | List and create users (admin only) |
 | GET | `/admin/tools` | Rebuild index, clear cache (admin only) |
+
+## Content types
+
+The **Типы контента** page (`/admin/types`) manages the files under
+`config/schemas/`. A type has a name (used as the file name and as the `type`
+value of its items), a human label, and a list of fields. Each field has a name,
+a type, an optional label, a `required` flag and an `indexed` flag (whether the
+index stores it for querying). Types marked `builtin` (`page`, `section`,
+`menu-item`) can be edited but not deleted.
+
+The item editor renders a control per field: text and number inputs, checkboxes,
+selects, textareas and list inputs. A field of type **relation** is rendered as a
+picker over the items of the target type, which is how one content type is
+attached to another (a product to a category, for example). See
+[content.md](content.md) for the schema format and relations.
+
+`TypeRepository` (`FlatCms\Content\TypeRepository`) writes the type files and
+validates names, field names and relation targets. Editing a type triggers an
+index rebuild so new `indexed` fields take effect immediately.
+
 
 ## Writing content
 

@@ -1,4 +1,6 @@
 type: section
+label: Раздел
+builtin: true
 fields:
   title:
     type: string
