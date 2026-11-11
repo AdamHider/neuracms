@@ -50,6 +50,9 @@ Passwords are stored with `password_hash()`. Users live in `var/users/`.
 | GET, POST | `/admin/types/new` | Create a type |
 | GET, POST | `/admin/types/edit` | Edit a type's fields and relations |
 | POST | `/admin/types/delete` | Delete a custom type (admin only) |
+| GET | `/admin/builder` | Page builder editor for an item |
+| POST | `/admin/builder/save` | Save a page-builder layout |
+| GET | `/admin/builder/types` | Block registry as JSON for the editor |
 | POST | `/admin/media/upload` | Upload an attachment |
 | POST | `/admin/media/delete` | Remove an attachment |
 | GET | `/admin/users` | List and create users (admin only) |
@@ -93,6 +96,36 @@ edit page displays.
 
 - Rebuild index — regenerates `var/cache/index.php` from the content tree.
 - Clear cache — removes rendered page cache.
+
+## Design
+
+The panel is built on **Bootstrap 5** and **Bootstrap Icons**, vendored under
+`src/Admin/assets/vendor/` and served at `/assets/admin/vendor/...`, so the admin
+works offline with no CDN. A thin theme layer in `src/Admin/assets/css/admin.css`
+sits on top: a dark top bar, a dark sidebar with icons, light content cards, and
+rounded panels. `src/Admin/assets/js/admin.js` adds the mobile sidebar toggle;
+dropdown menus, tooltips and modals come from Bootstrap's own bundle.
+
+Icons are requested by meaning, not by glyph. `FlatCms\Admin\Icons` maps a
+semantic key ("edit", "builder", "delete") to a Bootstrap Icons name, and
+templates call `$this->icon('edit')`. Swapping the icon set means editing one map.
+
+The shell lives in `src/Admin/partials/admin/layout.php`. Each page template
+renders its content, then calls the layout with a `title` and an `active` key so
+the sidebar can highlight the current section:
+
+```php
+$content = ob_get_clean();
+echo $this->partial('admin/layout', [
+    'content' => $content,
+    'title' => 'Контент',
+    'active' => 'content',
+    'admin_user' => $admin_user ?? null,
+]);
+```
+
+A page may pass a `head` string to inject extra `<link>` tags (the page builder
+uses this to load its own stylesheet).
 
 ## Command line
 

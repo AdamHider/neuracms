@@ -181,4 +181,4 @@ ob_start();
 </script>
 <?php
 $content = ob_get_clean();
-echo $this->partial('admin/layout', ['content' => $content, 'title' => $isNew ? 'Новый тип' : 'Тип: ' . $label, 'admin_user' => $admin_user ?? null]);
+echo $this->partial('admin/layout', ['content' => $content, 'title' => $isNew ? 'Новый тип' : 'Тип: ' . $label, 'active' => 'types', 'admin_user' => $admin_user ?? null]);

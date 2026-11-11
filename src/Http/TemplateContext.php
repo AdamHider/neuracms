@@ -43,6 +43,14 @@ final class TemplateContext
     }
 
     /**
+     * Render an admin icon (Bootstrap Icons) by semantic name.
+     */
+    public function icon(string $name, string $class = '', string $title = ''): string
+    {
+        return \FlatCms\Admin\Icons::render($name, $class, $title);
+    }
+
+    /**
      * Render the page builder layout for an item, if the builder module is loaded.
      */
     public function layout(mixed $item = null): string

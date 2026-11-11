@@ -6,17 +6,21 @@
  */
 ob_start();
 ?>
-<p><a href="<?= $this->e($this->url('/admin/content/edit?id=' . rawurlencode($id))) ?>">← К элементу</a></p>
+<p>
+    <a class="btn btn-sm btn-outline-secondary" href="<?= $this->e($this->url('/admin/content/edit?id=' . rawurlencode($id))) ?>">
+        <?= $this->icon('edit') ?> К элементу
+    </a>
+</p>
 
 <?php if ($entries === []): ?>
-    <p>История пуста. Копия создаётся при каждом сохранении.</p>
+    <div class="panel">История пуста. Копия создаётся при каждом сохранении.</div>
 <?php else: ?>
     <table class="table">
         <thead><tr><th>Сохранено</th><th>Папка</th></tr></thead>
         <tbody>
         <?php foreach ($entries as $entry): ?>
             <tr>
-                <td><?= $this->e($entry['saved_at']) ?></td>
+                <td><?= $this->icon('history', 'text-muted') ?> <?= $this->e($entry['saved_at']) ?></td>
                 <td><code>var/history/<?= $this->e($entry['id']) ?></code></td>
             </tr>
         <?php endforeach; ?>
@@ -26,4 +30,4 @@ ob_start();
 <?php endif; ?>
 <?php
 $content = ob_get_clean();
-echo $this->partial('admin/layout', ['content' => $content, 'title' => 'История: ' . $id, 'admin_user' => $admin_user ?? null]);
+echo $this->partial('admin/layout', ['content' => $content, 'title' => 'История: ' . $id, 'active' => 'content', 'admin_user' => $admin_user ?? null]);

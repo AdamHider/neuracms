@@ -12,11 +12,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Вход — FlatCMS</title>
+    <link rel="stylesheet" href="<?= $this->e($this->ownerAsset('admin', 'vendor/bootstrap/css/bootstrap.min.css')) ?>">
+    <link rel="stylesheet" href="<?= $this->e($this->ownerAsset('admin', 'vendor/bootstrap-icons/bootstrap-icons.min.css')) ?>">
     <link rel="stylesheet" href="<?= $this->e($this->ownerAsset('admin', 'css/admin.css')) ?>">
 </head>
 <body class="admin admin--login">
 <main class="login">
-    <h1>Вход в админку</h1>
+    <h1><?= $this->icon('dashboard', 'text-primary') ?> FlatCMS</h1>
+    <p class="muted" style="margin-top:-.5rem">Вход в панель управления</p>
 
     <?php if (($error ?? '') !== ''): ?>
         <p class="error"><?= $this->e($error) ?></p>
@@ -25,7 +28,7 @@
     <form method="post" action="<?= $this->e($this->url('/admin/login')) ?>">
         <label>Логин <input type="text" name="login" autocomplete="username" required autofocus></label>
         <label>Пароль <input type="password" name="password" autocomplete="current-password" required></label>
-        <button type="submit">Войти</button>
+        <button type="submit" class="btn btn-primary w-100"><?= $this->icon('login') ?> Войти</button>
     </form>
 </main>
 </body>

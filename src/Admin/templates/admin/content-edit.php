@@ -34,6 +34,10 @@ ob_start();
 <form method="post" action="<?= $this->e($this->url($isNew ? '/admin/content/new' : '/admin/content/edit')) ?>">
     <input type="hidden" name="id" value="<?= $this->e($id) ?>">
 
+    <?php if (!$isNew && $app->module('builder') !== null): ?>
+        <p><a class="btn btn-sm btn-outline-secondary" href="<?= $this->e($this->url('/admin/builder?id=' . rawurlencode($id))) ?>"><?= $this->icon('builder') ?> Открыть в конструкторе</a></p>
+    <?php endif; ?>
+
     <?php if ($isNew): ?>
         <label>Путь (id)
             <input type="text" name="id" value="<?= $this->e($id) ?>" placeholder="blog/second-post" required>
@@ -153,12 +157,12 @@ ob_start();
         <textarea name="body" rows="16"><?= $this->e($body ?? '') ?></textarea>
     </label>
 
-    <button type="submit">Сохранить</button>
+    <button type="submit" class="btn btn-primary"><?= $this->icon('save') ?> Сохранить</button>
 </form>
 
 <?php if (!$isNew): ?>
-    <section class="media">
-        <h2>Медиа</h2>
+    <section class="media panel">
+        <h2><?= $this->icon('media') ?> Медиа</h2>
         <ul class="media__list">
             <?php foreach ($media as $name): ?>
                 <li>
@@ -166,7 +170,7 @@ ob_start();
                     <form method="post" action="<?= $this->e($this->url('/admin/media/delete')) ?>">
                         <input type="hidden" name="id" value="<?= $this->e($id) ?>">
                         <input type="hidden" name="name" value="<?= $this->e($name) ?>">
-                        <button type="submit" class="danger">Удалить</button>
+                        <button type="submit" class="btn btn-sm btn-outline-danger"><?= $this->icon('delete') ?></button>
                     </form>
                 </li>
             <?php endforeach; ?>
@@ -174,25 +178,26 @@ ob_start();
         <form method="post" action="<?= $this->e($this->url('/admin/media/upload')) ?>" enctype="multipart/form-data">
             <input type="hidden" name="id" value="<?= $this->e($id) ?>">
             <input type="file" name="file" required>
-            <button type="submit">Загрузить</button>
+            <button type="submit" class="btn btn-outline-secondary"><?= $this->icon('media') ?> Загрузить</button>
         </form>
     </section>
 
-    <section class="move">
-        <h2>Переместить</h2>
+    <section class="move panel">
+        <h2><?= $this->icon('move') ?> Переместить</h2>
         <form method="post" action="<?= $this->e($this->url('/admin/content/move')) ?>">
             <input type="hidden" name="id" value="<?= $this->e($id) ?>">
             <label>Новый путь <input type="text" name="to" value="<?= $this->e($id) ?>"></label>
-            <button type="submit">Переместить</button>
+            <button type="submit" class="btn btn-outline-secondary"><?= $this->icon('move') ?> Переместить</button>
         </form>
     </section>
 
-    <p><a href="<?= $this->e($this->url('/admin/content/history?id=' . rawurlencode($id))) ?>">История версий</a></p>
+    <p><a class="btn btn-sm btn-outline-secondary" href="<?= $this->e($this->url('/admin/content/history?id=' . rawurlencode($id))) ?>"><?= $this->icon('history') ?> История версий</a></p>
 <?php endif; ?>
 <?php
 $content = ob_get_clean();
 echo $this->partial('admin/layout', [
     'content' => $content,
     'title' => $isNew ? 'Новый элемент' : 'Редактирование',
+    'active' => 'content',
     'admin_user' => $admin_user ?? null,
 ]);

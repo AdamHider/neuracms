@@ -174,6 +174,7 @@ final class AdminPanel implements Subsystem
         return $this->page('admin/content-list', 'Контент', [
             'items' => $query->sort('id')->find(),
             'type' => $type,
+            'types' => $this->typeOptions(),
         ]);
     }
 
