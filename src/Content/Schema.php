@@ -30,9 +30,10 @@ final class Schema implements Subsystem
 
     /**
      * Kinds of the core page-like types. Any other type is an element unless its
-     * schema file sets "kind" explicitly.
+     * schema file sets "kind" explicitly. Menu items are elements: they are data
+     * the Menu particle renders into navigation, not routable pages of their own.
      */
-    private const PAGE_KINDS = ['page', 'section', 'menu-item'];
+    private const PAGE_KINDS = ['page', 'section'];
 
     /**
      * @var array<string, array{fields: array<string, array>, indexed: list<string>, label: string, builtin: bool, kind: string}>

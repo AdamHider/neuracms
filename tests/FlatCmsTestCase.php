@@ -50,6 +50,15 @@ abstract class FlatCmsTestCase extends TestCase
     }
 
     /**
+     * Absolute path inside the real project (for reading fixtures the tests copy
+     * selectively rather than wholesale).
+     */
+    protected function project(string $relative): string
+    {
+        return dirname(__DIR__) . '/' . ltrim($relative, '/');
+    }
+
+    /**
      * Copy a folder from the real project into the fixture root. Used by tests
      * that exercise modules and themes.
      */

@@ -56,11 +56,28 @@ final class Icons
         'quote' => 'quote',
         'elements' => 'collection',
         'list' => 'list-ul',
+        'menu' => 'menu-button-wide',
+        'regions' => 'layout-text-window-reverse',
+        'docs' => 'journal-richtext',
+        'duplicate' => 'copy',
+        'move-up' => 'arrow-up',
+        'move-down' => 'arrow-down',
     ];
 
     public static function name(string $key): string
     {
         return self::MAP[$key] ?? $key;
+    }
+
+    /**
+     * The full semantic-key => Bootstrap-Icons-name map. Shared with the builder
+     * JS so templates and scripts agree on one icon vocabulary.
+     *
+     * @return array<string, string>
+     */
+    public static function all(): array
+    {
+        return self::MAP;
     }
 
     /**

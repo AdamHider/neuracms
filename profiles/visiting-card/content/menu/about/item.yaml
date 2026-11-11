@@ -1,0 +1,5 @@
+type: menu-item
+title: О нас
+link: /about
+order: 2
+published: true

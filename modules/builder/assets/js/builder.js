@@ -59,7 +59,8 @@
     }
 
     function icon(name) {
-        return '<i class="bi bi-' + esc(name || 'square') + '" aria-hidden="true"></i>';
+        var glyph = (config.icons && config.icons[name]) || name || 'square';
+        return '<i class="bi bi-' + esc(glyph) + '" aria-hidden="true"></i>';
     }
 
     function model() {
@@ -249,6 +250,7 @@
 
         html += '<div class="builder__settings-actions">'
             + '<button type="button" class="btn btn-sm btn-outline-secondary" data-col-add="' + si + '">' + icon('columns') + ' Добавить колонку</button>'
+            + '<button type="button" class="btn btn-sm btn-outline-danger" data-section-del="' + si + '">' + icon('delete') + ' Удалить секцию</button>'
             + '</div>';
 
         settingsBody.innerHTML = html;
@@ -301,10 +303,11 @@
                     html += '<input type="file" data-upload="block:' + esc(key) + '">';
                     var media = config.media || [];
                     if (media.length) {
+                        var mediaBase = config.mediaId || config.pageId;
                         html += '<select data-pick="block:' + esc(key) + '">';
                         html += option('', '— выбрать из медиа —', '');
                         media.forEach(function (name) {
-                            html += option('/media/' + config.pageId + '/' + name, name, '');
+                            html += option('/media/' + mediaBase + '/' + name, name, '');
                         });
                         html += '</select>';
                     }
@@ -332,6 +335,11 @@
         } else {
             html += '<p class="muted">У этого элемента нет настроек.</p>';
         }
+
+        html += '<div class="builder__settings-actions">'
+            + '<button type="button" class="btn btn-sm btn-outline-secondary" data-block-dup="' + si + ':' + ci + ':' + bi + '">' + icon('duplicate') + ' Дублировать</button>'
+            + '<button type="button" class="btn btn-sm btn-outline-danger" data-block-del="' + si + ':' + ci + ':' + bi + '">' + icon('delete') + ' Удалить</button>'
+            + '</div>';
 
         settingsBody.innerHTML = html;
     }
@@ -368,6 +376,16 @@
             selection = null;
             render();
         }
+    }
+
+    function duplicateBlock(si, ci, bi) {
+        var column = columnAt(si, ci);
+        if (!column || !column.blocks || !column.blocks[bi]) { return; }
+        var copy = clone(column.blocks[bi]);
+        copy.id = uid();
+        column.blocks.splice(bi + 1, 0, copy);
+        selection = { kind: 'block', path: [si, ci, bi + 1] };
+        render();
     }
 
     function moveBlock(from, to) {
@@ -486,11 +504,21 @@
         return event.clientY > rect.top + rect.height / 2 ? bi + 1 : bi;
     }
 
-    canvas.addEventListener('click', function (event) {
+    canvas.addEventListener('click', onEditorClick);
+    // The settings panel repeats delete/duplicate actions, so share the handler.
+    settingsBody.addEventListener('click', onEditorClick);
+
+    function onEditorClick(event) {
         var del = event.target.closest('[data-block-del]');
         if (del) {
             var p = del.getAttribute('data-block-del').split(':').map(Number);
             removeBlock(p[0], p[1], p[2]);
+            return;
+        }
+        var dup = event.target.closest('[data-block-dup]');
+        if (dup) {
+            var pd = dup.getAttribute('data-block-dup').split(':').map(Number);
+            duplicateBlock(pd[0], pd[1], pd[2]);
             return;
         }
         var secDel = event.target.closest('[data-section-del]');
@@ -543,7 +571,7 @@
             selection = { kind: 'section', path: [parseInt(section.getAttribute('data-si'), 10)] };
             render();
         }
-    });
+    }
 
     settingsBody.addEventListener('input', onSettingChange);
     settingsBody.addEventListener('change', onSettingChange);

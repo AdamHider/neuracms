@@ -394,6 +394,10 @@ final class BuilderTest extends FlatCmsTestCase
         self::assertArrayHasKey('types', $payload);
         self::assertTrue(array_is_list($payload['types']), 'types must serialize as a JSON array');
         self::assertNotEmpty($payload['types']);
+
+        // The shared icon map lets the editor render semantic icon names.
+        self::assertArrayHasKey('icons', $payload);
+        self::assertSame('trash', $payload['icons']['delete'] ?? null);
     }
 
     public function testSaveSanitizesUnknownTypesAndPersists(): void

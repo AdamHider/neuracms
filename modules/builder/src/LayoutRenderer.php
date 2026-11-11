@@ -33,6 +33,24 @@ final class LayoutRenderer
     }
 
     /**
+     * Render either an Item (using its "layout" property) or a raw layout array
+     * (used for theme regions, whose layout is stored outside the content tree).
+     */
+    public function renderValue(mixed $value): string
+    {
+        if ($value instanceof Item) {
+            return $this->render($value);
+        }
+
+        $layout = Layout::fromValue(is_array($value) ? $value : [], $this->columns());
+        if ($layout->isEmpty()) {
+            return '';
+        }
+
+        return $this->renderLayout($layout);
+    }
+
+    /**
      * @param array<string, mixed> $data
      */
     public function renderLayout(Layout $layout, array $data = []): string

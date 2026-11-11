@@ -15,8 +15,10 @@ $active = $active ?? '';
 $nav = [
     ['key' => 'dashboard', 'icon' => 'dashboard', 'label' => 'Панель', 'href' => '/admin'],
     ['key' => 'pages', 'icon' => 'content', 'label' => 'Страницы', 'href' => '/admin/pages'],
-    ['key' => 'elements', 'icon' => 'types', 'label' => 'Элементы', 'href' => '/admin/elements'],
-    ['key' => 'types', 'icon' => 'settings', 'label' => 'Типы контента', 'href' => '/admin/types'],
+    ['key' => 'elements', 'icon' => 'elements', 'label' => 'Элементы', 'href' => '/admin/elements'],
+    ['key' => 'regions', 'icon' => 'regions', 'label' => 'Области сайта', 'href' => '/admin/regions'],
+    ['key' => 'types', 'icon' => 'types', 'label' => 'Типы контента', 'href' => '/admin/types'],
+    ['key' => 'docs', 'icon' => 'docs', 'label' => 'Документация', 'href' => '/admin/docs'],
 ];
 $adminNav = [
     ['key' => 'users', 'icon' => 'users', 'label' => 'Пользователи', 'href' => '/admin/users'],

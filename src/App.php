@@ -7,6 +7,7 @@ namespace FlatCms;
 use FlatCms\Admin\AdminPanel;
 use FlatCms\Content\Index;
 use FlatCms\Content\Query;
+use FlatCms\Content\Regions;
 use FlatCms\Content\Schema;
 use FlatCms\Content\Storage;
 use FlatCms\Contracts\Module;
@@ -35,6 +36,7 @@ final class App
     public readonly Config $config;
     public readonly Storage $storage;
     public readonly Schema $schema;
+    public readonly Regions $regions;
     public readonly Index $index;
     public readonly Router $router;
     public readonly Renderer $renderer;
@@ -100,6 +102,9 @@ final class App
 
         $this->schema = new Schema($this->fs);
         $this->bootSubsystem($this->schema);
+
+        $this->regions = new Regions($this->fs);
+        $this->bootSubsystem($this->regions);
 
         $this->index = new Index($this->fs, $this->storage, $this->schema, $this->events, $this->config);
         $this->bootSubsystem($this->index);

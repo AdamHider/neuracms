@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace FlatCms\Modules\Builder;
 
 use FlatCms\App;
-use FlatCms\Content\Item;
 use FlatCms\Content\Schema;
 use FlatCms\Contracts\Module;
 use FlatCms\Core\Request;
@@ -18,6 +17,7 @@ use FlatCms\Modules\Builder\Types\HeadingType;
 use FlatCms\Modules\Builder\Types\HtmlType;
 use FlatCms\Modules\Builder\Types\ImageType;
 use FlatCms\Modules\Builder\Types\MediaType;
+use FlatCms\Modules\Builder\Types\MenuType;
 use FlatCms\Modules\Builder\Types\ProductsType;
 use FlatCms\Modules\Builder\Types\QuoteType;
 use FlatCms\Modules\Builder\Types\SpacerType;
@@ -45,12 +45,9 @@ final class BuilderModule implements Module
         $this->renderer = new LayoutRenderer($app, $this->types, $app->events);
 
         // Templates call $this->layout($item); the resolver renders the blocks.
-        $app->renderer->setLayoutResolver(function (mixed $item) use ($app): string {
-            if (!$item instanceof Item) {
-                return '';
-            }
-
-            return $this->renderer?->render($item) ?? '';
+        // Regions pass a raw layout array instead of an Item.
+        $app->renderer->setLayoutResolver(function (mixed $value) use ($app): string {
+            return $this->renderer?->renderValue($value) ?? '';
         });
 
         $router = $app->router;
@@ -91,6 +88,7 @@ final class BuilderModule implements Module
             new ColumnsType(),
             new ProductsType(),
             new ElementsType(),
+            new MenuType(),
             new DividerType(),
             new SpacerType(),
             new HtmlType(),
@@ -151,6 +149,33 @@ final class BuilderModule implements Module
         }
 
         $app = $this->requireApp();
+        $region = (string) $request->query('region', '');
+
+        if ($region !== '') {
+            if (!$app->regions->has($region)) {
+                return Response::html($app->renderer->renderTemplate('admin/404', ['title' => 'Не найдено']), 404);
+            }
+
+            $layout = Layout::fromValue($app->regions->layout($region), (int) $app->config->get('builder.grid_columns', 12));
+            $mediaId = $this->regionMediaId($region);
+
+            return Response::html($app->renderer->renderTemplate('admin/builder', [
+                'item' => null,
+                'id' => '',
+                'region' => $region,
+                'region_label' => $app->regions->all()[$region] ?? $region,
+                'layout' => $layout,
+                'types' => $this->types?->all() ?? [],
+                'categories' => $this->categories(),
+                'presets' => $this->presets(),
+                'elements' => $this->elementTypes(),
+                'media' => $app->admin->media()?->list($mediaId) ?? [],
+                'columns' => (int) $app->config->get('builder.grid_columns', 12),
+                'saved' => $request->query('saved') === '1',
+                'error' => (string) $request->query('error', ''),
+            ]));
+        }
+
         $id = (string) $request->query('id', '');
         if ($id === '') {
             return Response::redirect('/admin/pages', 302);
@@ -172,6 +197,8 @@ final class BuilderModule implements Module
         return Response::html($app->renderer->renderTemplate('admin/builder', [
             'item' => $item,
             'id' => $id,
+            'region' => '',
+            'region_label' => '',
             'layout' => $layout,
             'types' => $this->types?->all() ?? [],
             'categories' => $this->categories(),
@@ -182,6 +209,15 @@ final class BuilderModule implements Module
             'saved' => $request->query('saved') === '1',
             'error' => (string) $request->query('error', ''),
         ]));
+    }
+
+    /**
+     * Media for a region is stored in a hidden content folder ("_regions/<name>"),
+     * which Storage skips, so region uploads never show up as content.
+     */
+    private function regionMediaId(string $region): string
+    {
+        return '_regions/' . $region;
     }
 
     /**
@@ -223,6 +259,19 @@ final class BuilderModule implements Module
         }
 
         $app = $this->requireApp();
+        $region = (string) $request->input('region', '');
+
+        if ($region !== '') {
+            if (!$app->regions->has($region)) {
+                return Response::redirect('/admin/builder?region=' . rawurlencode($region) . '&error=' . rawurlencode('Область не найдена.'), 303);
+            }
+
+            $layout = $this->sanitize($this->readLayout($request), (int) $app->config->get('builder.grid_columns', 12));
+            $app->regions->save($region, $layout->toArray());
+
+            return Response::redirect('/admin/builder?region=' . rawurlencode($region) . '&saved=1', 303);
+        }
+
         $id = (string) $request->input('id', '');
         $item = $app->storage->load($id);
         if ($item === null) {
@@ -232,15 +281,7 @@ final class BuilderModule implements Module
             return Response::redirect('/admin/content/edit?id=' . rawurlencode($id), 303);
         }
 
-        $raw = $request->input('layout_json', null);
-        if (is_string($raw) && $raw !== '') {
-            $decoded = json_decode($raw, true);
-            $raw = is_array($decoded) ? $decoded : [];
-        } else {
-            $raw = $request->input('layout', []);
-        }
-
-        $layout = $this->sanitize($raw, (int) $app->config->get('builder.grid_columns', 12));
+        $layout = $this->sanitize($this->readLayout($request), (int) $app->config->get('builder.grid_columns', 12));
 
         $safe = $app->fs->safePath('content', $id);
         if ($safe === null) {
@@ -256,6 +297,23 @@ final class BuilderModule implements Module
     }
 
     /**
+     * The layout posted by the editor: either the JSON textarea or the nested form.
+     */
+    private function readLayout(Request $request): array
+    {
+        $raw = $request->input('layout_json', null);
+        if (is_string($raw) && $raw !== '') {
+            $decoded = json_decode($raw, true);
+
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        $raw = $request->input('layout', []);
+
+        return is_array($raw) ? $raw : [];
+    }
+
+    /**
      * Upload a file from the builder (media particle) into the page's folder and
      * return its /media URL as JSON, so the editor can drop it into a setting.
      */
@@ -266,10 +324,19 @@ final class BuilderModule implements Module
         }
 
         $app = $this->requireApp();
-        $id = (string) $request->input('id', '');
-        $item = $app->storage->load($id);
-        if ($item === null || !$app->schema->isPage($item->type())) {
-            return Response::json(['error' => 'Элемент не найден.'], 404);
+        $region = (string) $request->input('region', '');
+
+        if ($region !== '') {
+            if (!$app->regions->has($region)) {
+                return Response::json(['error' => 'Область не найдена.'], 404);
+            }
+            $id = $this->regionMediaId($region);
+        } else {
+            $id = (string) $request->input('id', '');
+            $item = $app->storage->load($id);
+            if ($item === null || !$app->schema->isPage($item->type())) {
+                return Response::json(['error' => 'Элемент не найден.'], 404);
+            }
         }
 
         $file = $request->file('file') ?? [];

@@ -50,11 +50,13 @@ Passwords are stored with `password_hash()`. Users live in `var/users/`.
 | GET, POST | `/admin/types/new` | Create a type |
 | GET, POST | `/admin/types/edit` | Edit a type's fields and relations |
 | POST | `/admin/types/delete` | Delete a custom type (admin only) |
-| GET | `/admin/builder` | Page builder editor for an item |
+| GET | `/admin/builder` | Page builder editor for an item (or `?region=<name>` for a theme region) |
 | POST | `/admin/builder/save` | Save a page-builder layout |
 | GET | `/admin/builder/types` | Block registry as JSON for the editor |
 | POST | `/admin/media/upload` | Upload an attachment |
 | POST | `/admin/media/delete` | Remove an attachment |
+| GET | `/admin/regions` | List theme regions (header, footer) and edit them |
+| GET | `/admin/docs` | Read the project documentation (`docs/*.md`) in the panel |
 | GET | `/admin/users` | List and create users (admin only) |
 | GET | `/admin/tools` | Rebuild index, clear cache (admin only) |
 
@@ -92,6 +94,23 @@ stored next to the item and served at `/media/<item id>/<file>`, so the `content
 folder never has to be web reachable. Upload failures set `media_error`, which the
 edit page displays.
 
+## Regions
+
+The **Области сайта** page (`/admin/regions`) lists the theme regions — the
+header and footer, plus any extra region a theme declares. Editing a region opens
+the page builder bound to `config/regions/<name>.yaml` instead of a content item,
+so the site chrome is edited with the same particles as a page. Region media is
+uploaded to `content/_regions/<name>/` and served at
+`/media/_regions/<name>/<file>`. See [regions.md](regions.md).
+
+## Documentation viewer
+
+The **Документация** page (`/admin/docs`) renders the project's own Markdown from
+`docs/` inside the panel, using `FlatCms\Admin\Docs`. It reads the first `# `
+heading as each page's title, sorts the list, and renders the selected file with
+the same safe Markdown renderer the front end uses. Doc names are validated, so a
+path like `../../etc/passwd` is ignored.
+
 ## Tools
 
 - Rebuild index — regenerates `var/cache/index.php` from the content tree.
@@ -108,7 +127,9 @@ dropdown menus, tooltips and modals come from Bootstrap's own bundle.
 
 Icons are requested by meaning, not by glyph. `FlatCms\Admin\Icons` maps a
 semantic key ("edit", "builder", "delete") to a Bootstrap Icons name, and
-templates call `$this->icon('edit')`. Swapping the icon set means editing one map.
+templates call `$this->icon('edit')`. The same map is handed to the builder
+JavaScript as `config.icons`, so the editor's buttons use one icon vocabulary
+too. Swapping the icon set means editing one map.
 
 The shell lives in `src/Admin/partials/admin/layout.php`. Each page template
 renders its content, then calls the layout with a `title` and an `active` key so

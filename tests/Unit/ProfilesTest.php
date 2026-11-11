@@ -34,6 +34,9 @@ final class ProfilesTest extends FlatCmsTestCase
         $fs->deleteDir('content');
         $fs->copyDir('profiles/' . $profile . '/content', 'content');
         $fs->copy('profiles/' . $profile . '/site.yaml', 'config/site.yaml');
+        if (is_dir($this->project('profiles/' . $profile . '/regions'))) {
+            $fs->copyDir('profiles/' . $profile . '/regions', 'config/regions');
+        }
 
         return $this->app();
     }
@@ -99,6 +102,26 @@ final class ProfilesTest extends FlatCmsTestCase
         self::assertStringContainsString('element-card', $body);
         self::assertStringContainsString('Сайт-визитка', $body);
         self::assertStringContainsString('30000', $body);
+    }
+
+    public function testVisitingCardRendersEditableHeaderAndFooterRegions(): void
+    {
+        $app = $this->install('visiting-card');
+
+        $body = $this->get($app, '/')->body();
+
+        // Header region: the logo comes from the region's own media folder and the
+        // navigation is built from the menu-item elements.
+        self::assertStringContainsString('/media/_regions/header/logo.svg', $body);
+        self::assertStringContainsString('site-nav', $body);
+        self::assertStringContainsString('>Услуги<', $body);
+
+        // Footer region: rendered on every page.
+        self::assertStringContainsString('Сайты для малого бизнеса с 2016 года.', $body);
+
+        // The theme's hard-coded fallback navigation must not appear when a region
+        // is defined.
+        self::assertStringNotContainsString('site-header__inner', $body);
     }
 
     public function testCorporateProfileDisablesTheShop(): void

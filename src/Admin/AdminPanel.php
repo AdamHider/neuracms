@@ -80,6 +80,10 @@ final class AdminPanel implements Subsystem
         $router->add('POST', '/admin/types/edit', fn (Request $r) => $this->typesSave($r));
         $router->add('POST', '/admin/types/delete', fn (Request $r) => $this->typesDelete($r));
 
+        $router->add('GET', '/admin/regions', fn (Request $r) => $this->regionsPage($r));
+
+        $router->add('GET', '/admin/docs', fn (Request $r) => $this->docsPage($r));
+
         $router->add('GET', '/admin/tools', fn (Request $r) => $this->toolsPage($r));
         $router->add('POST', '/admin/tools/rebuild', fn (Request $r) => $this->toolsRebuild($r));
         $router->add('POST', '/admin/tools/clear-cache', fn (Request $r) => $this->toolsClearCache($r));
@@ -439,6 +443,35 @@ final class AdminPanel implements Subsystem
             'cache_size' => $this->dirSize('var/cache'),
             'history_size' => $this->dirSize('var/history'),
             'done' => (string) $request->query('done', ''),
+        ]);
+    }
+
+    private function regionsPage(Request $request): Response
+    {
+        if (!$this->requireAuth()) {
+            return Response::redirect('/admin/login', 302);
+        }
+
+        return $this->page('admin/regions', 'Области сайта', [
+            'regions' => $this->requireApp()->regions->all(),
+        ]);
+    }
+
+    private function docsPage(Request $request): Response
+    {
+        if (!$this->requireAuth()) {
+            return Response::redirect('/admin/login', 302);
+        }
+
+        $docs = new Docs($this->requireApp()->fs);
+        $requested = trim((string) $request->query('page', ''));
+        $name = $requested !== '' && $docs->has($requested) ? $requested : '';
+
+        return $this->page('admin/docs', 'Документация', [
+            'docs' => $docs->all(),
+            'current' => $name,
+            'doc_title' => $name !== '' ? $docs->title($name) : '',
+            'doc_html' => $name !== '' ? $docs->html($name) : '',
         ]);
     }
 

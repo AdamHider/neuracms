@@ -115,6 +115,11 @@ function siteInstall(Fs $fs, string $name, bool $force): int
         $fs->copy($base . '/site.yaml', 'config/site.yaml');
     }
 
+    // Theme regions (header/footer layouts) ship with the profile.
+    if (is_dir(FLATCMS_ROOT . '/' . $base . '/regions')) {
+        $fs->copyDir($base . '/regions', 'config/regions');
+    }
+
     echo "Profile \"{$name}\" installed. Run \"php bin/flatcms index:build\" next.\n";
 
     return 0;

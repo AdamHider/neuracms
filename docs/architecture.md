@@ -29,11 +29,13 @@ folders under `content/`; everything else is generated into `var/`.
 | `Content\Query` | Fluent filtering and sorting over the index |
 | `Content\Schema` | Field descriptions, relations and `kind` (page vs element) per content type |
 | `Content\TypeRepository` | Creates, updates and deletes content types (writes `config/schemas/`) |
+| `Content\Regions` | Theme regions (header, footer): a builder layout per `config/regions/<name>.yaml` |
 | `Http\Router` | Pattern routes, redirects and content fallback |
 | `Http\Renderer` | Template lookup, partials and the layout resolver |
 | `Http\Assets` | Serves theme, core and module assets and item media |
 | `Admin\AdminPanel` | Core admin subsystem: auth, content, media, users, tools |
 | `Admin\Icons` | Semantic icon names mapped to Bootstrap Icons |
+| `Admin\Docs` | Reads `docs/*.md` for the in-panel documentation viewer |
 | `Support\Fs` | All file access, with path safety |
 
 ## Rendering
@@ -45,11 +47,17 @@ item `type` (`templates/<type>.php`), then `templates/page.php`. A theme's
 `/assets/<name>/...`: the theme wins, then a core subsystem, then a module.
 
 Templates receive `$item` (or the current data), `$app` and `$this`, a
-`TemplateContext` with `e()`, `url()`, `asset()`, `partial()` and `layout()`.
+`TemplateContext` with `e()`, `url()`, `link()`, `asset()`, `partial()`,
+`layout()` and `region()`.
 
 `$this->layout($item)` renders the item's builder layout (sections of columns of
 blocks). Without the builder module the resolver is empty and the helper returns
 an empty string, so themes can call it unconditionally.
+
+`$this->region('header')` renders a theme region — the site chrome, edited in the
+builder and stored under `config/regions/`. It returns an empty string when the
+region is empty, so a theme falls back to its own partial. See
+[regions.md](regions.md).
 
 ## Content index
 

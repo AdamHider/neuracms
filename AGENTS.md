@@ -36,9 +36,10 @@ php -S localhost:8000 -t public   # dev server
 
 - Every content type has a `kind`: `page` (core, routable, look set in the
   builder) or `element` (structured data with no look of its own).
-- `Schema::kind()/isPage()/isElement()/pages()/elements()`. Defaults: `page`,
-  `section`, `menu-item` are pages; every other type is an element unless its
-  schema sets `kind:` explicitly. `TypeRepository::save()` persists `kind`.
+- `Schema::kind()/isPage()/isElement()/pages()/elements()`. Defaults: `page` and
+  `section` are pages; every other type is an element unless its schema sets
+  `kind:` explicitly (`menu-item` is an element, set in its schema file).
+  `TypeRepository::save()` persists `kind`.
 - `Index` stores `kind` per row; `Query::kind($kind)` filters by it.
 - Admin has two lists: **Страницы** (`/admin/pages`) and **Элементы**
   (`/admin/elements`); `/admin/content` still exists as an unfiltered list. The
@@ -97,6 +98,26 @@ php -S localhost:8000 -t public   # dev server
   is a three-pane drag & drop UI; JSON textarea stays in sync (works without JS).
 - Save sanitizes sections/columns, drops unknown block types and non-scalar
   settings, clamps widths to `builder.grid_columns`.
+
+## Theme regions & navigation (added feature)
+
+- `Content\Regions` (core subsystem, `$app->regions`) stores the theme regions —
+  header, footer, plus any `config/regions/*.yaml` — as builder layouts, separate
+  from the content tree. `all()/has()/layout()/save()`.
+- `Renderer::region($name)` / `$this->region('header')` render a region through
+  the layout resolver; empty string when the region has no blocks. The default
+  theme falls back to its own `header`/`footer` partials in
+  `themes/default/partials/layout.php`.
+- Region media lives in `content/_regions/<name>/` (skipped by the scanner) and is
+  served at `/media/_regions/<name>/<file>`.
+- `menu` particle (`Types/MenuType.php`, `templates/blocks/menu.php`) renders
+  navigation from `source: menu` (`menu-item` elements), `pages`, or `custom`
+  lines. Items nest via a `parent` property (id or short name); `depth` limits
+  levels; `$this->link()` keeps absolute URLs/anchors and prefixes bare paths.
+- `menu-item` is an **element** type (schema `kind: element`).
+- Admin: **Области сайта** (`/admin/regions`) lists regions; the builder opens a
+  region with `?region=<name>` (save/media routes take the same `region` input).
+  **Документация** (`/admin/docs`) renders `docs/*.md` via `Admin\Docs`.
 
 ## Gotchas
 

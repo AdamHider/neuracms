@@ -24,6 +24,14 @@ final class TemplateContext
         return $this->renderer->url($path);
     }
 
+    /**
+     * Normalise a user-entered link (absolute URLs and anchors are kept as-is).
+     */
+    public function link(string $path): string
+    {
+        return $this->renderer->link($path);
+    }
+
     public function asset(string $path): string
     {
         return $this->renderer->asset($path);
@@ -56,5 +64,13 @@ final class TemplateContext
     public function layout(mixed $item = null): string
     {
         return $this->renderer->layout($item);
+    }
+
+    /**
+     * Render a theme region (header, footer, …) defined in the builder.
+     */
+    public function region(string $name): string
+    {
+        return $this->renderer->region($name);
     }
 }

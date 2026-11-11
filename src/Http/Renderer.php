@@ -82,6 +82,19 @@ final class Renderer implements Subsystem
         return (string) ($this->layoutResolver)($item);
     }
 
+    /**
+     * Render a theme region (header, footer, …) through the same layout resolver
+     * the builder registers, so a region's blocks render exactly like a page's.
+     */
+    public function region(string $name): string
+    {
+        if ($this->layoutResolver === null || $this->app === null) {
+            return '';
+        }
+
+        return (string) ($this->layoutResolver)($this->app->regions->layout($name));
+    }
+
     public function render(Item $item, array $data = []): string
     {
         $data['item'] = $item;
@@ -154,6 +167,24 @@ final class Renderer implements Subsystem
     public function url(string $path): string
     {
         return '/' . ltrim($path, '/');
+    }
+
+    /**
+     * Normalise a user-entered link: absolute URLs and anchors are kept as-is,
+     * everything else becomes a site-relative path.
+     */
+    public function link(string $path): string
+    {
+        $path = trim($path);
+        if ($path === '') {
+            return '';
+        }
+        // Keep absolute URLs, protocol-relative URLs, anchors and in-site paths.
+        if (preg_match('~^(?:https?:)?//|^[a-z][a-z0-9+.-]*:|^[#/]~i', $path) === 1) {
+            return $path;
+        }
+
+        return $this->url($path);
     }
 
     public function templateName(Item $item): string

@@ -38,10 +38,11 @@ refuses to touch a non-empty content tree.
 ## Layout of the project
 
 ```
-config/       site.yaml, redirects.yaml and per-type schemas
+config/       site.yaml, redirects.yaml, per-type schemas and theme regions
 content/      the site content: one folder per item
+docs/         project documentation, readable in the admin panel
 modules/      self-contained modules (builder, shop, contact-form)
-profiles/     ready-made sites (config + content)
+profiles/     ready-made sites (config + content + regions)
 src/          the CMS core
 tests/        PHPUnit tests
 themes/       themes; each has templates/, partials/ and assets/
@@ -135,10 +136,16 @@ layout:
 ```
 
 Core block types are `heading`, `text`, `image`, `button`, `quote`, `divider`,
-`spacer`, `columns`, `products` and `html`. Modules can add more through the
-`builder.types` filter. Edit a page in the admin under "Конструктор" on any
-content item: drag particles from the library into columns, rearrange them, and
-tune section and block settings in the side panel.
+`spacer`, `columns`, `products`, `menu`, `elements` and `html`. Modules can add
+more through the `builder.types` filter. Edit a page in the admin under
+"Конструктор" on any content item: drag particles from the library into columns,
+rearrange them, and tune section and block settings in the side panel.
+
+The same editor builds the **site chrome**. A theme region — the header and
+footer, plus any extra region a theme declares — is a builder layout stored under
+`config/regions/`, so navigation and the logo are edited as content rather than
+hard-coded in a theme. The `menu` particle feeds navigation from `menu-item`
+elements, the pages, or a hand-typed list. Edit regions under "Области сайта".
 
 ## CLI
 
@@ -158,4 +165,4 @@ vendor/bin/phpunit
 ## Documentation
 
 See [docs/](docs/) for the architecture, the content format, the builder, the
-admin panel and the site profiles.
+theme regions, the admin panel and the site profiles.

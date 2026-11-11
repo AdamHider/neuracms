@@ -116,6 +116,20 @@ the card. When `map_link` is empty the card links to the element's own URL. The
 editor offers the available properties of the chosen type in a dropdown, so the
 mapping is set visually, not by hand.
 
+## Menu particle
+
+The `menu` particle renders navigation from one of three sources — the
+`menu-item` elements (`source: menu`), the routable pages (`source: pages`), or a
+hand-typed list (`source: custom`). It is how the header and footer navigation is
+built as content rather than hard-coded in a theme. See
+[regions.md](regions.md#the-menu-particle) for the fields and nesting rules.
+
+## Regions
+
+The same editor builds the site chrome. A theme region (header, footer, …) is a
+builder layout stored in `config/regions/<name>.yaml`; open it with
+`/admin/builder?region=header`. See [regions.md](regions.md).
+
 ## Rendering
 
 The module registers a layout resolver with the renderer:
