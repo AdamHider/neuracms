@@ -11,10 +11,13 @@ use FlatCms\Core\Request;
 use FlatCms\Core\Response;
 use FlatCms\Modules\Builder\Types\ButtonType;
 use FlatCms\Modules\Builder\Types\ColumnsType;
+use FlatCms\Modules\Builder\Types\DividerType;
 use FlatCms\Modules\Builder\Types\HeadingType;
 use FlatCms\Modules\Builder\Types\HtmlType;
 use FlatCms\Modules\Builder\Types\ImageType;
 use FlatCms\Modules\Builder\Types\ProductsType;
+use FlatCms\Modules\Builder\Types\QuoteType;
+use FlatCms\Modules\Builder\Types\SpacerType;
 use FlatCms\Modules\Builder\Types\TextType;
 
 /**
@@ -79,8 +82,11 @@ final class BuilderModule implements Module
             new TextType(),
             new ImageType(),
             new ButtonType(),
+            new QuoteType(),
             new ColumnsType(),
             new ProductsType(),
+            new DividerType(),
+            new SpacerType(),
             new HtmlType(),
         ] as $type) {
             $registry->register($type);
@@ -101,7 +107,12 @@ final class BuilderModule implements Module
             $types[] = $type->toArray();
         }
 
-        return Response::json(['types' => $types]);
+        return Response::json([
+            'types' => $types,
+            'categories' => $this->categories(),
+            'presets' => $this->presets(),
+            'columns' => (int) $this->requireApp()->config->get('builder.grid_columns', 12),
+        ]);
     }
 
     private function editor(Request $request): Response
@@ -128,9 +139,44 @@ final class BuilderModule implements Module
             'id' => $id,
             'layout' => $layout,
             'types' => $this->types?->all() ?? [],
+            'categories' => $this->categories(),
+            'presets' => $this->presets(),
+            'columns' => (int) $app->config->get('builder.grid_columns', 12),
             'saved' => $request->query('saved') === '1',
             'error' => (string) $request->query('error', ''),
         ]));
+    }
+
+    /**
+     * Block types grouped by category, for the particle picker.
+     *
+     * @return array<string, list<array>>
+     */
+    private function categories(): array
+    {
+        $grouped = [];
+        foreach ($this->types?->all() ?? [] as $type) {
+            $grouped[$type->category()][] = $type->toArray();
+        }
+
+        return $grouped;
+    }
+
+    /**
+     * Ready-made section layouts ("presets"), each a list of column widths.
+     *
+     * @return list<array{name: string, title: string, widths: list<int>}>
+     */
+    private function presets(): array
+    {
+        return [
+            ['name' => 'one', 'title' => 'Одна колонка', 'widths' => [12]],
+            ['name' => 'two', 'title' => 'Две колонки', 'widths' => [6, 6]],
+            ['name' => 'two-wide', 'title' => 'Две колонки (широкая слева)', 'widths' => [8, 4]],
+            ['name' => 'three', 'title' => 'Три колонки', 'widths' => [4, 4, 4]],
+            ['name' => 'four', 'title' => 'Четыре колонки', 'widths' => [3, 3, 3, 3]],
+            ['name' => 'sidebar', 'title' => 'Контент + сайдбар', 'widths' => [9, 3]],
+        ];
     }
 
     private function save(Request $request): Response
@@ -171,33 +217,114 @@ final class BuilderModule implements Module
 
     /**
      * Rebuild a Layout from request data, dropping unknown block types and
-     * normalising settings to scalars so nothing unsafe reaches disk.
+     * normalising settings to scalars so nothing unsafe reaches disk. Accepts
+     * the current {"sections":[...]} shape and the legacy flat {"blocks":[...]}.
      */
     private function sanitize(mixed $raw, int $columns): Layout
     {
         if (!is_array($raw)) {
-            return new Layout([], null, $columns);
+            return new Layout([], $columns);
         }
 
-        $blocks = $raw['blocks'] ?? $raw;
-        $grid = $raw['grid'] ?? null;
+        $sections = [];
+        if (isset($raw['sections']) && is_array($raw['sections'])) {
+            foreach ($raw['sections'] as $entry) {
+                if (!is_array($entry)) {
+                    continue;
+                }
+                $section = $this->sanitizeSection($entry, $columns);
+                if ($section !== null) {
+                    $sections[] = $section;
+                }
+            }
 
+            return new Layout($sections, $columns);
+        }
+
+        // Legacy flat block list: upgrade through Layout so it lands as sections.
+        $blocks = $raw['blocks'] ?? $raw;
         $clean = [];
         if (is_array($blocks)) {
             foreach ($blocks as $entry) {
                 if (!is_array($entry)) {
                     continue;
                 }
-                $type = (string) ($entry['type'] ?? '');
-                if ($type === '' || !($this->types?->has($type) ?? false)) {
-                    continue;
+                $block = $this->sanitizeBlock($entry);
+                if ($block !== null) {
+                    $clean[] = $block;
                 }
-                $settings = $this->sanitizeSettings($entry['settings'] ?? []);
-                $clean[] = new Block($type, $settings, isset($entry['id']) ? (string) $entry['id'] : null);
             }
         }
 
-        return Layout::fromValue(['blocks' => array_map(static fn (Block $b): array => $b->toArray(), $clean), 'grid' => $grid], $columns);
+        return Layout::fromValue(
+            ['blocks' => array_map(static fn (Block $b): array => $b->toArray(), $clean)],
+            $columns
+        );
+    }
+
+    private function sanitizeSection(mixed $raw, int $columns): ?Section
+    {
+        if (!is_array($raw)) {
+            return null;
+        }
+
+        $columnsData = [];
+        foreach (is_array($raw['columns'] ?? null) ? $raw['columns'] : [] as $column) {
+            if (!is_array($column)) {
+                continue;
+            }
+            $blocks = [];
+            foreach (is_array($column['blocks'] ?? null) ? $column['blocks'] : [] as $entry) {
+                if (is_array($entry)) {
+                    $block = $this->sanitizeBlock($entry);
+                    if ($block !== null) {
+                        $blocks[] = $block;
+                    }
+                }
+            }
+            $width = isset($column['width']) ? max(0, min($columns, (int) $column['width'])) : 0;
+            $columnsData[] = new Column($blocks, $width);
+        }
+
+        // A section given as a flat block list keeps working.
+        if ($columnsData === [] && isset($raw['blocks']) && is_array($raw['blocks'])) {
+            $blocks = [];
+            foreach ($raw['blocks'] as $entry) {
+                if (is_array($entry)) {
+                    $block = $this->sanitizeBlock($entry);
+                    if ($block !== null) {
+                        $blocks[] = $block;
+                    }
+                }
+            }
+            $columnsData[] = new Column($blocks, $columns);
+        }
+
+        if ($columnsData === []) {
+            return null;
+        }
+
+        $settings = $this->sanitizeSettings($raw['settings'] ?? []);
+        $id = isset($raw['id']) && is_string($raw['id']) ? $raw['id'] : null;
+
+        return new Section($columnsData, $settings, $id);
+    }
+
+    private function sanitizeBlock(mixed $entry): ?Block
+    {
+        if (!is_array($entry)) {
+            return null;
+        }
+
+        $type = (string) ($entry['type'] ?? '');
+        if ($type === '' || !($this->types?->has($type) ?? false)) {
+            return null;
+        }
+
+        $settings = $this->sanitizeSettings($entry['settings'] ?? []);
+        $id = isset($entry['id']) && is_string($entry['id']) ? $entry['id'] : null;
+
+        return new Block($type, $settings, $id);
     }
 
     /**

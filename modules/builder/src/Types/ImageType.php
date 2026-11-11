@@ -14,6 +14,6 @@ final class ImageType extends BlockType
             'src' => ['type' => 'string', 'label' => 'Файл', 'default' => ''],
             'alt' => ['type' => 'string', 'label' => 'Подпись', 'default' => ''],
             'width' => ['type' => 'int', 'label' => 'Ширина, %', 'default' => 100],
-        ], null, 'Медиа');
+        ], null, 'Медиа', 'image');
     }
 }

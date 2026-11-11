@@ -14,6 +14,6 @@ final class ButtonType extends BlockType
             'text' => ['type' => 'string', 'label' => 'Текст', 'default' => 'Подробнее'],
             'url' => ['type' => 'string', 'label' => 'Ссылка', 'default' => '/'],
             'style' => ['type' => 'select', 'label' => 'Стиль', 'options' => ['primary', 'outline'], 'default' => 'primary'],
-        ], null, 'Текст');
+        ], null, 'Текст', 'button');
     }
 }

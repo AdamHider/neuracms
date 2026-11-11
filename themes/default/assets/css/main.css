@@ -106,3 +106,24 @@ form input[type="text"], form input[type="email"], form textarea { width: 100%; 
 .block--button .button--primary { background: #2563eb; color: #fff; padding: .6rem 1.1rem; border-radius: 6px; text-decoration: none; display: inline-block; }
 .block--button .button--outline { border: 1px solid #2563eb; color: #2563eb; padding: .6rem 1.1rem; border-radius: 6px; text-decoration: none; display: inline-block; }
 @media (max-width: 700px) { .block--columns { flex-direction: column; } }
+
+/* Page builder sections (Gantry-style section > column > block) */
+.g-section { padding: var(--g-padding, 2.5rem 0); }
+.g-section--muted { background: #f4f6fb; }
+.g-section--dark { background: #101725; color: #e8ecf5; }
+.g-section--accent { background: var(--accent); color: #fff; }
+.g-container { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+.g-container--full { max-width: none; padding: 0; }
+.g-row { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-start; }
+.g-col { flex: calc(var(--g-span, 12)) 1 0; min-width: 220px; }
+@media (max-width: 760px) { .g-col { flex: 1 1 100%; } }
+.block--spacer-sm { height: 1rem; }
+.block--spacer-md { height: 2rem; }
+.block--spacer-lg { height: 3.5rem; }
+.block--spacer-xl { height: 5.5rem; }
+.block--divider { border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+.block--divider-dashed { border-top-style: dashed; }
+.block--divider-dotted { border-top-style: dotted; }
+.block--quote { margin: 1.5rem 0; padding: .5rem 0 .5rem 1.25rem; border-left: 3px solid var(--accent); }
+.block--quote p { margin: 0 0 .4rem; font-style: italic; font-size: 1.1rem; }
+.block--quote cite { color: var(--muted); font-style: normal; font-size: .9rem; }

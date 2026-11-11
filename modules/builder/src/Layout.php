@@ -5,36 +5,46 @@ declare(strict_types=1);
 namespace FlatCms\Modules\Builder;
 
 /**
- * A page layout: an ordered list of blocks plus optional column widths for a
- * grid. The grid is a list of rows, each row a list of column spans.
+ * A page layout: an ordered list of sections. Each section holds columns, and
+ * each column holds blocks (the Gantry 5 "section > column > particle" shape).
+ *
+ * A legacy layout may still be a flat list of blocks or carry a "grid"; both are
+ * upgraded to sections on read so old content keeps rendering.
  */
 final class Layout
 {
     /**
-     * @param list<Block>        $blocks
-     * @param list<list<int>>|null $grid
+     * @param list<Section> $sections
      */
     public function __construct(
-        private readonly array $blocks = [],
-        private readonly ?array $grid = null,
+        private readonly array $sections = [],
         private readonly int $columns = 12,
     ) {
     }
 
     /**
+     * @return list<Section>
+     */
+    public function sections(): array
+    {
+        return $this->sections;
+    }
+
+    /**
+     * Every block on the page, in reading order.
+     *
      * @return list<Block>
      */
     public function blocks(): array
     {
-        return $this->blocks;
-    }
+        $blocks = [];
+        foreach ($this->sections as $section) {
+            foreach ($section->blocks() as $block) {
+                $blocks[] = $block;
+            }
+        }
 
-    /**
-     * @return list<list<int>>|null
-     */
-    public function grid(): ?array
-    {
-        return $this->grid;
+        return $blocks;
     }
 
     public function columns(): int
@@ -44,44 +54,36 @@ final class Layout
 
     public function isEmpty(): bool
     {
-        return $this->blocks === [];
+        return $this->blocks() === [];
     }
 
-    public function hasGrid(): bool
+    public function hasSections(): bool
     {
-        return $this->grid !== null && $this->grid !== [];
+        return $this->sections !== [];
     }
 
     /**
-     * Column spans of the grid row that holds the block at $index.
-     *
-     * @return list<int>|null
-     */
-    public function rowFor(int $index): ?array
-    {
-        if (!$this->hasGrid()) {
-            return null;
-        }
-
-        $cursor = 0;
-        foreach ($this->grid as $row) {
-            if ($index < $cursor + count($row)) {
-                return $index >= $cursor ? $row : null;
-            }
-            $cursor += count($row);
-        }
-
-        return null;
-    }
-
-    /**
-     * Build a layout from the raw "layout" value of item.yaml. Accepts a plain
-     * list of blocks or a mapping with "blocks" and "grid" keys.
+     * Build a layout from the raw "layout" value of item.yaml. Accepts:
+     *  - ["sections" => [...]]  (current format)
+     *  - ["blocks" => [...], "grid" => [...]]  (legacy)
+     *  - a plain list of blocks (legacy)
      */
     public static function fromValue(mixed $value, int $columns = 12): self
     {
         if (!is_array($value)) {
-            return new self([], null, $columns);
+            return new self([], $columns);
+        }
+
+        // Current format: explicit sections.
+        if (isset($value['sections']) && is_array($value['sections'])) {
+            $sections = [];
+            foreach ($value['sections'] as $entry) {
+                if (is_array($entry)) {
+                    $sections[] = Section::fromArray($entry, $columns);
+                }
+            }
+
+            return new self($sections, $columns);
         }
 
         $rawBlocks = $value;
@@ -91,49 +93,71 @@ final class Layout
             $grid = self::parseGrid($value['grid'] ?? null);
         }
 
+        return new self(self::sectionsFromFlatBlocks($rawBlocks, $grid, $columns), $columns);
+    }
+
+    /**
+     * @return array{sections: list<array>}
+     */
+    public function toArray(): array
+    {
+        return ['sections' => array_map(static fn (Section $s): array => $s->toArray(), $this->sections)];
+    }
+
+    /**
+     * Turn a flat block list plus an optional grid into sections: one section
+     * per grid row, one column per span. Without a grid each block becomes its
+     * own full-width section.
+     *
+     * @param mixed                 $rawBlocks
+     * @param list<list<int>>|null  $grid
+     *
+     * @return list<Section>
+     */
+    private static function sectionsFromFlatBlocks(mixed $rawBlocks, ?array $grid, int $columns): array
+    {
         $blocks = [];
-        foreach ($rawBlocks as $entry) {
+        foreach (is_array($rawBlocks) ? $rawBlocks : [] as $entry) {
             if (is_array($entry) && isset($entry['type'])) {
                 $blocks[] = Block::fromArray($entry);
             }
         }
 
-        return new self($blocks, $grid, $columns);
-    }
-
-    /**
-     * @return array{blocks: list<array>, grid?: list<list<int>>}
-     */
-    public function toArray(): array
-    {
-        $data = ['blocks' => array_map(static fn (Block $b): array => $b->toArray(), $this->blocks)];
-        if ($this->grid !== null) {
-            $data['grid'] = $this->grid;
+        if ($blocks === []) {
+            return [];
         }
 
-        return $data;
-    }
-
-    /**
-     * Column spans for a block, or null when no grid is set.
-     *
-     * @return list<int>|null
-     */
-    public function columnsFor(int $index): ?array
-    {
-        if ($this->grid === null) {
-            return null;
+        if ($grid === null || $grid === []) {
+            return array_map(static fn (Block $b): Section => new Section([new Column([$b], $columns)]), $blocks);
         }
 
+        $sections = [];
         $cursor = 0;
-        foreach ($this->grid as $row) {
-            if ($index >= $cursor && $index < $cursor + count($row)) {
-                return $row;
+        foreach ($grid as $row) {
+            $count = count($row);
+            if ($count === 0) {
+                continue;
             }
-            $cursor += count($row);
+            $slice = array_slice($blocks, $cursor, $count);
+            $cursor += $count;
+
+            $rowColumns = [];
+            foreach ($slice as $index => $block) {
+                $rowColumns[] = new Column([$block], max(1, (int) ($row[$index] ?? 1)));
+            }
+            if ($rowColumns !== []) {
+                $sections[] = new Section($rowColumns);
+            }
         }
 
-        return null;
+        // Any blocks beyond the grid keep rendering as their own sections.
+        if ($cursor < count($blocks)) {
+            foreach (array_slice($blocks, $cursor) as $block) {
+                $sections[] = new Section([new Column([$block], $columns)]);
+            }
+        }
+
+        return $sections;
     }
 
     /**

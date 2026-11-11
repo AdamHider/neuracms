@@ -1,6 +1,6 @@
 name: builder
 title: Конструктор страниц
-description: Блочный редактор страниц — блоки, сетка, шаблоны и API типов блоков.
+description: Конструктор страниц в стиле Gantry 5 — секции, колонки и блоки с drag & drop, шаблоны и API типов.
 version: 1.0.0
 enabled: true
 namespace: FlatCms\Modules\Builder

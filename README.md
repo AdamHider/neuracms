@@ -117,20 +117,28 @@ and assets under `assets/`, served at `/assets/<theme>/...`.
 
 ## Page builder
 
-A page can describe its body as blocks instead of Markdown:
+A page can describe its body as a layout of sections and columns instead of
+Markdown (a Gantry 5 style section > column > block model):
 
 ```yaml
 layout:
-  blocks:
-    - type: heading
-      settings: {text: 'Привет', level: h1}
-    - type: products
-      settings: {title: 'Хиты', limit: 3}
+  sections:
+    - columns:
+        - width: 8
+          blocks:
+            - type: heading
+              settings: {text: 'Привет', level: h1}
+        - width: 4
+          blocks:
+            - type: products
+              settings: {title: 'Хиты', limit: 3}
 ```
 
-Core block types are `heading`, `text`, `image`, `button`, `columns`,
-`products` and `html`. Modules can add more through the `builder.types` filter.
-Edit blocks in the admin under "Конструктор" on any content item.
+Core block types are `heading`, `text`, `image`, `button`, `quote`, `divider`,
+`spacer`, `columns`, `products` and `html`. Modules can add more through the
+`builder.types` filter. Edit a page in the admin under "Конструктор" on any
+content item: drag particles from the library into columns, rearrange them, and
+tune section and block settings in the side panel.
 
 ## CLI
 

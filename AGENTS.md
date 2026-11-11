@@ -45,6 +45,30 @@ php -S localhost:8000 -t public   # dev server
   `/admin/types/delete`.
 - Only fields listed in `indexed` are queryable (including relation fields).
 
+## Admin UI (Bootstrap redesign)
+
+- The panel is Bootstrap 5 + Bootstrap Icons, vendored under
+  `src/Admin/assets/vendor/` (offline, no CDN) and served at `/assets/admin/...`.
+- `Admin\Icons` maps semantic keys to Bootstrap Icons names; templates use
+  `$this->icon('edit')`. Add new meanings to the map, not glyphs to templates.
+- `src/Admin/partials/admin/layout.php` is the shell; pages pass `title`,
+  `active` (sidebar highlight) and optionally `head` (extra `<link>` tags).
+- `src/Admin/assets/css/admin.css` is a thin theme layer over Bootstrap.
+
+## Page builder (Gantry-style sections)
+
+- Model: `Layout` → `Section` → `Column` → `Block` (was a flat block list + grid).
+- `Layout::fromValue()` upgrades legacy `{blocks, grid}` and bare block lists to
+  sections on read, so old content keeps rendering. Saving writes `sections:`.
+- `LayoutRenderer` emits `.g-section` > `.g-container` > `.g-row` > `.g-col`
+  (`--g-span` custom property); theme styles these in `themes/default/.../main.css`.
+- Block types carry `category` and `icon`; registry exposes categories and
+  section presets. New types: `quote`, `divider`, `spacer`.
+- Editor `modules/builder/templates/admin/builder.php` + `assets/js/builder.js`
+  is a three-pane drag & drop UI; JSON textarea stays in sync (works without JS).
+- Save sanitizes sections/columns, drops unknown block types and non-scalar
+  settings, clamps widths to `builder.grid_columns`.
+
 ## Gotchas
 
 - Local `flatcms` branch tracks `origin/flatcms`; `master` is untouched, no PRs.

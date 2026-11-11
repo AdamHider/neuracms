@@ -19,6 +19,7 @@ class BlockType
         private readonly array $fields = [],
         private readonly ?string $template = null,
         private readonly string $category = 'Общие',
+        private readonly string $icon = 'square',
     ) {
     }
 
@@ -30,6 +31,11 @@ class BlockType
     public function title(): string
     {
         return $this->title;
+    }
+
+    public function icon(): string
+    {
+        return $this->icon;
     }
 
     public function template(): string
@@ -51,7 +57,7 @@ class BlockType
     }
 
     /**
-     * @return array{name: string, title: string, category: string, fields: array}
+     * @return array{name: string, title: string, category: string, icon: string, fields: array}
      */
     public function toArray(): array
     {
@@ -59,6 +65,7 @@ class BlockType
             'name' => $this->name,
             'title' => $this->title,
             'category' => $this->category,
+            'icon' => $this->icon,
             'fields' => $this->fields,
         ];
     }

@@ -33,6 +33,7 @@ folders under `content/`; everything else is generated into `var/`.
 | `Http\Renderer` | Template lookup, partials and the layout resolver |
 | `Http\Assets` | Serves theme, core and module assets and item media |
 | `Admin\AdminPanel` | Core admin subsystem: auth, content, media, users, tools |
+| `Admin\Icons` | Semantic icon names mapped to Bootstrap Icons |
 | `Support\Fs` | All file access, with path safety |
 
 ## Rendering
@@ -46,9 +47,9 @@ item `type` (`templates/<type>.php`), then `templates/page.php`. A theme's
 Templates receive `$item` (or the current data), `$app` and `$this`, a
 `TemplateContext` with `e()`, `url()`, `asset()`, `partial()` and `layout()`.
 
-`$this->layout($item)` renders the item's builder blocks. Without the builder
-module the resolver is empty and the helper returns an empty string, so themes
-can call it unconditionally.
+`$this->layout($item)` renders the item's builder layout (sections of columns of
+blocks). Without the builder module the resolver is empty and the helper returns
+an empty string, so themes can call it unconditionally.
 
 ## Content index
 

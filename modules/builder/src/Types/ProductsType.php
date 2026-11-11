@@ -18,6 +18,6 @@ final class ProductsType extends BlockType
             'title' => ['type' => 'string', 'label' => 'Заголовок', 'default' => ''],
             'limit' => ['type' => 'int', 'label' => 'Сколько товаров', 'default' => 6],
             'tags' => ['type' => 'string', 'label' => 'Теги через запятую', 'default' => ''],
-        ], null, 'Магазин');
+        ], null, 'Магазин', 'products');
     }
 }

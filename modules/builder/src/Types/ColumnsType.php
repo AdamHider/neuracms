@@ -17,6 +17,6 @@ final class ColumnsType extends BlockType
             'left' => ['type' => 'blocks', 'label' => 'Левая колонка', 'default' => []],
             'right' => ['type' => 'blocks', 'label' => 'Правая колонка', 'default' => []],
             'ratio' => ['type' => 'select', 'label' => 'Пропорции', 'options' => ['6-6', '8-4', '4-8'], 'default' => '6-6'],
-        ], null, 'Сетка');
+        ], null, 'Сетка', 'columns');
     }
 }

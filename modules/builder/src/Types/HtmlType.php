@@ -12,6 +12,6 @@ final class HtmlType extends BlockType
     {
         parent::__construct('html', 'HTML', [
             'html' => ['type' => 'text', 'label' => 'HTML', 'default' => ''],
-        ], null, 'Расширенное');
+        ], null, 'Расширенное', 'html');
     }
 }

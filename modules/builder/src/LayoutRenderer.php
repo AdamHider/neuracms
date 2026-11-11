@@ -10,7 +10,8 @@ use FlatCms\Core\Events;
 
 /**
  * Turns the "layout" property of an item into HTML by rendering each block with
- * its type template. Falls back to an empty string when a page has no blocks.
+ * its type template. Blocks live inside columns, columns inside sections, so the
+ * output mirrors the Gantry 5 grid. Falls back to an empty string with no blocks.
  */
 final class LayoutRenderer
 {
@@ -36,44 +37,51 @@ final class LayoutRenderer
      */
     public function renderLayout(Layout $layout, array $data = []): string
     {
-        $blocks = $layout->blocks();
         $html = '';
-        $openRow = false;
-        $rowSpans = [];
-        $rowPos = 0;
-
-        foreach ($blocks as $index => $block) {
-            $rendered = $this->renderBlock($block, $data);
-
-            if (!$layout->hasGrid()) {
-                if ($openRow) {
-                    $html .= '</div>';
-                    $openRow = false;
-                }
-                $html .= $rendered;
-                continue;
-            }
-
-            if (!$openRow || $rowPos >= count($rowSpans)) {
-                if ($openRow) {
-                    $html .= '</div>';
-                }
-                $rowSpans = $layout->rowFor($index) ?? [$layout->columns()];
-                $rowPos = 0;
-                $html .= '<div class="grid">';
-                $openRow = true;
-            }
-
-            $width = (int) ($rowSpans[$rowPos] ?? $layout->columns());
-            $html .= '<div class="grid__col" style="--span:' . $width . '">' . $rendered . '</div>';
-            $rowPos++;
-        }
-
-        if ($openRow) {
-            $html .= '</div>';
+        foreach ($layout->sections() as $section) {
+            $html .= $this->renderSection($section, $data);
         }
 
         return $html;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function renderSection(Section $section, array $data = []): string
+    {
+        $columns = $section->columns();
+        $grid = $this->columns();
+        $classes = ['g-section'];
+        if (($variant = (string) $section->get('variant', '')) !== '') {
+            $classes[] = 'g-section--' . preg_replace('/[^a-z0-9-]/', '', $variant);
+        }
+
+        $style = [];
+        if (($bg = (string) $section->get('background', '')) !== '') {
+            $style[] = 'background:' . $bg;
+        }
+        if (($padding = (string) $section->get('padding', '')) !== '') {
+            $style[] = '--g-padding:' . $padding;
+        }
+        $styleAttr = $style === [] ? '' : ' style="' . htmlspecialchars(implode(';', $style), ENT_QUOTES) . '"';
+
+        $inner = '';
+        foreach ($columns as $column) {
+            $width = $column->width() > 0 ? $column->width() : $grid;
+            $inner .= '<div class="g-col" style="--g-span:' . $width . '">';
+            foreach ($column->blocks() as $block) {
+                $inner .= $this->renderBlock($block, $data);
+            }
+            $inner .= '</div>';
+        }
+
+        $container = (string) $section->get('width', 'boxed');
+        $wrapperClass = $container === 'full' ? 'g-container g-container--full' : 'g-container';
+
+        return '<section class="' . implode(' ', $classes) . '"' . $styleAttr . '>'
+            . '<div class="' . $wrapperClass . '"><div class="g-row">' . $inner . '</div></div>'
+            . '</section>';
     }
 
     /**

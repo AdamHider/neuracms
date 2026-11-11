@@ -12,6 +12,6 @@ final class TextType extends BlockType
     {
         parent::__construct('text', 'Текст', [
             'body' => ['type' => 'markdown', 'label' => 'Текст', 'default' => ''],
-        ], null, 'Текст');
+        ], null, 'Текст', 'text');
     }
 }

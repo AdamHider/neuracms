@@ -13,6 +13,6 @@ final class HeadingType extends BlockType
         parent::__construct('heading', 'Заголовок', [
             'text' => ['type' => 'string', 'label' => 'Текст', 'default' => 'Заголовок'],
             'level' => ['type' => 'select', 'label' => 'Уровень', 'options' => ['h1', 'h2', 'h3'], 'default' => 'h2'],
-        ], null, 'Текст');
+        ], null, 'Текст', 'heading');
     }
 }
