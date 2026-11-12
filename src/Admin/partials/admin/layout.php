@@ -52,6 +52,7 @@ $adminNav = [
     <a class="admin__brand" href="<?= $this->e($this->url('/admin')) ?>">
         <i class="bi bi-layers-half"></i> FlatCMS
     </a>
+    <h1 class="admin__title"><?= $this->e($title ?? '') ?></h1>
     <div class="admin__user dropdown">
         <button class="admin__user-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             <span class="admin__avatar"><?= $this->e(mb_strtoupper(mb_substr((string) $user['login'], 0, 1))) ?></span>
@@ -92,7 +93,6 @@ $adminNav = [
         </nav>
     <?php endif; ?>
     <main class="admin__main">
-        <h1><?= $this->e($title ?? '') ?></h1>
         <?= $content ?>
     </main>
 </div>

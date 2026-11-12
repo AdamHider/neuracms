@@ -40,8 +40,8 @@ ob_start();
 </div>
 
 <?php if ($current !== ''): ?>
-    <p class="muted">Фильтр: <span class="badge text-bg-light"><?= $this->e($current) ?></span>
-        <a href="<?= $this->e($this->url($listHref)) ?>">сбросить</a></p>
+    <p class="muted mb-3">Показаны только <span class="badge text-bg-light"><?= $this->e($current) ?></span>.
+        <a href="<?= $this->e($this->url($listHref)) ?>">Показать все</a></p>
 <?php endif; ?>
 
 <div class="panel p-0">

@@ -360,13 +360,18 @@ final class BuilderTest extends FlatCmsTestCase
         self::assertStringNotContainsString('Fallback body', $response->body());
     }
 
-    public function testPageWithoutBlocksFallsBackToMarkdown(): void
+    public function testPageWithoutLayoutRendersEmptyArticle(): void
     {
         $app = $this->appWithBuilder();
+        $this->write('content/landing/item.yaml', "type: page\ntitle: Landing\n");
+        $this->write('content/landing/content.md', 'Body that must not leak');
+        $app->build();
 
-        $response = $app->handle(new Request('GET', '/about', [], [], [], [], []));
+        $response = $app->handle(new Request('GET', '/landing', [], [], [], [], []));
 
-        self::assertStringContainsString('About', $response->body());
+        self::assertSame(200, $response->status());
+        self::assertStringContainsString('Landing', $response->body());
+        self::assertStringNotContainsString('Body that must not leak', $response->body());
     }
 
     public function testEditorRequiresAdmin(): void

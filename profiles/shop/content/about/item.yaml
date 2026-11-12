@@ -2,3 +2,10 @@ type: page
 title: О магазине
 order: 2
 published: true
+layout:
+  blocks:
+    - type: heading
+      settings: {text: 'О магазине', level: h2}
+    - type: text
+      settings:
+        body: 'Мы работаем с небольшими обжарщиками и чайными плантациями напрямую.'

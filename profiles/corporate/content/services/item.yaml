@@ -2,3 +2,10 @@ type: section
 title: Услуги
 order: 2
 published: true
+layout:
+  blocks:
+    - type: heading
+      settings: {text: 'Услуги', level: h1}
+    - type: text
+      settings:
+        body: 'Выберите направление, чтобы узнать подробности.'

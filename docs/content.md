@@ -7,7 +7,6 @@ content/
   index/                  -> /
   about/                  -> /about
     item.yaml
-    content.md
   products/
     item.yaml             -> /products
     teapot/
@@ -16,8 +15,9 @@ content/
       photo.jpg           -> /media/products/teapot/photo.jpg
 ```
 
-`item.yaml` holds the properties, `content.md` holds the body. Either file may be
-missing. Any other file in the folder is an attachment.
+`item.yaml` holds the properties. An element may also carry a `content.md` body
+(Markdown); pages do not — a page's look comes entirely from the builder. Any
+other file in the folder is an attachment.
 
 ## Reserved properties
 
@@ -88,11 +88,10 @@ fields:
 indexed: [price, sku, tags]
 ```
 
-Field types are `string`, `text`, `markdown`, `int`, `float`, `bool`, `date`,
-`select`, `list`, `file` and `relation`. A field may also set `required`,
-`default` and `label`. The editor renders exactly the fields the type describes;
-a type with no `fields` shows only the common properties (title, slug, order,
-published).
+Field types are `string`, `text`, `int`, `float`, `bool`, `date`, `select`,
+`list`, `file` and `relation`. A field may also set `required`, `default` and
+`label`. The editor renders exactly the fields the type describes; a type with no
+`fields` shows only the common properties (title, slug, order, published).
 
 ### Built-in types
 

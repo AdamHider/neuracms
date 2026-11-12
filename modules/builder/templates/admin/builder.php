@@ -40,6 +40,7 @@ ob_start();
 <?php if (($error ?? '') !== ''): ?><p class="error"><?= $this->icon('warning') ?> <?= $this->e($error) ?></p><?php endif; ?>
 
 <div class="builder-bar">
+    <button type="button" class="btn btn-sm btn-outline-secondary" data-builder-back="1"><?= $this->icon('up') ?> Назад</button>
     <span class="muted">
         <?= $this->icon('builder') ?> Страница <code><?= $this->e($id) ?></code>
     </span>

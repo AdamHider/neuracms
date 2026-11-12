@@ -16,7 +16,7 @@ use FlatCms\Support\Fs;
 final class Schema implements Subsystem
 {
     public const FIELD_TYPES = [
-        'string', 'text', 'markdown', 'int', 'float', 'bool', 'list', 'file', 'select', 'date', 'relation',
+        'string', 'text', 'int', 'float', 'bool', 'list', 'file', 'select', 'date', 'relation',
     ];
 
     /** Types that ship with the core; they can be edited but never deleted. */
@@ -434,7 +434,7 @@ final class Schema implements Subsystem
             'float' => is_float($value) || is_int($value) || (is_string($value) && is_numeric($value)),
             'bool' => is_bool($value) || in_array($value, ['1', '0', 'true', 'false'], true),
             'list' => is_array($value),
-            'string', 'text', 'markdown', 'file', 'select', 'date' => is_string($value) || is_numeric($value),
+            'string', 'text', 'file', 'select', 'date' => is_string($value) || is_numeric($value),
             default => true,
         };
     }

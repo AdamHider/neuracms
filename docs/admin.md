@@ -42,7 +42,7 @@ Passwords are stored with `password_hash()`. Users live in `var/users/`.
 | POST | `/admin/logout` | Sign out |
 | GET | `/admin/content` | List items, filter by type |
 | GET, POST | `/admin/content/new` | Create an item |
-| GET, POST | `/admin/content/edit` | Edit properties, body and media |
+| GET, POST | `/admin/content/edit` | Edit an item's properties and media |
 | POST | `/admin/content/delete` | Delete (to `var/trash/`) |
 | POST | `/admin/content/move` | Rename or move an item |
 | GET | `/admin/content/history` | Versions of an item |
@@ -108,7 +108,8 @@ when the feature is unused.
 
 ## Writing content
 
-`ContentWriter` saves `item.yaml` and `content.md`. Before it writes, it copies
+`ContentWriter` saves `item.yaml`, and writes `content.md` only when the item
+carries a Markdown body (elements may; pages do not). Before it writes, it copies
 the previous version to `var/history/<type>__<id>/<timestamp>/`, so every save is
 recoverable from the history page.
 

@@ -1,8 +1,8 @@
 # Page builder
 
 The builder module defines how **pages** look. Pages are the core, routable
-content; their appearance is set exclusively here, as a layout instead of
-Markdown. The layout lives in the reserved `layout` property of an item.
+content; their appearance is set exclusively here, as a layout instead of a
+Markdown body. The layout lives in the reserved `layout` property of an item.
 
 Every other content type is an **element**: structured data with no look of its
 own. Elements are shown on pages by the `elements` particle (see below), and the

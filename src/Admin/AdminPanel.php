@@ -275,7 +275,7 @@ final class AdminPanel implements Subsystem
             return $this->notFound();
         }
 
-        return $this->page('admin/content-edit', 'Редактирование: ' . $item->title(), $this->editData(
+        return $this->page('admin/content-edit', $item->title(), $this->editData(
             $item,
             $id,
             $item->type(),
@@ -303,7 +303,7 @@ final class AdminPanel implements Subsystem
         if ($errors !== []) {
             $item = new Item($id, $data, $body);
 
-            return $this->page('admin/content-edit', 'Редактирование: ' . $item->title(), $this->editData(
+            return $this->page('admin/content-edit', $item->title(), $this->editData(
                 $item,
                 $id,
                 $type,
@@ -537,6 +537,11 @@ final class AdminPanel implements Subsystem
         }
 
         $body = (string) $request->input('body', '');
+
+        // A page's look comes from the builder, so pages carry no markdown body.
+        if ($app->schema->isPage($type)) {
+            $body = '';
+        }
 
         $item = new Item('', $data, $body);
         $errors = $app->schema->validate($item);

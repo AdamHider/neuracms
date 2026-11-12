@@ -830,6 +830,17 @@
         });
     }
 
+    var backButton = document.querySelector('[data-builder-back]');
+    if (backButton) {
+        backButton.addEventListener('click', function () {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '/admin/pages';
+            }
+        });
+    }
+
     if (jsonArea) {
         jsonArea.addEventListener('change', function () {
             try {

@@ -3,3 +3,11 @@ title: Первая запись
 date: '2024-12-07T10:00:00+00:00'
 order: 1
 published: true
+layout:
+  blocks:
+    - type: heading
+      settings: {text: 'Первая запись', level: h1}
+    - type: text
+      settings:
+        body: |
+          Это пример записи блога. Она ничем не отличается от страницы или товара: всё тот же Item с другим набором свойств.

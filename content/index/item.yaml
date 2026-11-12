@@ -2,3 +2,17 @@ type: page
 title: Главная
 order: 0
 published: true
+layout:
+  blocks:
+    - type: heading
+      settings: {text: 'Добро пожаловать в FlatCMS', level: h1}
+    - type: text
+      settings:
+        body: |
+          Это маленькая CMS без базы данных. Контент лежит в папке `content/`, каждый элемент описывается набором свойств в `item.yaml`.
+
+          - Простое ядро без тяжёлого фреймворка
+          - Всё есть Item: страница, товар и запись блога отличаются только полем `type`
+          - Модули расширяют систему через хуки и маршруты
+    - type: button
+      settings: {text: 'О проекте', url: /about, style: primary}

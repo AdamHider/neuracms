@@ -1,7 +1,8 @@
 # AGENTS.md — FlatCMS
 
 Flat-file CMS in PHP (namespace `FlatCms`). No database: content is folders under
-`content/`, one `item.yaml` (properties) plus optional `content.md` (body) each.
+`content/`, one `item.yaml` (properties) each. Pages get their look from the
+builder (their `layout`); an element may also carry an optional `content.md` body.
 
 ## Commands
 
@@ -47,7 +48,8 @@ php -S localhost:8000 -t public   # dev server
   do not, and deleting returns to the matching list.
 - The builder is page-only: `/admin/builder` and `/admin/builder/save` redirect
   element items to `/admin/content/edit`. Page appearance is the builder layout;
-  `page.php` still falls back to `$item->html()` only when there is no layout.
+  pages carry no Markdown body at all (the editor has none, `ContentWriter` drops
+  an empty `content.md`, and `page.php`/`section.php` render only the layout).
 
 ## Builder particles (added feature)
 
@@ -97,6 +99,12 @@ php -S localhost:8000 -t public   # dev server
   The item's type is fixed once picked (a "Товар" opens the product form). All
   action buttons sit in a top bar (`.editor-bar`, OpenCart/Joomla style), and the
   form warns with `confirm`/`beforeunload` when leaving unsaved changes.
+- Editor pages use a two-column `.editor-grid` (form on the left, meta/move on
+  the right, sticky side column); `.form-grid` lays fields out in two columns with
+  `.form-field--full` for wide ones. `types-edit.php` and `users.php` share it.
+- The `markdown` field type was **removed** from `Schema::FIELD_TYPES` and the
+  type editor; a page has no Markdown body, and the type editor label is plain
+  "Название" (the old "(для людей)" suffix is gone).
 
 ## Page builder (Gantry-style sections)
 

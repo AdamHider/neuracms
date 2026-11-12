@@ -2,3 +2,17 @@ type: page
 title: Доставка и оплата
 order: 3
 published: true
+layout:
+  blocks:
+    - type: heading
+      settings: {text: 'Доставка', level: h2}
+    - type: text
+      settings:
+        body: |
+          - Курьером по городу — 300 ₽, бесплатно от 3 000 ₽
+          - Самовывоз из магазина — бесплатно
+    - type: heading
+      settings: {text: 'Оплата', level: h2}
+    - type: text
+      settings:
+        body: 'Картой онлайн, наличными курьеру или по счёту для юрлиц.'

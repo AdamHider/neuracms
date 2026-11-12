@@ -1,7 +1,8 @@
 # FlatCMS
 
 A tiny flat-file CMS in PHP. No database: every page, product or news item is a
-folder with an `item.yaml` (properties) and an optional `content.md` (body).
+folder with an `item.yaml` (properties). Pages get their look from the builder; an
+element may also carry an optional `content.md` body.
 
 The same core plus a few modules assembles three kinds of site: a business card
 site, a corporate site and a small shop.
@@ -57,7 +58,7 @@ you like, and a schema is only used to describe them for the editor.
 
 ```
 content/products/teapot/item.yaml   # properties
-content/products/teapot/content.md  # body
+content/products/teapot/content.md  # optional body (elements only)
 content/products/teapot/photo.jpg   # attachment, served at /media/products/teapot/photo.jpg
 ```
 
@@ -129,8 +130,8 @@ and assets under `assets/`, served at `/assets/<theme>/...`.
 
 ## Page builder
 
-A page can describe its body as a layout of sections and columns instead of
-Markdown (a Gantry 5 style section > column > block model):
+A page describes its look as a layout of sections and columns (a Gantry 5 style
+section > column > block model), not a Markdown body:
 
 ```yaml
 layout:

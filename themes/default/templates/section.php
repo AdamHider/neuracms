@@ -1,5 +1,8 @@
 <?php
 /**
+ * A section renders its builder layout and lists its child items. Like a page it
+ * has no markdown body — the builder defines its appearance.
+ *
  * @var \FlatCms\Content\Item $item
  * @var \FlatCms\App $app
  * @var \FlatCms\Http\TemplateContext $this
@@ -9,8 +12,7 @@ $layout = $this->layout($item);
 ob_start();
 ?>
 <section class="item item--section">
-    <h1><?= $this->e($item->title()) ?></h1>
-    <?= $layout !== '' ? $layout : $item->html() ?>
+    <?= $layout ?>
     <?php if ($children !== []): ?>
         <ul class="item-list">
             <?php foreach ($children as $child): ?>

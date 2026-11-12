@@ -35,8 +35,13 @@ final class ContentWriter
         $this->fs->ensureDir($dir);
 
         $this->fs->writeYaml($dir . '/item.yaml', $data);
-        if ($body !== '' || $this->fs->isFile($dir . '/content.md')) {
+
+        // content.md is only meaningful for elements; drop it when it is empty so
+        // a page folder stays item.yaml-only.
+        if ($body !== '') {
             $this->fs->write($dir . '/content.md', $body);
+        } elseif ($this->fs->isFile($dir . '/content.md')) {
+            $this->fs->delete($dir . '/content.md');
         }
 
         return true;

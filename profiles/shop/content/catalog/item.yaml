@@ -2,3 +2,10 @@ type: section
 title: Каталог
 order: 1
 published: true
+layout:
+  blocks:
+    - type: heading
+      settings: {text: 'Каталог', level: h1}
+    - type: text
+      settings:
+        body: 'Все товары магазина.'

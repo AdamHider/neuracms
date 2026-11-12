@@ -2,3 +2,13 @@ type: page
 title: Команда
 order: 3
 published: true
+layout:
+  blocks:
+    - type: heading
+      settings: {text: 'Руководство', level: h2}
+    - type: text
+      settings:
+        body: |
+          - Анна Ветрова — генеральный директор
+          - Игорь Логинов — технический директор
+          - Мария Полева — финансовый директор

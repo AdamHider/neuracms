@@ -30,8 +30,9 @@ The command copies `profiles/<name>/content` over `content/` and `site.yaml` ove
 
 A small site for a studio. The home page carries a header and a footer **section**
 (a heading plus a `menu` particle) and a body of builder blocks, plus about,
-services and a contact page. The `menu` particle lists the pages whose custom
-"Показывать в меню" property is set, so navigation is content, not theme code.
+services and a contact page. Pages have no Markdown body — their look is the
+builder layout. The `menu` particle lists the pages whose custom "Показывать в
+меню" property is set, so navigation is content, not theme code.
 Modules: `builder`, `contact-form`. The core admin panel is on.
 
 ### corporate

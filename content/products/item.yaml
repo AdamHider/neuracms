@@ -2,3 +2,7 @@ type: section
 title: Товары
 order: 20
 published: true
+layout:
+  blocks:
+    - type: heading
+      settings: {text: 'Товары', level: h1}
