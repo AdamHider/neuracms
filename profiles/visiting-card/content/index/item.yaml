@@ -2,23 +2,57 @@ type: page
 title: Главная
 order: 0
 published: true
+show_in_menu: true
 layout:
-  blocks:
-    - type: media
-      settings: {src: '/media/index/logo.svg', alt: 'Логотип студии «Верста»', width: 40}
-    - type: heading
-      settings: {text: 'Студия «Верста»', level: h1}
-    - type: text
-      settings:
-        body: 'Делаем сайты, которые быстро открываются и легко правятся.'
-    - type: columns
-      settings:
-        ratio: '6-6'
-        left:
-          - {type: heading, settings: {text: 'Сайты', level: h3}}
-          - {type: text, settings: {body: 'Лендинги и корпоративные сайты под ключ.'}}
-        right:
-          - {type: heading, settings: {text: 'Поддержка', level: h3}}
-          - {type: text, settings: {body: 'Обновляем и сопровождаем запущенные проекты.'}}
-    - type: button
-      settings: {text: 'Обсудить проект', url: /contact, style: primary}
+  sections:
+    - columns:
+        - width: 4
+          blocks:
+            - type: heading
+              settings: {text: 'Студия «Верста»', level: h2}
+        - width: 8
+          blocks:
+            - type: menu
+              settings:
+                source: pages
+                content_type: page
+                depth: 1
+                filters:
+                  - {field: show_in_menu, op: '=', value: '1'}
+                class: site-nav
+    - columns:
+        - width: 12
+          blocks:
+            - type: media
+              settings: {src: '/media/index/logo.svg', alt: 'Логотип студии «Верста»', width: 40}
+            - type: heading
+              settings: {text: 'Студия «Верста»', level: h1}
+            - type: text
+              settings:
+                body: 'Делаем сайты, которые быстро открываются и легко правятся.'
+            - type: columns
+              settings:
+                ratio: '6-6'
+                left:
+                  - {type: heading, settings: {text: 'Сайты', level: h3}}
+                  - {type: text, settings: {body: 'Лендинги и корпоративные сайты под ключ.'}}
+                right:
+                  - {type: heading, settings: {text: 'Поддержка', level: h3}}
+                  - {type: text, settings: {body: 'Обновляем и сопровождаем запущенные проекты.'}}
+            - type: button
+              settings: {text: 'Обсудить проект', url: /contact, style: primary}
+    - columns:
+        - width: 12
+          blocks:
+            - type: heading
+              settings: {text: 'Подвал сайта', level: h3}
+            - type: text
+              settings: {body: 'Сайты для малого бизнеса с 2016 года.'}
+            - type: menu
+              settings:
+                source: pages
+                content_type: page
+                depth: 1
+                filters:
+                  - {field: show_in_menu, op: '=', value: '1'}
+                class: site-nav--footer

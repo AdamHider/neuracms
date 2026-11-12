@@ -2,3 +2,4 @@ type: page
 title: О нас
 order: 1
 published: true
+show_in_menu: true

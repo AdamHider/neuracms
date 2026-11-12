@@ -58,8 +58,7 @@ final class TypeTest extends FlatCmsTestCase
         // Core page-like types are pages; custom data types are elements.
         self::assertSame(Schema::KIND_PAGE, $schema->kind('page'));
         self::assertSame(Schema::KIND_PAGE, $schema->kind('section'));
-        // Menu items are data the Menu particle renders, not pages of their own.
-        self::assertSame(Schema::KIND_ELEMENT, $schema->kind('menu-item'));
+        // Custom data types are elements: no page of their own.
         self::assertSame(Schema::KIND_ELEMENT, $schema->kind('product'));
         self::assertTrue($schema->isPage('page'));
         self::assertFalse($schema->isPage('product'));

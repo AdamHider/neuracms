@@ -38,11 +38,11 @@ refuses to touch a non-empty content tree.
 ## Layout of the project
 
 ```
-config/       site.yaml, redirects.yaml, per-type schemas and theme regions
+config/       site.yaml, redirects.yaml and per-type schemas
 content/      the site content: one folder per item
 docs/         project documentation, readable in the admin panel
 modules/      self-contained modules (builder, shop, contact-form)
-profiles/     ready-made sites (config + content + regions)
+profiles/     ready-made sites (config + content)
 src/          the CMS core
 tests/        PHPUnit tests
 themes/       themes; each has templates/, partials/ and assets/
@@ -69,7 +69,7 @@ Reserved keys are `type`, `title`, `slug`, `order`, `published`, `template`,
 A **content type** (`config/schemas/<type>.yaml`) describes the fields of items
 of that type, which of them the index stores, and relations to other types. Types
 are created and edited in the admin panel under **Типы контента**, which writes
-the same files. `page`, `section` and `menu-item` are built in and cannot be
+the same files. `page` and `section` are built in and cannot be
 deleted; everything else is custom.
 
 A type can also ask for its own entry in the admin sidebar (an `admin:` block
@@ -156,15 +156,12 @@ rearrange them, and tune section and block settings in the side panel.
 and **Шапка сайта** / **Подвал сайта** presets that arrive with their blocks (a
 heading plus a `menu`) already in place.
 
-The same editor builds the **site chrome**. A theme region — the header and
-footer, plus any extra region a theme declares — is a builder layout stored under
-`config/regions/`, so navigation and the logo are edited as content rather than
-hard-coded in a theme. The `menu` particle feeds navigation from `menu-item`
-elements, the pages, or a hand-typed list. Edit regions under "Области сайта".
-
-A header/footer section preset adds a section to **one page**; a region renders
-on **every page**. Use the presets for a per-page header or footer and a region
-for the site-wide chrome.
+The header and footer are ordinary **sections** — there is no separate "regions"
+subsystem. The `menu` particle feeds navigation from content items or a
+hand-typed list. With `source: pages` it lists the items of a chosen type and
+narrows them with any number of **property filters** (each `{field, op, value}`),
+so a custom "Показывать в меню" flag on the page type decides what appears in the
+menu. The filter builder in the editor writes the list for you.
 
 ## CLI
 
@@ -184,4 +181,4 @@ vendor/bin/phpunit
 ## Documentation
 
 See [docs/](docs/) for the architecture, the content format, the builder, the
-theme regions, the admin panel and the site profiles.
+admin panel and the site profiles.

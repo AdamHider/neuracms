@@ -12,11 +12,18 @@ $type = $type ?? '';
 $kind = $kind ?? null;
 $current = $type !== '' ? ($types[$type] ?? $type) : '';
 $listHref = $kind === 'page' ? '/admin/pages' : ($kind === 'element' ? '/admin/elements' : '/admin/content');
-$newHref = '/admin/content/new' . ($kind !== null ? '?kind=' . rawurlencode($kind) : '');
+$newParams = [];
+if ($kind !== null) {
+    $newParams['kind'] = $kind;
+}
+if ($type !== '') {
+    $newParams['type'] = $type;
+}
+$newHref = '/admin/content/new' . ($newParams !== [] ? '?' . http_build_query($newParams) : '');
 ob_start();
 ?>
 <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-    <a class="btn btn-primary btn-sm" href="<?= $this->e($this->url($newHref)) ?>"><?= $this->icon('add') ?> Добавить<?= $kind === 'page' ? ' страницу' : ' элемент' ?></a>
+    <a class="btn btn-primary btn-sm" href="<?= $this->e($this->url($newHref)) ?>"><?= $this->icon('add') ?> Добавить<?= $type !== '' ? ': ' . $this->e($types[$type] ?? $type) : ($kind === 'page' ? ' страницу' : ' элемент') ?></a>
 
     <form method="get" action="<?= $this->e($this->url($listHref)) ?>" class="d-flex gap-2 ms-auto">
         <div class="input-group input-group-sm" style="width:auto">

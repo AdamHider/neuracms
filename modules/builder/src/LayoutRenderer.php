@@ -34,7 +34,7 @@ final class LayoutRenderer
 
     /**
      * Render either an Item (using its "layout" property) or a raw layout array
-     * (used for theme regions, whose layout is stored outside the content tree).
+     * (for callers that hold a layout outside the content tree).
      */
     public function renderValue(mixed $value): string
     {

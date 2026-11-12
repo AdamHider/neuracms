@@ -179,18 +179,42 @@ final class AdminTest extends FlatCmsTestCase
 
         $post = [
             'id' => 'blog/created',
-            'type' => 'page',
+            'type' => 'product',
             'title' => 'Created',
             'order' => '3',
             'published' => '1',
             'body' => '# Hi',
-            'props' => [['key' => 'author', 'value' => 'Ivan']],
+            'fields' => ['price' => '42.5'],
         ];
         $response = $app->handle(new Request('POST', '/admin/content/new', [], $post, [], [], []));
 
         self::assertSame(303, $response->status());
         self::assertFileExists($this->root . '/content/blog/created/item.yaml');
-        self::assertStringContainsString('author', (string) file_get_contents($this->root . '/content/blog/created/item.yaml'));
+        self::assertStringContainsString('price: 42.5', (string) file_get_contents($this->root . '/content/blog/created/item.yaml'));
+    }
+
+    public function testContentSavePreservesPropertiesMissingFromTheType(): void
+    {
+        $app = $this->appWithAdmin();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        // A custom property the type does not describe must survive a save, so
+        // menu filters that rely on it keep working.
+        $this->write('content/about/item.yaml', "type: page\ntitle: About\nshow_in_menu: true\norder: 10\n");
+
+        $post = [
+            'id' => 'about',
+            'type' => 'page',
+            'title' => 'About',
+            'order' => '10',
+            'published' => '1',
+            'fields' => [],
+        ];
+        $response = $app->handle(new Request('POST', '/admin/content/edit', [], $post, [], [], []));
+
+        self::assertSame(303, $response->status());
+        self::assertStringContainsString('show_in_menu: true', (string) file_get_contents($this->root . '/content/about/item.yaml'));
     }
 
     public function testContentValidationFailureReturns422(): void
@@ -205,17 +229,16 @@ final class AdminTest extends FlatCmsTestCase
         self::assertFileDoesNotExist($this->root . '/content/blog/bad/item.yaml');
     }
 
-    public function testNewContentFormDefaultsTypeToKind(): void
+    public function testNewContentFormKeepsTheRequestedType(): void
     {
         $app = $this->appWithAdmin();
         (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
         $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
 
-        $page = $app->handle(new Request('GET', '/admin/content/new', ['kind' => 'page'], [], [], [], [], []))->body();
-        self::assertMatchesRegularExpression('/<option value="page"[^>]*selected/', $page);
-
-        $element = $app->handle(new Request('GET', '/admin/content/new', ['kind' => 'element'], [], [], [], [], []))->body();
-        self::assertMatchesRegularExpression('/<option value="product"[^>]*selected/', $element);
+        // A product (an element type) opens the product form, not a generic one.
+        $product = $app->handle(new Request('GET', '/admin/content/new', ['kind' => 'element', 'type' => 'product'], [], [], [], [], []))->body();
+        self::assertStringContainsString('name="type" value="product"', $product);
+        self::assertStringContainsString('name="fields[price]"', $product);
     }
 
     public function testPagesListShowsOnlyPages(): void

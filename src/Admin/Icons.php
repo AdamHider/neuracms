@@ -57,7 +57,6 @@ final class Icons
         'elements' => 'collection',
         'list' => 'list-ul',
         'menu' => 'menu-button-wide',
-        'regions' => 'layout-text-window-reverse',
         'docs' => 'journal-richtext',
         'duplicate' => 'copy',
         'move-up' => 'arrow-up',

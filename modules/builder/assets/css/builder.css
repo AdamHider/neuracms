@@ -170,6 +170,14 @@
 .builder__setting input[type="checkbox"] { margin-top: .3rem; }
 .builder__settings-actions { margin-top: .5rem; }
 
+/* ---- Property filters (menu particle) ---- */
+.builder__filters { margin: .3rem 0 .8rem; padding: .6rem; border: 1px dashed var(--admin-line, #e3e8f0); border-radius: 10px; }
+.builder__filters-head { font-size: .82rem; font-weight: 600; color: var(--admin-muted, #6b7280); margin-bottom: .4rem; }
+.builder__filter { display: flex; gap: .35rem; align-items: center; margin-bottom: .4rem; }
+.builder__filter select, .builder__filter input { flex: 1 1 0; min-width: 0; }
+.builder__icon-btn { border: 0; background: transparent; color: var(--admin-muted, #6b7280); padding: .2rem; border-radius: 6px; }
+.builder__icon-btn:hover { color: #dc2626; background: rgba(220, 38, 38, .08); }
+
 /* ---- Preset preview ---- */
 .preset-preview { display: inline-flex; gap: 2px; width: 34px; margin-right: .5rem; vertical-align: middle; }
 .preset-preview span { height: 10px; background: var(--admin-accent, #2563eb); border-radius: 2px; opacity: .55; }

@@ -34,9 +34,6 @@ final class ProfilesTest extends FlatCmsTestCase
         $fs->deleteDir('content');
         $fs->copyDir('profiles/' . $profile . '/content', 'content');
         $fs->copy('profiles/' . $profile . '/site.yaml', 'config/site.yaml');
-        if (is_dir($this->project('profiles/' . $profile . '/regions'))) {
-            $fs->copyDir('profiles/' . $profile . '/regions', 'config/regions');
-        }
 
         return $this->app();
     }
@@ -104,24 +101,26 @@ final class ProfilesTest extends FlatCmsTestCase
         self::assertStringContainsString('30000', $body);
     }
 
-    public function testVisitingCardRendersEditableHeaderAndFooterRegions(): void
+    public function testVisitingCardHeaderAndFooterAreSections(): void
     {
         $app = $this->install('visiting-card');
 
         $body = $this->get($app, '/')->body();
 
-        // Header region: the logo comes from the region's own media folder and the
-        // navigation is built from the menu-item elements.
-        self::assertStringContainsString('/media/_regions/header/logo.svg', $body);
+        // No "области сайта" anymore: the theme's own header/footer partials
+        // render the site chrome, and a page can carry header/footer sections.
+        self::assertStringContainsString('site-header__inner', $body);
         self::assertStringContainsString('site-nav', $body);
-        self::assertStringContainsString('>Услуги<', $body);
+        self::assertStringContainsString('site-footer', $body);
 
-        // Footer region: rendered on every page.
+        // Header/footer builder sections live on the page, like any other section.
+        self::assertStringContainsString('block--menu', $body);
+        self::assertStringContainsString('Подвал сайта', $body);
         self::assertStringContainsString('Сайты для малого бизнеса с 2016 года.', $body);
 
-        // The theme's hard-coded fallback navigation must not appear when a region
-        // is defined.
-        self::assertStringNotContainsString('site-header__inner', $body);
+        // The menu particle is sourced from pages filtered by the "Показывать в
+        // меню" property, so a page that opts in shows up in the navigation.
+        self::assertStringContainsString('>Услуги<', $body);
     }
 
     public function testCorporateProfileDisablesTheShop(): void

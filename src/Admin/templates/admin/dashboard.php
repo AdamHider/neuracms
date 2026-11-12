@@ -13,7 +13,6 @@ $icons = [
     'section' => 'section',
     'product' => 'products',
     'category' => 'types',
-    'menu-item' => 'link',
     'post' => 'text',
 ];
 ob_start();
@@ -32,7 +31,6 @@ ob_start();
 <div class="d-flex flex-wrap gap-2 mb-4">
     <a class="btn btn-primary btn-sm" href="<?= $this->e($this->url('/admin/content/new?kind=page')) ?>"><?= $this->icon('add') ?> Новая страница</a>
     <a class="btn btn-outline-secondary btn-sm" href="<?= $this->e($this->url('/admin/content/new?kind=element')) ?>"><?= $this->icon('add') ?> Новый элемент</a>
-    <a class="btn btn-outline-secondary btn-sm" href="<?= $this->e($this->url('/admin/regions')) ?>"><?= $this->icon('regions') ?> Шапка и подвал</a>
     <a class="btn btn-outline-secondary btn-sm" href="<?= $this->e($this->url('/admin/types')) ?>"><?= $this->icon('types') ?> Типы контента</a>
     <a class="btn btn-outline-secondary btn-sm" href="<?= $this->e($this->url('/admin/docs')) ?>"><?= $this->icon('docs') ?> Документация</a>
 </div>

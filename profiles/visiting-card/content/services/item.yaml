@@ -2,6 +2,7 @@ type: page
 title: Услуги
 order: 2
 published: true
+show_in_menu: true
 layout:
   sections:
     - columns:

@@ -1,15 +1,14 @@
 <?php
 /**
- * Site chrome. The header and footer are theme regions: if the site defines a
- * layout for them (edited in the builder) it is rendered here, otherwise the
- * theme falls back to its own default header/footer partials.
+ * Site chrome. The theme ships its own header and footer partials. A page may
+ * also carry its own "Шапка сайта"/"Подвал сайта" builder sections (see the
+ * builder section presets); those render inside the page body like any section.
  *
  * @var \FlatCms\App $app
  * @var array $site
  * @var \FlatCms\Http\TemplateContext $this
  */
-$headerRegion = $this->region('header');
-$footerRegion = $this->region('footer');
+$navigation = $app->query()->kind(\FlatCms\Content\Schema::KIND_PAGE)->sort('order')->limit(10)->find();
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -20,19 +19,10 @@ $footerRegion = $this->region('footer');
     <link rel="stylesheet" href="<?= $this->e($this->asset('css/main.css')) ?>">
 </head>
 <body>
-<?php if ($headerRegion !== ''): ?>
-    <?= $headerRegion ?>
-<?php else: ?>
-    <?php $navigation = $app->query()->type('page')->sort('order')->limit(10)->find(); ?>
-    <?= $this->partial('header', ['site' => $site, 'navigation' => $navigation]) ?>
-<?php endif; ?>
+<?= $this->partial('header', ['site' => $site, 'navigation' => $navigation]) ?>
 <main class="container">
 <?= $content ?? '' ?>
 </main>
-<?php if ($footerRegion !== ''): ?>
-    <?= $footerRegion ?>
-<?php else: ?>
-    <?= $this->partial('footer', ['site' => $site]) ?>
-<?php endif; ?>
+<?= $this->partial('footer', ['site' => $site]) ?>
 </body>
 </html>

@@ -45,7 +45,6 @@ final class BuilderModule implements Module
         $this->renderer = new LayoutRenderer($app, $this->types, $app->events);
 
         // Templates call $this->layout($item); the resolver renders the blocks.
-        // Regions pass a raw layout array instead of an Item.
         $app->renderer->setLayoutResolver(function (mixed $value) use ($app): string {
             return $this->renderer?->renderValue($value) ?? '';
         });
@@ -149,33 +148,6 @@ final class BuilderModule implements Module
         }
 
         $app = $this->requireApp();
-        $region = (string) $request->query('region', '');
-
-        if ($region !== '') {
-            if (!$app->regions->has($region)) {
-                return Response::html($app->renderer->renderTemplate('admin/404', ['title' => 'Не найдено']), 404);
-            }
-
-            $layout = Layout::fromValue($app->regions->layout($region), (int) $app->config->get('builder.grid_columns', 12));
-            $mediaId = $this->regionMediaId($region);
-
-            return Response::html($app->renderer->renderTemplate('admin/builder', [
-                'item' => null,
-                'id' => '',
-                'region' => $region,
-                'region_label' => $app->regions->all()[$region] ?? $region,
-                'layout' => $layout,
-                'types' => $this->types?->all() ?? [],
-                'categories' => $this->categories(),
-                'presets' => $this->presets(),
-                'elements' => $this->elementTypes(),
-                'media' => $app->admin->media()?->list($mediaId) ?? [],
-                'columns' => (int) $app->config->get('builder.grid_columns', 12),
-                'saved' => $request->query('saved') === '1',
-                'error' => (string) $request->query('error', ''),
-            ]));
-        }
-
         $id = (string) $request->query('id', '');
         if ($id === '') {
             return Response::redirect('/admin/pages', 302);
@@ -197,13 +169,12 @@ final class BuilderModule implements Module
         return Response::html($app->renderer->renderTemplate('admin/builder', [
             'item' => $item,
             'id' => $id,
-            'region' => '',
-            'region_label' => '',
             'layout' => $layout,
             'types' => $this->types?->all() ?? [],
             'categories' => $this->categories(),
             'presets' => $this->presets(),
             'elements' => $this->elementTypes(),
+            'menu' => $this->menuSources(),
             'media' => $app->admin->media()?->list($id) ?? [],
             'columns' => (int) $app->config->get('builder.grid_columns', 12),
             'saved' => $request->query('saved') === '1',
@@ -212,12 +183,41 @@ final class BuilderModule implements Module
     }
 
     /**
-     * Media for a region is stored in a hidden content folder ("_regions/<name>"),
-     * which Storage skips, so region uploads never show up as content.
+     * Content types and their properties, so the menu particle can offer a type
+     * picker and a property filter builder. Each property carries a label and
+     * type so the filter value control matches the field.
+     *
+     * @return array<string, array{label: string, kind: string, properties: list<array{name: string, label: string, type: string}>}>
      */
-    private function regionMediaId(string $region): string
+    private function menuSources(): array
     {
-        return '_regions/' . $region;
+        $app = $this->requireApp();
+        $out = [];
+        foreach ($app->schema->all() as $name => $schema) {
+            $properties = [
+                ['name' => 'title', 'label' => 'Заголовок', 'type' => 'string'],
+                ['name' => 'published', 'label' => 'Опубликовано', 'type' => 'bool'],
+                ['name' => 'order', 'label' => 'Порядок', 'type' => 'int'],
+                ['name' => 'date', 'label' => 'Дата', 'type' => 'date'],
+            ];
+            foreach ($schema['fields'] as $fieldName => $field) {
+                if (in_array($fieldName, ['title', 'published', 'order', 'date'], true)) {
+                    continue;
+                }
+                $properties[] = [
+                    'name' => (string) $fieldName,
+                    'label' => (string) ($field['label'] ?? $fieldName),
+                    'type' => (string) ($field['type'] ?? 'string'),
+                ];
+            }
+            $out[$name] = [
+                'label' => $schema['label'],
+                'kind' => $schema['kind'],
+                'properties' => $properties,
+            ];
+        }
+
+        return $out;
     }
 
     /**
@@ -254,7 +254,7 @@ final class BuilderModule implements Module
             [
                 'name' => 'header',
                 'title' => 'Шапка сайта',
-                'icon' => 'regions',
+                'icon' => 'menu',
                 'position' => 'start',
                 'widths' => [4, 8],
                 'blocks' => [
@@ -262,14 +262,14 @@ final class BuilderModule implements Module
                         ['type' => 'heading', 'settings' => ['text' => 'Название сайта', 'level' => 'h2']],
                     ],
                     [
-                        ['type' => 'menu', 'settings' => ['source' => 'menu', 'depth' => 2, 'class' => 'site-nav']],
+                        ['type' => 'menu', 'settings' => ['source' => 'pages', 'depth' => 2, 'class' => 'site-nav']],
                     ],
                 ],
             ],
             [
                 'name' => 'footer',
                 'title' => 'Подвал сайта',
-                'icon' => 'regions',
+                'icon' => 'menu',
                 'widths' => [6, 6],
                 'blocks' => [
                     [
@@ -277,7 +277,7 @@ final class BuilderModule implements Module
                         ['type' => 'text', 'settings' => ['body' => 'Коротко о сайте.']],
                     ],
                     [
-                        ['type' => 'menu', 'settings' => ['source' => 'menu', 'depth' => 1, 'class' => 'site-nav--footer']],
+                        ['type' => 'menu', 'settings' => ['source' => 'pages', 'depth' => 1, 'class' => 'site-nav--footer']],
                         ['type' => 'text', 'settings' => ['body' => '© ' . date('Y') . ' Все права защищены.']],
                     ],
                 ],
@@ -292,19 +292,6 @@ final class BuilderModule implements Module
         }
 
         $app = $this->requireApp();
-        $region = (string) $request->input('region', '');
-
-        if ($region !== '') {
-            if (!$app->regions->has($region)) {
-                return Response::redirect('/admin/builder?region=' . rawurlencode($region) . '&error=' . rawurlencode('Область не найдена.'), 303);
-            }
-
-            $layout = $this->sanitize($this->readLayout($request), (int) $app->config->get('builder.grid_columns', 12));
-            $app->regions->save($region, $layout->toArray());
-
-            return Response::redirect('/admin/builder?region=' . rawurlencode($region) . '&saved=1', 303);
-        }
-
         $id = (string) $request->input('id', '');
         $item = $app->storage->load($id);
         if ($item === null) {
@@ -357,19 +344,10 @@ final class BuilderModule implements Module
         }
 
         $app = $this->requireApp();
-        $region = (string) $request->input('region', '');
-
-        if ($region !== '') {
-            if (!$app->regions->has($region)) {
-                return Response::json(['error' => 'Область не найдена.'], 404);
-            }
-            $id = $this->regionMediaId($region);
-        } else {
-            $id = (string) $request->input('id', '');
-            $item = $app->storage->load($id);
-            if ($item === null || !$app->schema->isPage($item->type())) {
-                return Response::json(['error' => 'Элемент не найден.'], 404);
-            }
+        $id = (string) $request->input('id', '');
+        $item = $app->storage->load($id);
+        if ($item === null || !$app->schema->isPage($item->type())) {
+            return Response::json(['error' => 'Элемент не найден.'], 404);
         }
 
         $file = $request->file('file') ?? [];

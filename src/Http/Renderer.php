@@ -82,19 +82,6 @@ final class Renderer implements Subsystem
         return (string) ($this->layoutResolver)($item);
     }
 
-    /**
-     * Render a theme region (header, footer, …) through the same layout resolver
-     * the builder registers, so a region's blocks render exactly like a page's.
-     */
-    public function region(string $name): string
-    {
-        if ($this->layoutResolver === null || $this->app === null) {
-            return '';
-        }
-
-        return (string) ($this->layoutResolver)($this->app->regions->layout($name));
-    }
-
     public function render(Item $item, array $data = []): string
     {
         $data['item'] = $item;

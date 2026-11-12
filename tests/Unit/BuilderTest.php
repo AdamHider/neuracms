@@ -534,6 +534,9 @@ final class BuilderTest extends FlatCmsTestCase
         // The presets carry ready-made blocks so a header/footer can be dropped in.
         self::assertSame('menu', $presets['header']['blocks'][1][0]['type']);
         self::assertSame('menu', $presets['footer']['blocks'][1][0]['type']);
+        // Header/footer presets are ordinary sections now — no "области сайта".
+        self::assertArrayNotHasKey('region', $presets['header']);
+        self::assertArrayNotHasKey('region', $presets['footer']);
     }
 
     public function testHeaderAndFooterPresetsRenderAsSections(): void
@@ -552,5 +555,91 @@ final class BuilderTest extends FlatCmsTestCase
         $html = $renderer->renderLayout($layout);
         self::assertStringContainsString('Мой сайт', $html);
         self::assertStringContainsString('site-nav', $html);
+    }
+
+    public function testMenuParticleFiltersPagesByCustomProperty(): void
+    {
+        // The user adds a custom bool property to the page type and uses it to
+        // decide which pages appear in the menu.
+        $this->write('config/schemas/page.yaml', "type: page\nlabel: Страница\nbuiltin: true\nfields:\n  title: { type: string, required: true }\n  show_in_menu: { type: bool, default: true }\n");
+        $this->write('content/about/item.yaml', "type: page\ntitle: О нас\nshow_in_menu: true\norder: 1\n");
+        $this->write('content/private/item.yaml', "type: page\ntitle: Скрытая\nshow_in_menu: false\norder: 2\n");
+
+        $app = $this->appWithBuilder();
+        $renderer = $this->builder($app)->renderer();
+        self::assertNotNull($renderer);
+
+        $html = $renderer->renderBlock(new Block('menu', [
+            'source' => 'pages',
+            'content_type' => 'page',
+            'filters' => [['field' => 'show_in_menu', 'op' => '=', 'value' => '1']],
+        ]));
+
+        self::assertStringContainsString('О нас', $html);
+        self::assertStringNotContainsString('Скрытая', $html);
+    }
+
+    public function testMenuParticleSupportsMultipleFilters(): void
+    {
+        $this->write('config/schemas/page.yaml', "type: page\nlabel: Страница\nbuiltin: true\nfields:\n  title: { type: string, required: true }\n  show_in_menu: { type: bool, default: true }\n  group: { type: string }\n");
+        $this->write('content/about/item.yaml', "type: page\ntitle: О нас\nshow_in_menu: true\ngroup: main\norder: 1\n");
+        $this->write('content/team/item.yaml', "type: page\ntitle: Команда\nshow_in_menu: true\ngroup: secondary\norder: 2\n");
+        $this->write('content/private/item.yaml', "type: page\ntitle: Скрытая\nshow_in_menu: false\ngroup: main\norder: 3\n");
+
+        $app = $this->appWithBuilder();
+        $renderer = $this->builder($app)->renderer();
+        self::assertNotNull($renderer);
+
+        $html = $renderer->renderBlock(new Block('menu', [
+            'source' => 'pages',
+            'content_type' => 'page',
+            'filters' => [
+                ['field' => 'show_in_menu', 'op' => '=', 'value' => '1'],
+                ['field' => 'group', 'op' => '=', 'value' => 'main'],
+            ],
+        ]));
+
+        self::assertStringContainsString('О нас', $html);
+        self::assertStringNotContainsString('Команда', $html);
+        self::assertStringNotContainsString('Скрытая', $html);
+    }
+
+    public function testMenuFiltersSurviveSaveAndRender(): void
+    {
+        $this->write('config/schemas/page.yaml', "type: page\nlabel: Страница\nbuiltin: true\nfields:\n  title: { type: string, required: true }\n  show_in_menu: { type: bool, default: true }\n");
+        $this->write('content/about/item.yaml', "type: page\ntitle: About\nshow_in_menu: true\norder: 1\n");
+        $this->write('content/index/item.yaml', "type: page\ntitle: Home\norder: 0\n");
+
+        $app = $this->appWithBuilder(true);
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $json = json_encode(['sections' => [[
+            'columns' => [[
+                'width' => 12,
+                'blocks' => [[
+                    'type' => 'menu',
+                    'settings' => [
+                        'source' => 'pages',
+                        'content_type' => 'page',
+                        'filters' => [['field' => 'show_in_menu', 'op' => '=', 'value' => '1']],
+                    ],
+                ]],
+            ]],
+        ]]], JSON_UNESCAPED_UNICODE);
+
+        $response = $app->handle(new Request('POST', '/admin/builder/save', [], [
+            'id' => 'about',
+            'layout_json' => $json,
+        ], [], [], []));
+        self::assertSame(303, $response->status());
+
+        $yaml = (string) file_get_contents($this->root . '/content/about/item.yaml');
+        self::assertStringContainsString('filters:', $yaml);
+        self::assertStringContainsString('show_in_menu', $yaml);
+
+        $page = $app->handle(new Request('GET', '/about', [], [], [], [], []));
+        self::assertStringContainsString('block--menu', $page->body());
+        self::assertStringContainsString('>About<', $page->body());
     }
 }

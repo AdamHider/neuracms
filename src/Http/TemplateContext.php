@@ -65,12 +65,4 @@ final class TemplateContext
     {
         return $this->renderer->layout($item);
     }
-
-    /**
-     * Render a theme region (header, footer, …) defined in the builder.
-     */
-    public function region(string $name): string
-    {
-        return $this->renderer->region($name);
-    }
 }

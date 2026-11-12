@@ -38,8 +38,8 @@ php -S localhost:8000 -t public   # dev server
   builder) or `element` (structured data with no look of its own).
 - `Schema::kind()/isPage()/isElement()/pages()/elements()`. Defaults: `page` and
   `section` are pages; every other type is an element unless its schema sets
-  `kind:` explicitly (`menu-item` is an element, set in its schema file).
-  `TypeRepository::save()` persists `kind`.
+  `kind:` explicitly (for example `category` is an element, set in its schema
+  file). `TypeRepository::save()` persists `kind`.
 - `Index` stores `kind` per row; `Query::kind($kind)` filters by it.
 - Admin has two lists: **Страницы** (`/admin/pages`) and **Элементы**
   (`/admin/elements`); `/admin/content` still exists as an unfiltered list. The
@@ -61,13 +61,16 @@ php -S localhost:8000 -t public   # dev server
   `elements` map in the builder payload (`BuilderModule::elementTypes()`).
 - The builder payload also carries `media`, `uploadUrl` and `pageId` for the
   media particle.
+- `menu` particle (`Types/MenuType.php`): navigation from content items or a
+  hand-typed list, with property filters (see **Menus & navigation**). The editor
+  renders the filter builder from the `filters` field.
 
 ## Content types & relations (added feature)
 
 - `Content\Schema` reads `config/schemas/<type>.yaml`: `label`, `builtin`,
   `fields`, `indexed`, plus `relations()`, `referencedBy()`, `names()`, `all()`.
 - `Content\TypeRepository` creates/updates/deletes type files; validates names and
-  field names; builtins (`page`, `section`, `menu-item`) cannot be deleted.
+  field names; builtins (`page`, `section`) cannot be deleted.
 - A field of type `relation` has `to: <type>` and optional `multiple: true`; the
   editor renders a picker over target items and stores referenced item ids.
   Relation targets are validated against `Storage` on save.
@@ -89,6 +92,11 @@ php -S localhost:8000 -t public   # dev server
 - `src/Admin/partials/admin/layout.php` is the shell; pages pass `title`,
   `active` (sidebar highlight) and optionally `head` (extra `<link>` tags).
 - `src/Admin/assets/css/admin.css` is a thin theme layer over Bootstrap.
+- Content editor (`templates/admin/content-edit.php`): a single flat list of the
+  chosen type's fields — no "Поля типа" heading, no Markdown/Media/Move sections.
+  The item's type is fixed once picked (a "Товар" opens the product form). All
+  action buttons sit in a top bar (`.editor-bar`, OpenCart/Joomla style), and the
+  form warns with `confirm`/`beforeunload` when leaving unsaved changes.
 
 ## Page builder (Gantry-style sections)
 
@@ -109,28 +117,25 @@ php -S localhost:8000 -t public   # dev server
 - Save sanitizes sections/columns, drops unknown block types and non-scalar
   settings, clamps widths to `builder.grid_columns`.
 
-## Theme regions & navigation (added feature)
+## Menus & navigation (added feature)
 
-- `Content\Regions` (core subsystem, `$app->regions`) stores the theme regions —
-  header, footer, plus any `config/regions/*.yaml` — as builder layouts, separate
-  from the content tree. `all()/has()/layout()/save()`.
-- `Renderer::region($name)` / `$this->region('header')` render a region through
-  the layout resolver; empty string when the region has no blocks. The default
-  theme falls back to its own `header`/`footer` partials in
-  `themes/default/partials/layout.php`.
-- Region media lives in `content/_regions/<name>/` (skipped by the scanner) and is
-  served at `/media/_regions/<name>/<file>`.
+- There is no separate "regions" subsystem and no `menu-item` type. Header and
+  footer are ordinary **sections** on a page (the **Шапка сайта** / **Подвал
+  сайта** presets), and the theme's own `header`/`footer` partials render the
+  site chrome.
 - `menu` particle (`Types/MenuType.php`, `templates/blocks/menu.php`) renders
-  navigation from `source: menu` (`menu-item` elements), `pages`, or `custom`
-  lines. Items nest via a `parent` property (id or short name); `depth` limits
-  levels; `$this->link()` keeps absolute URLs/anchors and prefixes bare paths.
-- `menu-item` is an **element** type (schema `kind: element`).
-- Admin: **Области сайта** (`/admin/regions`) lists regions; the builder opens a
-  region with `?region=<name>` (save/media routes take the same `region` input).
-  **Документация** (`/admin/docs`) renders `docs/*.md` via `Admin\Docs`.
-- Regions are site-wide chrome; the **Шапка сайта** / **Подвал сайта** section
-  presets are per-page sections built from the same particles. See
-  `docs/regions.md`.
+  navigation from content items. `source: pages` (default) lists items of a
+  chosen `content_type`, ordered by `order`, optionally narrowed by any number of
+  **property filters** (`filters: [{field, op, value}]`, e.g. a custom
+  "Показывать в меню" bool added to the page type). `source: custom` renders
+  hand-typed `Title | /url` lines.
+- Filters compare loaded item properties in PHP (not only indexed fields), so any
+  schema property works. Operators: `=`, `!=`, `>`, `>=`, `<`, `<=`, `contains`.
+  Items nest via their parent id; `depth` limits levels; `$this->link()` keeps
+  absolute URLs/anchors and prefixes bare paths.
+- Core types are `page` and `section` (both pages); `category`, `product`,
+  `service` are elements.
+- Admin: **Документация** (`/admin/docs`) renders `docs/*.md` via `Admin\Docs`.
 
 ## Gotchas
 

@@ -7,37 +7,33 @@
  *
  * @var \FlatCms\Content\Item|null $item
  * @var string $id
- * @var string $region
- * @var string $region_label
  * @var \FlatCms\Modules\Builder\Layout $layout
  * @var array<string, \FlatCms\Modules\Builder\BlockType> $types
  * @var array<string, list<array>> $categories
  * @var list<array{name: string, title: string, widths: list<int>}> $presets
  * @var array<string, array{label: string, fields: list<string>}> $elements
+ * @var array<string, array{label: string, kind: string, properties: list<array>}> $menu
  * @var list<string> $media
  * @var int $columns
  * @var bool $saved
  * @var string $error
  * @var \FlatCms\Http\TemplateContext $this
  */
-$region = $region ?? '';
-$isRegion = $region !== '';
-$mediaId = $isRegion ? '_regions/' . $region : $id;
 $payload = [
     'layout' => $layout->toArray(),
     'types' => array_values(array_map(static fn ($t): array => $t->toArray(), $types)),
     'categories' => $categories,
     'presets' => $presets,
     'elements' => $elements ?? [],
+    'menu' => $menu ?? [],
     'media' => array_values($media ?? []),
     'uploadUrl' => '/admin/builder/media',
     'pageId' => $id,
-    'mediaId' => $mediaId,
-    'region' => $region,
+    'mediaId' => $id,
     'columns' => $columns,
     'icons' => \FlatCms\Admin\Icons::all(),
 ];
-$title = $isRegion ? 'Область: ' . ($region_label ?? $region) : 'Конструктор: ' . $item?->title();
+$title = 'Конструктор: ' . $item?->title();
 ob_start();
 ?>
 <?php if (!empty($saved)): ?><p class="notice"><?= $this->icon('check') ?> Сохранено.</p><?php endif; ?>
@@ -45,30 +41,17 @@ ob_start();
 
 <div class="builder-bar">
     <span class="muted">
-        <?php if ($isRegion): ?>
-            <?= $this->icon('regions') ?> Область сайта <code><?= $this->e($region) ?></code>
-        <?php else: ?>
-            <?= $this->icon('builder') ?> Страница <code><?= $this->e($id) ?></code>
-        <?php endif; ?>
+        <?= $this->icon('builder') ?> Страница <code><?= $this->e($id) ?></code>
     </span>
     <span class="builder-bar__spacer"></span>
-    <?php if ($isRegion): ?>
-        <a class="btn btn-sm btn-outline-secondary" href="<?= $this->e($this->url('/')) ?>" target="_blank" rel="noopener"><?= $this->icon('view') ?> Открыть сайт</a>
-        <a class="btn btn-sm btn-outline-secondary" href="<?= $this->e($this->url('/admin/regions')) ?>"><?= $this->icon('regions') ?> Все области</a>
-    <?php else: ?>
-        <a class="btn btn-sm btn-outline-secondary" href="<?= $this->e($this->url($item->url())) ?>" target="_blank" rel="noopener"><?= $this->icon('view') ?> Открыть</a>
-        <a class="btn btn-sm btn-outline-secondary" href="<?= $this->e($this->url('/admin/content/edit?id=' . rawurlencode($id))) ?>"><?= $this->icon('edit') ?> Обычное редактирование</a>
-    <?php endif; ?>
+    <a class="btn btn-sm btn-outline-secondary" href="<?= $this->e($this->url($item->url())) ?>" target="_blank" rel="noopener"><?= $this->icon('view') ?> Открыть</a>
+    <a class="btn btn-sm btn-outline-secondary" href="<?= $this->e($this->url('/admin/content/edit?id=' . rawurlencode($id))) ?>"><?= $this->icon('edit') ?> Обычное редактирование</a>
     <button type="button" class="btn btn-sm btn-outline-secondary" data-builder-toggle="json"><?= $this->icon('html') ?> JSON</button>
     <button type="submit" form="builder-form" class="btn btn-sm btn-primary"><?= $this->icon('save') ?> Сохранить</button>
 </div>
 
 <form method="post" action="<?= $this->e($this->url('/admin/builder/save')) ?>" id="builder-form">
-    <?php if ($isRegion): ?>
-        <input type="hidden" name="region" value="<?= $this->e($region) ?>">
-    <?php else: ?>
-        <input type="hidden" name="id" value="<?= $this->e($id) ?>">
-    <?php endif; ?>
+    <input type="hidden" name="id" value="<?= $this->e($id) ?>">
 
     <div class="builder" id="builder"
          data-builder='<?= $this->e((string) json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?>'>
@@ -125,7 +108,7 @@ $head = '<link rel="stylesheet" href="' . $this->e($this->ownerAsset('builder', 
 echo $this->partial('admin/layout', [
     'content' => $content,
     'title' => $title,
-    'active' => $isRegion ? 'regions' : 'pages',
+    'active' => 'pages',
     'head' => $head,
     'admin_user' => $admin_user ?? null,
 ]);

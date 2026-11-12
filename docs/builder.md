@@ -118,17 +118,27 @@ mapping is set visually, not by hand.
 
 ## Menu particle
 
-The `menu` particle renders navigation from one of three sources — the
-`menu-item` elements (`source: menu`), the routable pages (`source: pages`), or a
-hand-typed list (`source: custom`). It is how the header and footer navigation is
-built as content rather than hard-coded in a theme. See
-[regions.md](regions.md#the-menu-particle) for the fields and nesting rules.
+The `menu` particle renders navigation from content items (`source: pages`,
+the default) or a hand-typed list (`source: custom`). With `source: pages` it
+lists the items of a chosen `content_type`, ordered by `order`, and can narrow
+them with any number of **property filters** — for example a custom
+"Показывать в меню" boolean added to the page type. Items nest through their
+parent id, and `depth` limits how many levels are rendered.
 
-## Regions
+Each filter is `{field, op, value}` with `op` one of `=`, `!=`, `>`, `>=`, `<`,
+`<=`, `contains`. Filters compare the loaded item's own properties, so they work
+for any schema property, not only indexed ones. The builder's filter builder
+writes this list for you.
 
-The same editor builds the site chrome. A theme region (header, footer, …) is a
-builder layout stored in `config/regions/<name>.yaml`; open it with
-`/admin/builder?region=header`. See [regions.md](regions.md).
+This is how the header and footer navigation is built as content rather than
+hard-coded in a theme.
+
+## Header and footer
+
+There is no separate "regions" subsystem: the header and footer are ordinary
+**sections** on a page. The **Шапка сайта** / **Подвал сайта** section presets
+drop in a working header/footer section (a heading plus a `menu` particle), and
+the theme's own `header`/`footer` partials still render the site chrome.
 
 ## Rendering
 
@@ -230,16 +240,17 @@ header) is inserted above the existing sections instead of appended:
 [
     'name' => 'header',
     'title' => 'Шапка сайта',
-    'icon' => 'regions',
+    'icon' => 'menu',
     'position' => 'start',
     'widths' => [4, 8],
     'blocks' => [
         [['type' => 'heading', 'settings' => ['text' => 'Название сайта', 'level' => 'h2']]],
-        [['type' => 'menu', 'settings' => ['source' => 'menu', 'depth' => 2, 'class' => 'site-nav']]],
+        [['type' => 'menu', 'settings' => ['source' => 'pages', 'depth' => 2, 'class' => 'site-nav']]],
     ],
 ]
 ```
 
-Presets are sections, not regions: adding a header/footer preset puts an editable
-section at the top or bottom of the current layout. To make the chrome appear on
-every page, save it into a region instead (see [regions.md](regions.md)).
+Presets are sections: adding a header/footer preset puts an editable section at
+the top or bottom of the current layout. To show the same chrome on every page,
+either put the section on each page or let the theme's `header`/`footer` partials
+render it.

@@ -58,10 +58,9 @@ label: Услуга
 kind: element      # "page" or "element"
 ```
 
-`kind` defaults to `page` for the core page-like types (`page`, `section`,
-`menu-item`) and to `element` for every other type, so existing sites keep
-working without changes. The admin type editor writes it back as a "Назначение"
-selector. In code:
+`kind` defaults to `page` for the core page-like types (`page`, `section`) and to
+`element` for every other type, so existing sites keep working without changes.
+The admin type editor writes it back as a "Назначение" selector. In code:
 
 ```php
 $app->schema->isPage('page');       // true
@@ -91,15 +90,15 @@ indexed: [price, sku, tags]
 
 Field types are `string`, `text`, `markdown`, `int`, `float`, `bool`, `date`,
 `select`, `list`, `file` and `relation`. A field may also set `required`,
-`default` and `label`. If a type has no `fields`, the editor falls back to a
-generic list of free-form properties.
+`default` and `label`. The editor renders exactly the fields the type describes;
+a type with no `fields` shows only the common properties (title, slug, order,
+published).
 
 ### Built-in types
 
-`page`, `section` and `menu-item` ship with the core and are marked
-`builtin: true`. They can be edited but not deleted from the admin panel, so a
-site always keeps the types the core itself relies on. Any other type is
-custom and can be removed.
+`page` and `section` ship with the core and are marked `builtin: true`. They can
+be edited but not deleted from the admin panel, so a site always keeps the types
+the core itself relies on. Any other type is custom and can be removed.
 
 ### Relations between types
 

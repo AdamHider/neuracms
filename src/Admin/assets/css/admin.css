@@ -116,6 +116,21 @@ body.admin {
 }
 .panel + .panel { margin-top: 1rem; }
 
+/* ---- Editor action bar ---- */
+.editor-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+    padding: .6rem .75rem;
+    margin: 0 0 1rem;
+    background: var(--admin-panel);
+    border: 1px solid var(--admin-line);
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+}
+.editor-bar__spacer { flex: 1 1 auto; }
+
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .85rem; }
 .card {
     display: flex;

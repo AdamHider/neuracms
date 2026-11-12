@@ -13,6 +13,10 @@ fields:
     type: select
     options: [page, section]
     label: Шаблон
+  show_in_menu:
+    type: bool
+    default: true
+    label: Показывать в меню
   published:
     type: bool
     default: true

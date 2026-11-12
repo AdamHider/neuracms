@@ -50,12 +50,11 @@ Passwords are stored with `password_hash()`. Users live in `var/users/`.
 | GET, POST | `/admin/types/new` | Create a type |
 | GET, POST | `/admin/types/edit` | Edit a type's fields and relations |
 | POST | `/admin/types/delete` | Delete a custom type (admin only) |
-| GET | `/admin/builder` | Page builder editor for an item (or `?region=<name>` for a theme region) |
+| GET | `/admin/builder` | Page builder editor for an item |
 | POST | `/admin/builder/save` | Save a page-builder layout |
 | GET | `/admin/builder/types` | Block registry as JSON for the editor |
 | POST | `/admin/media/upload` | Upload an attachment |
 | POST | `/admin/media/delete` | Remove an attachment |
-| GET | `/admin/regions` | List theme regions (header, footer) and edit them |
 | GET | `/admin/docs` | Read the project documentation (`docs/*.md`) in the panel |
 | GET | `/admin/users` | List and create users (admin only) |
 | GET | `/admin/tools` | Rebuild index, clear cache (admin only) |
@@ -66,8 +65,8 @@ The **Типы контента** page (`/admin/types`) manages the files under
 `config/schemas/`. A type has a name (used as the file name and as the `type`
 value of its items), a human label, and a list of fields. Each field has a name,
 a type, an optional label, a `required` flag and an `indexed` flag (whether the
-index stores it for querying). Types marked `builtin` (`page`, `section`,
-`menu-item`) can be edited but not deleted.
+index stores it for querying). Types marked `builtin` (`page`, `section`) can be
+edited but not deleted.
 
 The item editor renders a control per field: text and number inputs, checkboxes,
 selects, textareas and list inputs. A field of type **relation** is rendered as a
@@ -121,14 +120,13 @@ stored next to the item and served at `/media/<item id>/<file>`, so the `content
 folder never has to be web reachable. Upload failures set `media_error`, which the
 edit page displays.
 
-## Regions
+## Header and footer
 
-The **Области сайта** page (`/admin/regions`) lists the theme regions — the
-header and footer, plus any extra region a theme declares. Editing a region opens
-the page builder bound to `config/regions/<name>.yaml` instead of a content item,
-so the site chrome is edited with the same particles as a page. Region media is
-uploaded to `content/_regions/<name>/` and served at
-`/media/_regions/<name>/<file>`. See [regions.md](regions.md).
+There is no separate "regions" subsystem. The header and footer are ordinary
+builder **sections** on a page; the **Шапка сайта** / **Подвал сайта** presets
+drop in a working section (a heading plus a `menu` particle), and the theme's own
+`header`/`footer` partials render the site chrome. The `menu` particle builds
+navigation from content items (filtered by any property) or a hand-typed list.
 
 ## Documentation viewer
 

@@ -1,13 +1,14 @@
 <?php
 /**
- * Menu particle. Builds navigation from one of three sources and renders it as a
- * list of links, optionally nested one level deep.
+ * Menu particle. Builds navigation from content items (a chosen type, optionally
+ * narrowed by property filters) or from a hand-typed list, and renders it as a
+ * list of links, optionally nested one level deep through the items' parent ids.
  *
  * @var array $settings
  * @var \FlatCms\App $app
  * @var \FlatCms\Http\TemplateContext $this
  */
-$source = in_array($settings['source'] ?? 'menu', ['menu', 'pages', 'custom'], true) ? $settings['source'] : 'menu';
+$source = ($settings['source'] ?? 'pages') === 'custom' ? 'custom' : 'pages';
 $depth = max(1, min(3, (int) ($settings['depth'] ?? 1)));
 $root = trim((string) ($settings['root'] ?? ''));
 $cssClass = trim((string) ($settings['class'] ?? 'site-nav'));
@@ -35,13 +36,45 @@ $render = static function (array $entries, int $level, int $depth, string $cssCl
     return $html . '</ul>';
 };
 
+/**
+ * Compare an item property against a filter value. Booleans, numbers and lists
+ * are coerced so "да/нет", "1/0" and "true/false" all work.
+ */
+$matches = static function (mixed $actual, string $op, mixed $expected): bool {
+    $normalise = static function (mixed $value): mixed {
+        if (is_bool($value)) {
+            return $value ? '1' : '0';
+        }
+        if (is_scalar($value)) {
+            return trim((string) $value);
+        }
+
+        return $value;
+    };
+
+    $left = $normalise($actual);
+    $right = $normalise($expected);
+
+    return match ($op) {
+        '!=', '<>' => $left != $right,
+        'contains' => is_array($actual)
+            ? in_array($expected, $actual, false) || in_array($right, $actual, false)
+            : str_contains((string) $left, (string) $right),
+        '>', '>=', '<', '<=' => is_numeric($left) && is_numeric($right)
+            ? match ($op) {
+                '>' => (float) $left > (float) $right,
+                '>=' => (float) $left >= (float) $right,
+                '<' => (float) $left < (float) $right,
+                default => (float) $left <= (float) $right,
+            }
+            : false,
+        default => $left == $right,
+    };
+};
+
 $entries = [];
 
-if ($source === 'pages') {
-    foreach ($app->query()->kind(\FlatCms\Content\Schema::KIND_PAGE)->sort('order')->find() as $page) {
-        $entries[] = ['title' => $page->title(), 'url' => $page->url(), 'children' => []];
-    }
-} elseif ($source === 'custom') {
+if ($source === 'custom') {
     foreach (preg_split('/\r\n|\r|\n/', (string) ($settings['items'] ?? '')) ?: [] as $line) {
         $line = trim($line);
         if ($line === '') {
@@ -56,14 +89,46 @@ if ($source === 'pages') {
         $entries[] = ['title' => $title, 'url' => $this->link($url), 'children' => []];
     }
 } else {
-    // Menu items, grouped into a tree through their "parent" property. A parent
-    // may be given as the full id ("menu/services") or the short name ("services").
-    $items = $app->query()->type('menu-item')->sort('order')->find();
+    $contentType = trim((string) ($settings['content_type'] ?? 'page'));
+    $query = $app->query()->sort('order');
+    if ($contentType !== '') {
+        $query = $query->type($contentType);
+    }
+
+    $filters = [];
+    foreach (($settings['filters'] ?? []) as $filter) {
+        if (!is_array($filter)) {
+            continue;
+        }
+        $field = trim((string) ($filter['field'] ?? ''));
+        if ($field === '') {
+            continue;
+        }
+        $filters[] = [
+            'field' => $field,
+            'op' => trim((string) ($filter['op'] ?? '=')) ?: '=',
+            'value' => $filter['value'] ?? '',
+        ];
+    }
+
+    $items = array_values(array_filter(
+        $query->find(),
+        static function ($item) use ($filters, $matches): bool {
+            foreach ($filters as $filter) {
+                if (!$matches($item->get($filter['field']), $filter['op'], $filter['value'])) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    ));
+
     $byParent = [];
     $ids = [];
     $short = static fn (string $id): string => basename(str_replace('\\', '/', $id));
     foreach ($items as $item) {
-        $byParent[(string) $item->get('parent', '')][] = $item;
+        $byParent[$item->parentId()][] = $item;
         $ids[$item->id()] = true;
         $ids[$short($item->id())] = true;
     }
@@ -75,10 +140,9 @@ if ($source === 'pages') {
         }
         $out = [];
         foreach ($children as $item) {
-            $link = (string) $item->get('link', '');
             $out[] = [
                 'title' => $item->title(),
-                'url' => $link !== '' ? $link : $item->url(),
+                'url' => $item->url(),
                 'children' => $build($item->id()),
             ];
         }

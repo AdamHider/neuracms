@@ -80,8 +80,6 @@ final class AdminPanel implements Subsystem
         $router->add('POST', '/admin/types/edit', fn (Request $r) => $this->typesSave($r));
         $router->add('POST', '/admin/types/delete', fn (Request $r) => $this->typesDelete($r));
 
-        $router->add('GET', '/admin/regions', fn (Request $r) => $this->regionsPage($r));
-
         $router->add('GET', '/admin/docs', fn (Request $r) => $this->docsPage($r));
 
         $router->add('GET', '/admin/tools', fn (Request $r) => $this->toolsPage($r));
@@ -214,8 +212,9 @@ final class AdminPanel implements Subsystem
         $requested = (string) $request->query('type', '');
         $type = $requested !== '' ? $requested : $this->defaultType($kind);
         $isPage = $this->requireApp()->schema->isPage($type);
+        $label = $this->typeOptions($kind)[$type] ?? $type;
 
-        return $this->page('admin/content-edit', $isPage ? 'Новая страница' : 'Новый элемент', $this->editData(null, '', $type, []));
+        return $this->page('admin/content-edit', 'Новый: ' . $label, $this->editData(null, '', $type, []));
     }
 
     /**
@@ -248,13 +247,13 @@ final class AdminPanel implements Subsystem
         $writer = $this->writer;
 
         if ($writer === null || $id === '') {
-            return $this->page('admin/content-edit', 'Новый элемент', $this->editData(null, $id, $type, ['Укажите путь элемента.']))
+            return $this->page('admin/content-edit', 'Новый: ' . $type, $this->editData(null, $id, $type, ['Укажите путь элемента.']))
                 ->setStatus(422);
         }
 
         [$data, $body, $errors] = $this->collect($request);
         if ($errors !== []) {
-            return $this->page('admin/content-edit', 'Новый элемент', $this->editData(null, $id, $type, $errors, $data, $body))
+            return $this->page('admin/content-edit', 'Новый: ' . $type, $this->editData(null, $id, $type, $errors, $data, $body))
                 ->setStatus(422);
         }
 
@@ -446,17 +445,6 @@ final class AdminPanel implements Subsystem
         ]);
     }
 
-    private function regionsPage(Request $request): Response
-    {
-        if (!$this->requireAuth()) {
-            return Response::redirect('/admin/login', 302);
-        }
-
-        return $this->page('admin/regions', 'Области сайта', [
-            'regions' => $this->requireApp()->regions->all(),
-        ]);
-    }
-
     private function docsPage(Request $request): Response
     {
         if (!$this->requireAuth()) {
@@ -501,7 +489,8 @@ final class AdminPanel implements Subsystem
 
     /**
      * Read the posted form into item data. Values described by the type's schema
-     * are cast to their field type; unknown keys stay free-form properties.
+     * are cast to their field type. Properties that exist on disk but are not
+     * described by the type are preserved, so saving never drops them.
      *
      * @return array{0: array<string, mixed>, 1: string, 2: list<string>}
      */
@@ -533,18 +522,17 @@ final class AdminPanel implements Subsystem
             $data[$name] = $this->castField($field, $posted[$name] ?? null);
         }
 
-        $props = $request->input('props', []);
-        if (is_array($props)) {
-            foreach ($props as $pair) {
-                if (!is_array($pair)) {
+        // Keep properties already stored on disk that the type does not describe.
+        $id = trim((string) $request->input('id', ''));
+        $existing = $id !== '' ? $this->writer?->load($id) : null;
+        if ($existing !== null) {
+            foreach ($existing->all() as $key => $value) {
+                if (in_array($key, Item::RESERVED, true) || array_key_exists($key, $fields)) {
                     continue;
                 }
-                $key = trim((string) ($pair['key'] ?? ''));
-                if ($key === '' || in_array($key, Item::RESERVED, true) || array_key_exists($key, $fields)) {
-                    continue;
+                if (!array_key_exists($key, $data)) {
+                    $data[$key] = $value;
                 }
-                $value = $pair['value'] ?? '';
-                $data[$key] = is_string($value) ? trim($value) : $value;
             }
         }
 

@@ -256,6 +256,47 @@
         settingsBody.innerHTML = html;
     }
 
+    function renderFilters(key, filters, props) {
+        var html = '<div class="builder__filters">';
+        html += '<div class="builder__filters-head">' + esc('Фильтры по свойствам') + '</div>';
+        if (!filters.length) {
+            html += '<p class="muted">Нет фильтров — выводятся все элементы типа.</p>';
+        }
+        filters.forEach(function (filter, i) {
+            var field = filter.field || '';
+            var op = filter.op || '=';
+            var value = filter.value === undefined ? '' : filter.value;
+            html += '<div class="builder__filter" data-filter-index="' + i + '">';
+            html += '<select data-filter-field="' + i + '">';
+            html += option('', '— свойство —', field);
+            props.forEach(function (p) {
+                html += option(p.name, (p.label || p.name), field);
+            });
+            html += '</select>';
+            html += '<select data-filter-op="' + i + '">';
+            [['=', 'равно'], ['!=', 'не равно'], ['contains', 'содержит'], ['>', 'больше'], ['<', 'меньше']].forEach(function (pair) {
+                html += option(pair[0], pair[1], op);
+            });
+            html += '</select>';
+            var propType = '';
+            props.forEach(function (p) { if (p.name === field) { propType = p.type || ''; } });
+            if (propType === 'bool') {
+                html += '<select data-filter-value="' + i + '">';
+                html += option('1', 'да', String(value));
+                html += option('0', 'нет', String(value));
+                html += '</select>';
+            } else {
+                html += '<input type="text" data-filter-value="' + i + '" value="' + esc(value) + '" placeholder="значение">';
+            }
+            html += '<button type="button" class="builder__icon-btn" data-filter-remove="' + i + '" title="Удалить фильтр">' + icon('close') + '</button>';
+            html += '</div>';
+        });
+        html += '<button type="button" class="btn btn-sm btn-outline-secondary" data-filter-add="1">' + icon('add') + ' Добавить фильтр</button>';
+        html += '</div>';
+
+        return html;
+    }
+
     function renderBlockSettings(si, ci, bi) {
         var column = columnAt(si, ci);
         var block = column && column.blocks ? column.blocks[bi] : null;
@@ -273,6 +314,23 @@
                     ? settings[key]
                     : (field['default'] !== undefined ? field['default'] : '');
                 html += '<label class="builder__setting">' + esc(label);
+
+                if (key === 'content_type') {
+                    html += '<select data-setting="block:' + esc(key) + '">';
+                    Object.keys(config.menu || {}).forEach(function (name) {
+                        html += option(name, (config.menu[name].label || name), value);
+                    });
+                    html += '</select></label>';
+                    return;
+                }
+
+                if (key === 'filters') {
+                    var chosenType = settings.content_type || 'page';
+                    var props = (config.menu && config.menu[chosenType] && config.menu[chosenType].properties) || [];
+                    html += '</label>';
+                    html += renderFilters(key, settings[key] || [], props);
+                    return;
+                }
 
                 if (key === 'element_type') {
                     html += '<select data-setting="block:' + esc(key) + '">';
@@ -535,6 +593,24 @@
     settingsBody.addEventListener('click', onEditorClick);
 
     function onEditorClick(event) {
+        var filterAdd = event.target.closest('[data-filter-add]');
+        if (filterAdd) {
+            var filters = currentBlockFilters();
+            if (filters) {
+                filters.push({ field: '', op: '=', value: '' });
+                renderSettings();
+            }
+            return;
+        }
+        var filterRemove = event.target.closest('[data-filter-remove]');
+        if (filterRemove) {
+            var list = currentBlockFilters();
+            if (list) {
+                list.splice(parseInt(filterRemove.getAttribute('data-filter-remove'), 10), 1);
+                renderSettings();
+            }
+            return;
+        }
         var del = event.target.closest('[data-block-del]');
         if (del) {
             var p = del.getAttribute('data-block-del').split(':').map(Number);
@@ -601,6 +677,21 @@
 
     settingsBody.addEventListener('input', onSettingChange);
     settingsBody.addEventListener('change', onSettingChange);
+    settingsBody.addEventListener('input', onFilterChange);
+    settingsBody.addEventListener('change', onFilterChange);
+
+    // Menu particle: rebuild the property-filter builder when the content type
+    // (and therefore the available properties) changes.
+    settingsBody.addEventListener('change', function (event) {
+        var el = event.target.closest('[data-setting]');
+        if (el && el.getAttribute('data-setting') === 'block:content_type') {
+            var filters = currentBlockFilters();
+            if (filters) {
+                filters.forEach(function (f) { f.field = ''; });
+            }
+            renderSettings();
+        }
+    });
 
     // Element-list particle: when the element type changes, rebuild the mapping
     // selects so they list the properties of the newly chosen type.
@@ -640,6 +731,19 @@
             .catch(function () { window.alert('Не удалось загрузить файл.'); });
     });
 
+    function currentBlockFilters() {
+        if (!selection || selection.kind !== 'block') { return null; }
+        var column = columnAt(selection.path[0], selection.path[1]);
+        var block = column && column.blocks ? column.blocks[selection.path[2]] : null;
+        if (!block) { return null; }
+        block.settings = block.settings || {};
+        if (!Array.isArray(block.settings.filters)) {
+            block.settings.filters = [];
+        }
+
+        return block.settings.filters;
+    }
+
     function setBlockSetting(key, value) {
         if (!selection || selection.kind !== 'block') { return; }
         var column = columnAt(selection.path[0], selection.path[1]);
@@ -650,6 +754,21 @@
         syncJson();
         updateCardSummary();
         renderSettings();
+    }
+
+    function onFilterChange(event) {
+        var el = event.target.closest('[data-filter-field], [data-filter-op], [data-filter-value]');
+        if (!el || !selection || selection.kind !== 'block') { return; }
+        var filters = currentBlockFilters();
+        if (!filters) { return; }
+        var index = parseInt(el.getAttribute('data-filter-field') !== null
+            ? el.getAttribute('data-filter-field')
+            : (el.getAttribute('data-filter-op') !== null ? el.getAttribute('data-filter-op') : el.getAttribute('data-filter-value')), 10);
+        if (!filters[index]) { return; }
+        if (el.hasAttribute('data-filter-field')) { filters[index].field = el.value; }
+        else if (el.hasAttribute('data-filter-op')) { filters[index].op = el.value; }
+        else { filters[index].value = el.value; }
+        syncJson();
     }
 
     function onSettingChange(event) {

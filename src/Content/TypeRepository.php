@@ -8,7 +8,7 @@ use FlatCms\Support\Fs;
 
 /**
  * Creates, updates and deletes content types (the files under config/schemas/).
- * Types that ship with the core (page, section, menu-item) can be edited but not
+ * Types that ship with the core (page, section) can be edited but not
  * deleted. Relation fields are stored like any other field, with a "to" key that
  * names the target type.
  */

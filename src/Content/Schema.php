@@ -20,7 +20,7 @@ final class Schema implements Subsystem
     ];
 
     /** Types that ship with the core; they can be edited but never deleted. */
-    public const BUILTIN = ['page', 'section', 'menu-item'];
+    public const BUILTIN = ['page', 'section'];
 
     /** Kind: a routable page whose appearance is defined in the builder. */
     public const KIND_PAGE = 'page';
@@ -30,8 +30,7 @@ final class Schema implements Subsystem
 
     /**
      * Kinds of the core page-like types. Any other type is an element unless its
-     * schema file sets "kind" explicitly. Menu items are elements: they are data
-     * the Menu particle renders into navigation, not routable pages of their own.
+     * schema file sets "kind" explicitly.
      */
     private const PAGE_KINDS = ['page', 'section'];
 

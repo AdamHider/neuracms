@@ -2,3 +2,4 @@ type: page
 title: Контакты
 order: 3
 published: true
+show_in_menu: true
