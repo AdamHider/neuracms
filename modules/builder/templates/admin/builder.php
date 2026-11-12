@@ -90,8 +90,8 @@ ob_start();
                     <ul class="dropdown-menu dropdown-menu-end" id="builder-presets">
                         <?php foreach ($presets as $preset): ?>
                             <li>
-                                <button class="dropdown-item" type="button" data-preset='<?= $this->e((string) json_encode($preset['widths'])) ?>'>
-                                    <span class="preset-preview"><?php foreach ($preset['widths'] as $w): ?><span style="flex:<?= (int) $w ?>"></span><?php endforeach; ?></span>
+                                <button class="dropdown-item" type="button" data-preset='<?= $this->e((string) json_encode($preset, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?>'>
+                                    <?php if (!empty($preset['icon'])): ?><?= $this->icon($preset['icon']) ?><?php else: ?><span class="preset-preview"><?php foreach ($preset['widths'] as $w): ?><span style="flex:<?= (int) $w ?>"></span><?php endforeach; ?></span><?php endif; ?>
                                     <?= $this->e($preset['title']) ?>
                                 </button>
                             </li>

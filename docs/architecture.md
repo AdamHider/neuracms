@@ -27,7 +27,7 @@ folders under `content/`; everything else is generated into `var/`.
 | `Content\Storage` | Loads an item folder into an `Item` |
 | `Content\Index` | Cached list of items with the fields that queries need |
 | `Content\Query` | Fluent filtering and sorting over the index |
-| `Content\Schema` | Field descriptions, relations and `kind` (page vs element) per content type |
+| `Content\Schema` | Field descriptions, relations, `kind` (page vs element) and `admin` menu settings per content type |
 | `Content\TypeRepository` | Creates, updates and deletes content types (writes `config/schemas/`) |
 | `Content\Regions` | Theme regions (header, footer): a builder layout per `config/regions/<name>.yaml` |
 | `Http\Router` | Pattern routes, redirects and content fallback |

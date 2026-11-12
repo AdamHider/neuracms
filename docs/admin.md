@@ -79,6 +79,33 @@ attached to another (a product to a category, for example). See
 validates names, field names and relation targets. Editing a type triggers an
 index rebuild so new `indexed` fields take effect immediately.
 
+### A type's own admin menu entry
+
+A type can ask for its own entry in the admin sidebar. In the type editor, tick
+**Показывать этот тип отдельным пунктом в боковом меню** and set the label, icon
+and order; the entry then appears next to **Страницы** and **Элементы** and opens
+the list filtered by that type. In the schema file this is an `admin` block:
+
+```yaml
+# config/schemas/article.yaml
+type: article
+kind: element
+label: Статья
+admin:
+  menu: true
+  label: Статьи
+  icon: docs
+  order: 5
+fields:
+  headline: { type: string }
+```
+
+`Schema::adminMenu()` returns the types that set `admin.menu`, sorted by `order`
+then label. The `icon` is a semantic name from the admin icon set
+(`FlatCms\Admin\Icons`) or any Bootstrap Icons name; it falls back to `content`.
+Unticking the box removes the `admin` block again, so a type file stays minimal
+when the feature is unused.
+
 
 ## Writing content
 

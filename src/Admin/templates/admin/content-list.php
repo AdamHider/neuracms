@@ -83,4 +83,9 @@ ob_start();
 $content = ob_get_clean();
 $listTitle = $kind === 'page' ? 'Страницы' : ($kind === 'element' ? 'Элементы' : 'Контент');
 $activeNav = $kind === 'page' ? 'pages' : ($kind === 'element' ? 'elements' : 'content');
+// A type that asked for its own sidebar entry highlights that entry when filtered.
+if ($type !== '' && !empty($app->schema->get($type)['admin']['menu'])) {
+    $activeNav = 'type:' . $type;
+    $listTitle = $types[$type] ?? $type;
+}
 echo $this->partial('admin/layout', ['content' => $content, 'title' => $listTitle, 'active' => $activeNav, 'admin_user' => $admin_user ?? null]);

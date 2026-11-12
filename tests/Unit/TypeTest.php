@@ -364,4 +364,80 @@ final class TypeTest extends FlatCmsTestCase
 
         self::assertSame(422, $response->status());
     }
+
+    public function testSchemaReadsAdminMenuSettings(): void
+    {
+        $this->write('config/schemas/article.yaml', "type: article\nkind: element\nlabel: Статья\nadmin:\n  menu: true\n  label: Статьи\n  icon: docs\n  order: 5\nfields:\n  headline: { type: string }\n");
+
+        $schema = new Schema(new Fs($this->root));
+
+        $admin = $schema->get('article')['admin'];
+        self::assertTrue($admin['menu']);
+        self::assertSame('Статьи', $admin['label']);
+        self::assertSame('docs', $admin['icon']);
+        self::assertSame(5, $admin['order']);
+
+        // A type without the block defaults to no menu entry.
+        self::assertFalse($schema->get('product')['admin']['menu']);
+
+        $menu = $schema->adminMenu();
+        self::assertCount(1, $menu);
+        self::assertSame('article', $menu[0]['type']);
+        self::assertSame('Статьи', $menu[0]['label']);
+        self::assertSame('docs', $menu[0]['icon']);
+    }
+
+    public function testTypeRepositoryPersistsAdminMenuSettings(): void
+    {
+        $app = $this->app();
+        $repository = new TypeRepository($app->fs, $app->schema);
+
+        self::assertTrue($repository->save('article', ['headline' => ['type' => 'string']], [], 'Статья', 'element', [
+            'menu' => true,
+            'label' => 'Статьи',
+            'icon' => 'docs',
+            'order' => 5,
+        ]));
+
+        $yaml = (string) file_get_contents($this->root . '/config/schemas/article.yaml');
+        self::assertStringContainsString('menu: true', $yaml);
+        self::assertStringContainsString('icon: docs', $yaml);
+
+        $loaded = $repository->load('article');
+        self::assertTrue($loaded['admin']['menu']);
+        self::assertSame('Статьи', $loaded['admin']['label']);
+
+        // Turning the entry off drops the "admin" block again.
+        self::assertTrue($repository->save('article', ['headline' => ['type' => 'string']], [], 'Статья', 'element', ['menu' => false]));
+        self::assertStringNotContainsString('admin:', (string) file_get_contents($this->root . '/config/schemas/article.yaml'));
+    }
+
+    public function testTypeWithAdminMenuGetsItsOwnSidebarEntry(): void
+    {
+        $app = $this->appWithAdmin();
+        $this->login($app);
+
+        $app->handle(new Request('POST', '/admin/types/new', [], [
+            'name' => 'article',
+            'label' => 'Статья',
+            'kind' => 'element',
+            'admin_menu' => '1',
+            'admin_label' => 'Статьи',
+            'admin_icon' => 'docs',
+            'admin_order' => '5',
+        ], [], [], []));
+
+        $this->write('content/articles/first/item.yaml', "type: article\ntitle: Первая\n");
+        $app->build();
+
+        $dashboard = $app->handle(new Request('GET', '/admin', [], [], [], [], []))->body();
+        self::assertStringContainsString('/admin/elements?type=article', $dashboard);
+        self::assertStringContainsString('Статьи', $dashboard);
+
+        // The entry opens the element list filtered by the type and highlights it.
+        $list = $app->handle(new Request('GET', '/admin/elements', ['type' => 'article'], [], [], [], []));
+        self::assertSame(200, $list->status());
+        self::assertStringContainsString('is-active', $list->body());
+        self::assertStringContainsString('Первая', $list->body());
+    }
 }

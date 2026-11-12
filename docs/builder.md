@@ -196,8 +196,10 @@ module and register the type on the `builder.types` event.
   particle into a column to add it.
 - **Middle**: the canvas. Drag the handle on a block to reorder or move it between
   columns; drag a section header to reorder sections. Use "Добавить секцию" to
-  add a section from a preset (one to four columns, sidebar, …). Select a section
-  or block to open its settings.
+  add a section from a preset (one to four columns, sidebar, …), or a ready-made
+  **Шапка сайта** / **Подвал сайта** section that arrives with its blocks already
+  in place (a heading plus a `menu` particle). Select a section or block to open
+  its settings.
 - **Right**: settings for the current selection (section styling, or the block's
   declared fields).
 
@@ -213,3 +215,31 @@ JavaScript the JSON textarea is still editable by hand. Saving posts to
 
 `GET /admin/builder/types` returns the registry, categories, presets and grid
 size as JSON for the editor.
+
+## Section presets
+
+`BuilderModule::presets()` lists the ready-made sections the "Добавить секцию"
+menu offers. Each preset carries a `name`, a `title` and the `widths` of its
+columns; a preset may also carry `blocks` — a list of block lists, one per column
+— and an `icon`. The editor inserts the blocks (filling in each particle's field
+defaults) when the preset is chosen, so the header/footer presets drop in a
+working section rather than an empty one. A preset with `position: start` (the
+header) is inserted above the existing sections instead of appended:
+
+```php
+[
+    'name' => 'header',
+    'title' => 'Шапка сайта',
+    'icon' => 'regions',
+    'position' => 'start',
+    'widths' => [4, 8],
+    'blocks' => [
+        [['type' => 'heading', 'settings' => ['text' => 'Название сайта', 'level' => 'h2']]],
+        [['type' => 'menu', 'settings' => ['source' => 'menu', 'depth' => 2, 'class' => 'site-nav']]],
+    ],
+]
+```
+
+Presets are sections, not regions: adding a header/footer preset puts an editable
+section at the top or bottom of the current layout. To make the chrome appear on
+every page, save it into a region instead (see [regions.md](regions.md)).

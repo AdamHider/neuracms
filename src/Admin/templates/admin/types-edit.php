@@ -6,12 +6,14 @@
  * @var list<string> $indexed
  * @var bool $builtin
  * @var string $kind
+ * @var array{menu: bool, label: string, icon: string, order: int} $admin
  * @var bool $isNew
  * @var array<string, string> $typeNames
  * @var list<string> $errors
  * @var list<string> $referenced_by
  * @var \FlatCms\Http\TemplateContext $this
  */
+$admin = $admin ?? ['menu' => false, 'label' => '', 'icon' => '', 'order' => 100];
 $fieldTypes = [
     'string' => 'Строка',
     'text' => 'Текст',
@@ -72,6 +74,32 @@ ob_start();
         </select>
         <small>Страницы имеют собственный URL и открываются в конструкторе. Элементы — это структурированные данные без страницы.</small>
     </label>
+
+    <fieldset>
+        <legend>Пункт в меню админки</legend>
+        <label class="checkbox-inline">
+            <input type="checkbox" name="admin_menu" value="1" <?= !empty($admin['menu']) ? 'checked' : '' ?>>
+            Показывать этот тип отдельным пунктом в боковом меню
+        </label>
+        <small>Например, тип «Статьи» получит собственный пункт «Статьи» рядом со «Страницами» и «Элементами».</small>
+        <div class="type-admin-row">
+            <label>Название пункта
+                <input type="text" name="admin_label" value="<?= $this->e($admin['label']) ?>" placeholder="<?= $this->e($label !== '' ? $label : 'Статьи') ?>">
+            </label>
+            <label>Иконка (Bootstrap Icons)
+                <input type="text" name="admin_icon" value="<?= $this->e($admin['icon']) ?>" placeholder="content" list="icon-list">
+            </label>
+            <label>Порядок
+                <input type="number" name="admin_order" value="<?= (int) ($admin['order'] ?? 100) ?>" step="1">
+            </label>
+        </div>
+        <datalist id="icon-list">
+            <?php foreach (\FlatCms\Admin\Icons::all() as $key => $glyph): ?>
+                <option value="<?= $this->e($key) ?>"><?= $this->e($key) ?> — bi-<?= $this->e($glyph) ?></option>
+            <?php endforeach; ?>
+        </datalist>
+        <small>Иконка задаётся смысловым именем из набора админки (например <code>content</code>, <code>docs</code>, <code>list</code>) или любым именем Bootstrap Icons.</small>
+    </fieldset>
 
     <fieldset>
         <legend>Поля</legend>

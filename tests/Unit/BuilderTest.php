@@ -511,4 +511,46 @@ final class BuilderTest extends FlatCmsTestCase
         self::assertStringContainsString('--g-span:6', $page->body());
         self::assertStringContainsString('Секция', $page->body());
     }
+
+    public function testPresetsIncludeHeaderAndFooterWithReadyMadeBlocks(): void
+    {
+        $app = $this->appWithBuilder(true);
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $body = $app->handle(new Request('GET', '/admin/builder', ['id' => 'about'], [], [], [], []))->body();
+
+        self::assertSame(1, preg_match("/data-builder='(.*?)'/s", $body, $m));
+        $payload = json_decode(html_entity_decode($m[1], ENT_QUOTES), true, 512, JSON_THROW_ON_ERROR);
+
+        $presets = [];
+        foreach ($payload['presets'] as $preset) {
+            $presets[$preset['name']] = $preset;
+        }
+
+        self::assertArrayHasKey('header', $presets);
+        self::assertArrayHasKey('footer', $presets);
+        self::assertSame([4, 8], $presets['header']['widths']);
+        // The presets carry ready-made blocks so a header/footer can be dropped in.
+        self::assertSame('menu', $presets['header']['blocks'][1][0]['type']);
+        self::assertSame('menu', $presets['footer']['blocks'][1][0]['type']);
+    }
+
+    public function testHeaderAndFooterPresetsRenderAsSections(): void
+    {
+        $app = $this->appWithBuilder();
+        $renderer = $this->builder($app)->renderer();
+        self::assertNotNull($renderer);
+
+        $layout = Layout::fromValue(['sections' => [
+            ['columns' => [
+                ['width' => 4, 'blocks' => [['type' => 'heading', 'settings' => ['text' => 'Мой сайт', 'level' => 'h2']]]],
+                ['width' => 8, 'blocks' => [['type' => 'menu', 'settings' => ['source' => 'pages', 'class' => 'site-nav']]]],
+            ]],
+        ]], 12);
+
+        $html = $renderer->renderLayout($layout);
+        self::assertStringContainsString('Мой сайт', $html);
+        self::assertStringContainsString('site-nav', $html);
+    }
 }

@@ -28,6 +28,7 @@ ob_start();
             <td>
                 <code><?= $this->e($name) ?></code>
                 <?php if (!empty($type['builtin'])): ?><span class="tag">встроенный</span><?php endif; ?>
+                <?php if (!empty($type['admin']['menu'])): ?><span class="tag"><?= $this->icon($type['admin']['icon']) ?> в меню</span><?php endif; ?>
             </td>
             <td><?= $this->e($type['label']) ?></td>
             <td>

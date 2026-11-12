@@ -46,7 +46,7 @@ final class TypeRepository
     }
 
     /**
-     * @return array{label: string, fields: array<string, array>, indexed: list<string>, kind: string}|null
+     * @return array{label: string, fields: array<string, array>, indexed: list<string>, kind: string, admin: array{menu: bool, label: string, icon: string, order: int}}|null
      */
     public function load(string $type): ?array
     {
@@ -61,16 +61,18 @@ final class TypeRepository
             'fields' => $schema['fields'],
             'indexed' => $schema['indexed'],
             'kind' => $schema['kind'],
+            'admin' => $schema['admin'],
         ];
     }
 
     /**
      * Write a type. Passing a name that does not exist yet creates it.
      *
-     * @param array<string, array> $fields
-     * @param list<string>         $indexed
+     * @param array<string, array>                 $fields
+     * @param list<string>                         $indexed
+     * @param array{menu?: bool, label?: string, icon?: string, order?: int} $admin
      */
-    public function save(string $type, array $fields, array $indexed, string $label = '', ?string $kind = null): bool
+    public function save(string $type, array $fields, array $indexed, string $label = '', ?string $kind = null, array $admin = []): bool
     {
         $type = $this->normalizeName($type);
         if ($type === null) {
@@ -97,6 +99,9 @@ final class TypeRepository
         if ($kind === Schema::KIND_PAGE || $kind === Schema::KIND_ELEMENT) {
             $payload['kind'] = $kind;
         }
+        if (($adminSettings = $this->cleanAdmin($admin)) !== []) {
+            $payload['admin'] = $adminSettings;
+        }
         $payload['fields'] = $clean;
         $payload['indexed'] = $indexed;
 
@@ -104,6 +109,35 @@ final class TypeRepository
         $this->schema->flush();
 
         return $ok;
+    }
+
+    /**
+     * Keep only the admin-menu keys that were actually set, so a type file stays
+     * minimal when the feature is not used.
+     *
+     * @param array{menu?: bool, label?: string, icon?: string, order?: int} $admin
+     *
+     * @return array<string, mixed>
+     */
+    private function cleanAdmin(array $admin): array
+    {
+        $clean = [];
+        if (!empty($admin['menu'])) {
+            $clean['menu'] = true;
+        }
+        $label = trim((string) ($admin['label'] ?? ''));
+        if ($label !== '') {
+            $clean['label'] = $label;
+        }
+        $icon = trim((string) ($admin['icon'] ?? ''));
+        if ($icon !== '') {
+            $clean['icon'] = $icon;
+        }
+        if (isset($admin['order']) && $admin['order'] !== '' && (int) $admin['order'] !== 100) {
+            $clean['order'] = (int) $admin['order'];
+        }
+
+        return $clean;
     }
 
     public function delete(string $type): bool

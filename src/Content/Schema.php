@@ -36,7 +36,7 @@ final class Schema implements Subsystem
     private const PAGE_KINDS = ['page', 'section'];
 
     /**
-     * @var array<string, array{fields: array<string, array>, indexed: list<string>, label: string, builtin: bool, kind: string}>
+     * @var array<string, array{fields: array<string, array>, indexed: list<string>, label: string, builtin: bool, kind: string, admin: array{menu: bool, label: string, icon: string, order: int}}>
      */
     private array $cache = [];
 
@@ -64,7 +64,7 @@ final class Schema implements Subsystem
     }
 
     /**
-     * @return array{fields: array<string, array>, indexed: list<string>, label: string, builtin: bool}
+     * @return array{fields: array<string, array>, indexed: list<string>, label: string, builtin: bool, kind: string, admin: array{menu: bool, label: string, icon: string, order: int}}
      */
     public function get(string $type): array
     {
@@ -104,6 +104,37 @@ final class Schema implements Subsystem
                 ? (bool) $raw['builtin']
                 : in_array($type, self::BUILTIN, true),
             'kind' => $this->readKind($type, $raw),
+            'admin' => $this->readAdmin($type, $raw, $label),
+        ];
+    }
+
+    /**
+     * Admin-menu settings of a type: whether it gets its own sidebar entry, and
+     * with which label, icon and order. Defaults to the type label and a generic
+     * icon; "admin: {menu: true, ...}" in the schema file turns the entry on.
+     *
+     * @param array<string, mixed> $raw
+     *
+     * @return array{menu: bool, label: string, icon: string, order: int}
+     */
+    private function readAdmin(string $type, array $raw, mixed $label): array
+    {
+        $admin = is_array($raw['admin'] ?? null) ? $raw['admin'] : [];
+
+        $menu = $admin['menu'] ?? $raw['in_admin_menu'] ?? false;
+
+        $menuLabel = $admin['label'] ?? null;
+        if (!is_string($menuLabel) || $menuLabel === '') {
+            $menuLabel = is_string($label) && $label !== '' ? $label : $this->defaultLabel($type);
+        }
+
+        $icon = $admin['icon'] ?? null;
+
+        return [
+            'menu' => (bool) $menu,
+            'label' => $menuLabel,
+            'icon' => is_string($icon) && $icon !== '' ? $icon : 'content',
+            'order' => (int) ($admin['order'] ?? 100),
         ];
     }
 
@@ -213,6 +244,39 @@ final class Schema implements Subsystem
     public function label(string $type): string
     {
         return $this->get($type)['label'];
+    }
+
+    /**
+     * Types that asked for their own admin sidebar entry, sorted by "order" then
+     * label. Each entry carries the type name, its menu label and icon.
+     *
+     * @return list<array{type: string, label: string, icon: string, kind: string}>
+     */
+    public function adminMenu(): array
+    {
+        $entries = [];
+        foreach ($this->all() as $type => $schema) {
+            if (empty($schema['admin']['menu'])) {
+                continue;
+            }
+            $entries[] = [
+                'type' => $type,
+                'label' => $schema['admin']['label'],
+                'icon' => $schema['admin']['icon'],
+                'kind' => $schema['kind'],
+                'order' => $schema['admin']['order'],
+            ];
+        }
+
+        usort($entries, static function (array $a, array $b): int {
+            return $a['order'] <=> $b['order'] ?: strcmp($a['label'], $b['label']);
+        });
+
+        return array_map(static function (array $entry): array {
+            unset($entry['order']);
+
+            return $entry;
+        }, $entries);
     }
 
     /**

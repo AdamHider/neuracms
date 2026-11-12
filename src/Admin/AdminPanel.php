@@ -703,6 +703,7 @@ final class AdminPanel implements Subsystem
                 'label' => $schema['label'],
                 'kind' => $schema['kind'],
                 'builtin' => $schema['builtin'],
+                'admin' => $schema['admin'],
                 'fields' => $schema['fields'],
                 'indexed' => $schema['indexed'],
                 'relations' => $app->schema->relations($name),
@@ -729,6 +730,7 @@ final class AdminPanel implements Subsystem
             'name' => '',
             'label' => '',
             'kind' => $this->normalizeKind((string) $request->query('kind', '')),
+            'admin' => ['menu' => false, 'label' => '', 'icon' => '', 'order' => 100],
             'fields' => [],
             'indexed' => [],
             'builtin' => false,
@@ -762,7 +764,7 @@ final class AdminPanel implements Subsystem
             return $this->typesFormError($name, $label, $kind, $request, $parsed['errors']);
         }
 
-        $repository->save($name, $parsed['fields'], $parsed['indexed'], $label, $kind);
+        $repository->save($name, $parsed['fields'], $parsed['indexed'], $label, $kind, $this->adminFromRequest($request));
         $this->requireApp()->build();
 
         return Response::redirect('/admin/types?created=' . rawurlencode($name), 303);
@@ -784,6 +786,7 @@ final class AdminPanel implements Subsystem
             'name' => $name,
             'label' => $loaded['label'],
             'kind' => $loaded['kind'],
+            'admin' => $loaded['admin'],
             'fields' => $loaded['fields'],
             'indexed' => $loaded['indexed'],
             'builtin' => $this->types?->isBuiltin($name) ?? false,
@@ -814,7 +817,7 @@ final class AdminPanel implements Subsystem
             return $this->typesFormError($name, $label, $kind, $request, $parsed['errors']);
         }
 
-        $repository->save($name, $parsed['fields'], $parsed['indexed'], $label, $kind);
+        $repository->save($name, $parsed['fields'], $parsed['indexed'], $label, $kind, $this->adminFromRequest($request));
         $this->requireApp()->build();
 
         return Response::redirect('/admin/types?created=' . rawurlencode($name), 303);
@@ -853,6 +856,7 @@ final class AdminPanel implements Subsystem
             'name' => $name,
             'label' => $label,
             'kind' => $this->normalizeKind($kind),
+            'admin' => $this->adminFromRequest($request) + ['menu' => false, 'label' => '', 'icon' => '', 'order' => 100],
             'fields' => $this->submittedFields($request),
             'indexed' => $this->submittedIndexed($request),
             'builtin' => $name !== '' && ($this->types?->isBuiltin($name) ?? false),
@@ -861,6 +865,21 @@ final class AdminPanel implements Subsystem
             'errors' => $errors,
             'referenced_by' => $name !== '' ? $this->requireApp()->schema->referencedBy($name) : [],
         ])->setStatus(422);
+    }
+
+    /**
+     * Admin-menu settings posted by the type form.
+     *
+     * @return array{menu: bool, label: string, icon: string, order: int}
+     */
+    private function adminFromRequest(Request $request): array
+    {
+        return [
+            'menu' => (bool) $request->input('admin_menu', false),
+            'label' => trim((string) $request->input('admin_label', '')),
+            'icon' => trim((string) $request->input('admin_icon', '')),
+            'order' => (int) $request->input('admin_order', 100),
+        ];
     }
 
     /**

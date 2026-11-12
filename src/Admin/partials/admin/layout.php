@@ -20,6 +20,15 @@ $nav = [
     ['key' => 'types', 'icon' => 'types', 'label' => 'Типы контента', 'href' => '/admin/types'],
     ['key' => 'docs', 'icon' => 'docs', 'label' => 'Документация', 'href' => '/admin/docs'],
 ];
+// Types that asked for their own sidebar entry (schema "admin: {menu: true}").
+foreach (($app ?? null)?->schema->adminMenu() ?? [] as $entry) {
+    $nav[] = [
+        'key' => 'type:' . $entry['type'],
+        'icon' => $entry['icon'],
+        'label' => $entry['label'],
+        'href' => '/admin/' . ($entry['kind'] === 'page' ? 'pages' : 'elements') . '?type=' . rawurlencode($entry['type']),
+    ];
+}
 $adminNav = [
     ['key' => 'users', 'icon' => 'users', 'label' => 'Пользователи', 'href' => '/admin/users'],
     ['key' => 'tools', 'icon' => 'tools', 'label' => 'Инструменты', 'href' => '/admin/tools'],

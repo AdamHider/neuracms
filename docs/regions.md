@@ -64,6 +64,21 @@ content folder, `content/_regions/<name>/`, served at
 `/media/_regions/<name>/<file>`. Folders whose name begins with `_` are skipped
 by the content scanner, so region uploads never appear as content items.
 
+## Regions vs. section presets
+
+Both the header and the footer can be built two ways, and the difference is
+**scope**:
+
+- A **section preset** ("Добавить секцию" → *Шапка сайта* / *Подвал сайта*)
+  inserts an editable section into the layout of **one page**. Use it to give a
+  single page its own header or footer.
+- A **region** (`config/regions/header.yaml`) is chrome rendered by the theme on
+  **every page**. Use it for the site-wide header and footer.
+
+The header/footer presets and the header/footer regions use the same particles
+(a `heading` plus a `menu`), so a section built with a preset can be moved into a
+region by copying its blocks, and vice versa.
+
 ## The menu particle
 
 The `menu` block renders navigation. It has three sources:

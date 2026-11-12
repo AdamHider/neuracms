@@ -72,6 +72,17 @@ are created and edited in the admin panel under **Типы контента**, w
 the same files. `page`, `section` and `menu-item` are built in and cannot be
 deleted; everything else is custom.
 
+A type can also ask for its own entry in the admin sidebar (an `admin:` block
+with `menu`, `label`, `icon` and `order`), so a type like "Статьи" gets a
+dedicated menu item that opens its filtered list:
+
+```yaml
+type: article
+kind: element
+label: Статья
+admin: {menu: true, label: Статьи, icon: docs, order: 5}
+```
+
 A field of type `relation` attaches one content type to another — a product to a
 category, for example:
 
@@ -141,11 +152,19 @@ more through the `builder.types` filter. Edit a page in the admin under
 "Конструктор" on any content item: drag particles from the library into columns,
 rearrange them, and tune section and block settings in the side panel.
 
+"Добавить секцию" offers ready-made sections — one to four columns, a sidebar,
+and **Шапка сайта** / **Подвал сайта** presets that arrive with their blocks (a
+heading plus a `menu`) already in place.
+
 The same editor builds the **site chrome**. A theme region — the header and
 footer, plus any extra region a theme declares — is a builder layout stored under
 `config/regions/`, so navigation and the logo are edited as content rather than
 hard-coded in a theme. The `menu` particle feeds navigation from `menu-item`
 elements, the pages, or a hand-typed list. Edit regions under "Области сайта".
+
+A header/footer section preset adds a section to **one page**; a region renders
+on **every page**. Use the presets for a per-page header or footer and a region
+for the site-wide chrome.
 
 ## CLI
 

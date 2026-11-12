@@ -73,6 +73,11 @@ php -S localhost:8000 -t public   # dev server
   Relation targets are validated against `Storage` on save.
 - Admin routes: `/admin/types` (list), `/admin/types/new`, `/admin/types/edit`,
   `/admin/types/delete`.
+- A type may ask for its own admin sidebar entry with an `admin:` block
+  (`menu`, `label`, `icon`, `order`); `Schema::adminMenu()` returns them sorted,
+  `TypeRepository::save()` persists them, and the type editor has the checkbox +
+  label/icon/order fields. `layout.php` appends them to `$nav`; `content-list.php`
+  highlights `type:<name>` when filtered.
 - Only fields listed in `indexed` are queryable (including relation fields).
 
 ## Admin UI (Bootstrap redesign)
@@ -94,6 +99,11 @@ php -S localhost:8000 -t public   # dev server
   (`--g-span` custom property); theme styles these in `themes/default/.../main.css`.
 - Block types carry `category` and `icon`; registry exposes categories and
   section presets. New types: `quote`, `divider`, `spacer`.
+- `BuilderModule::presets()` lists ready-made sections for "Добавить секцию": the
+  plain ones carry `widths`, and the **Шапка сайта** / **Подвал сайта** presets
+  also carry `blocks` (a list of block lists, one per column) so the editor drops
+  in a working section. `builder.js` `addSection(preset)` accepts a preset object
+  or a bare widths array and fills each particle's field defaults.
 - Editor `modules/builder/templates/admin/builder.php` + `assets/js/builder.js`
   is a three-pane drag & drop UI; JSON textarea stays in sync (works without JS).
 - Save sanitizes sections/columns, drops unknown block types and non-scalar
@@ -118,6 +128,9 @@ php -S localhost:8000 -t public   # dev server
 - Admin: **Области сайта** (`/admin/regions`) lists regions; the builder opens a
   region with `?region=<name>` (save/media routes take the same `region` input).
   **Документация** (`/admin/docs`) renders `docs/*.md` via `Admin\Docs`.
+- Regions are site-wide chrome; the **Шапка сайта** / **Подвал сайта** section
+  presets are per-page sections built from the same particles. See
+  `docs/regions.md`.
 
 ## Gotchas
 

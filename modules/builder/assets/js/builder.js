@@ -348,11 +348,37 @@
         return '<option value="' + esc(value) + '"' + (String(current) === String(value) ? ' selected' : '') + '>' + esc(label) + '</option>';
     }
 
-    function addSection(widths) {
-        var columns = widths.map(function (w) {
-            return { width: w, blocks: [] };
+    function presetBlock(entry) {
+        var type = entry && entry.type ? entry.type : '';
+        if (!type) { return null; }
+        var settings = defaultsFor(type);
+        if (entry.settings && typeof entry.settings === 'object') {
+            Object.keys(entry.settings).forEach(function (key) {
+                settings[key] = entry.settings[key];
+            });
+        }
+        return { type: type, id: uid(), settings: settings };
+    }
+
+    function addSection(preset) {
+        // Accepts a preset object ({widths, blocks, position}) or a bare widths array.
+        var widths = Array.isArray(preset) ? preset : (preset.widths || [grid]);
+        var presetBlocks = (!Array.isArray(preset) && Array.isArray(preset.blocks)) ? preset.blocks : [];
+        var columns = widths.map(function (w, ci) {
+            var blocks = [];
+            (presetBlocks[ci] || []).forEach(function (entry) {
+                var block = presetBlock(entry);
+                if (block) { blocks.push(block); }
+            });
+            return { width: w, blocks: blocks };
         });
-        sections().push({ id: uid(), settings: {}, columns: columns });
+        var section = { id: uid(), settings: {}, columns: columns };
+        // A "start" preset (the header) goes above the existing sections.
+        if (!Array.isArray(preset) && preset.position === 'start') {
+            sections().unshift(section);
+        } else {
+            sections().push(section);
+        }
         render();
     }
 

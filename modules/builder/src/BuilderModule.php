@@ -236,9 +236,11 @@ final class BuilderModule implements Module
     }
 
     /**
-     * Ready-made section layouts ("presets"), each a list of column widths.
+     * Ready-made sections ("presets"). Each carries a name, a title and the
+     * column widths; some also carry ready-made blocks, so the "Добавить секцию"
+     * menu can drop in a header or a footer in one click.
      *
-     * @return list<array{name: string, title: string, widths: list<int>}>
+     * @return list<array{name: string, title: string, widths: list<int>, blocks?: array<int, list<array>>, icon?: string, position?: string}>
      */
     private function presets(): array
     {
@@ -249,6 +251,37 @@ final class BuilderModule implements Module
             ['name' => 'three', 'title' => 'Три колонки', 'widths' => [4, 4, 4]],
             ['name' => 'four', 'title' => 'Четыре колонки', 'widths' => [3, 3, 3, 3]],
             ['name' => 'sidebar', 'title' => 'Контент + сайдбар', 'widths' => [9, 3]],
+            [
+                'name' => 'header',
+                'title' => 'Шапка сайта',
+                'icon' => 'regions',
+                'position' => 'start',
+                'widths' => [4, 8],
+                'blocks' => [
+                    [
+                        ['type' => 'heading', 'settings' => ['text' => 'Название сайта', 'level' => 'h2']],
+                    ],
+                    [
+                        ['type' => 'menu', 'settings' => ['source' => 'menu', 'depth' => 2, 'class' => 'site-nav']],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'footer',
+                'title' => 'Подвал сайта',
+                'icon' => 'regions',
+                'widths' => [6, 6],
+                'blocks' => [
+                    [
+                        ['type' => 'heading', 'settings' => ['text' => 'Название сайта', 'level' => 'h3']],
+                        ['type' => 'text', 'settings' => ['body' => 'Коротко о сайте.']],
+                    ],
+                    [
+                        ['type' => 'menu', 'settings' => ['source' => 'menu', 'depth' => 1, 'class' => 'site-nav--footer']],
+                        ['type' => 'text', 'settings' => ['body' => '© ' . date('Y') . ' Все права защищены.']],
+                    ],
+                ],
+            ],
         ];
     }
 
