@@ -145,6 +145,30 @@ php -S localhost:8000 -t public   # dev server
   `service` are elements.
 - Admin: **Документация** (`/admin/docs`) renders `docs/*.md` via `Admin\Docs`.
 
+## Global sections & blocks (added feature)
+
+- `GlobalLibrary` (`modules/builder/src/GlobalLibrary.php`) keeps reusable
+  sections/blocks **outside** the content tree, at
+  `content/_global/<kind>/<name>/item.yaml` (`kind` is `section` or `block`).
+  `content/_global` is skipped by indexing, so a global never shows up as a page
+  or element. Each file holds `title`, `kind`, `order`, `role` and either
+  `section:` (one section payload) or `block:` (one block payload).
+- A page references a global two ways: a section with
+  `settings: {global: <name>}` (section kind) or a block of type `global` with
+  `settings: {name: <name>}` (block kind). `LayoutRenderer::resolveSection()` /
+  `resolveBlock()` swap in the stored payload at render time, so editing a
+  global updates every page that uses it.
+- Admin: `/admin/globals` lists both kinds with a reference count and a role
+  badge; the editor reuses the page canvas via
+  `/admin/builder?global=section:<name>` or `?global=block:<name>`;
+  `POST /admin/builder/global` handles promote/save/delete. "Promote" copies a
+  section or block off a page into the library.
+- `role` on a section (`header` / `footer`) makes it a chrome band rather than
+  body content: `LayoutRenderer::pageShell()` renders it as `<header>`/`<footer>`
+  next to the body, and `renderLayout()` skips role sections in the body. A page
+  without a band falls back to the theme `header`/`footer` partials; an item-less
+  page (cart, contact form) borrows the chrome from the home page.
+
 ## Gotchas
 
 - Local `flatcms` branch tracks `origin/flatcms`; `master` is untouched, no PRs.
