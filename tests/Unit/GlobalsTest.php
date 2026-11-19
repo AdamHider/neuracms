@@ -157,6 +157,68 @@ final class GlobalsTest extends FlatCmsTestCase
         self::assertSame('/shop', $block->get('url'));
     }
 
+    public function testPromoteAcceptsTheFullSectionRowColumnBlockPath(): void
+    {
+        $app = $this->appWithBuilder();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        // A header section sits at index 1, so a path that drops the section index
+        // would hit the wrong block (or none at all).
+        $layout = [
+            'sections' => [
+                ['rows' => [['columns' => [['width' => 12, 'blocks' => [['type' => 'text', 'settings' => ['body' => 'ТЕЛО']]]]]]]],
+                [
+                    'settings' => ['role' => 'header'],
+                    'rows' => [['columns' => [[
+                        'width' => 12,
+                        'blocks' => [['type' => 'button', 'settings' => ['text' => 'Войти', 'url' => '/login']]],
+                    ]]]],
+                ],
+            ],
+        ];
+
+        $response = $app->handle(new Request('POST', '/admin/builder/global', [], [
+            'action' => 'promote',
+            'kind' => 'block',
+            'title' => 'Кнопка входа',
+            'block_index' => '1:0:0:0',
+            'layout_json' => json_encode($layout),
+        ], [], [], []));
+
+        self::assertSame(200, $response->status());
+        $block = (new GlobalLibrary($app->fs))->block('knopka-vhoda');
+        self::assertNotNull($block);
+        self::assertSame('/login', $block->get('url'));
+    }
+
+    public function testPageReferencingAGlobalSectionRendersItsContent(): void
+    {
+        $app = $this->appWithBuilder();
+        $library = new GlobalLibrary($app->fs);
+        $library->save(GlobalLibrary::SECTION, 'site-header', 'Шапка сайта', [
+            'section' => (new Section([
+                new Row([new Column([new Block('text', ['body' => 'ОБЩАЯ-ШАПКА'])], 12)]),
+            ], ['role' => 'header']))->toArray(),
+        ]);
+
+        $this->write('content/about/item.yaml', "type: page\ntitle: О нас\nlayout:\n"
+            . "  sections:\n"
+            . "    - settings: {global: site-header}\n"
+            . "    - rows:\n"
+            . "        - columns:\n"
+            . "            - width: 12\n"
+            . "              blocks:\n"
+            . "                - type: text\n"
+            . "                  settings: { body: ТЕЛО }\n");
+        $app->build();
+
+        $html = $app->handle(new Request('GET', '/about', [], [], [], [], []))->body();
+
+        self::assertStringContainsString('ОБЩАЯ-ШАПКА', $html);
+        self::assertStringContainsString('ТЕЛО', $html);
+    }
+
     public function testGlobalBlockReferenceRendersSharedContent(): void
     {
         $app = $this->appWithBuilder();

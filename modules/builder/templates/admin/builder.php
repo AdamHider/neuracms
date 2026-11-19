@@ -12,6 +12,7 @@
  * @var string|null $globalKind
  * @var string|null $globalName
  * @var array<string, array<string, array>>|null $globals
+ * @var array<string, array<string, string>>|null $globalPreviews
  * @var \FlatCms\Modules\Builder\Layout $layout
  * @var array<string, \FlatCms\Modules\Builder\BlockType> $types
  * @var array<string, list<array>> $categories
@@ -37,6 +38,7 @@ $payload = [
     'menu' => $menu ?? [],
     'media' => array_values($media ?? []),
     'globals' => $globals ?? [],
+    'globalPreviews' => $globalPreviews ?? [],
     'global' => $global,
     'uploadUrl' => '/admin/builder/media',
     'pageId' => $id,
@@ -92,7 +94,7 @@ ob_start();
 
             <div class="builder__globals">
                 <h2><?= $this->icon('global') ?> Глобальные</h2>
-                <p class="muted">Один раз создали — используете на любой странице.</p>
+                <p class="muted">Один раз создали — используете на любой странице. Перетащите на страницу.</p>
                 <div id="builder-globals"></div>
                 <a class="btn btn-sm btn-outline-secondary w-100 mt-2" href="<?= $this->e($this->url('/admin/globals')) ?>">
                     <?= $this->icon('global') ?> Управление глобальными
@@ -117,6 +119,24 @@ ob_start();
                                 </button>
                             </li>
                         <?php endforeach; ?>
+                        <?php
+                        $sectionGlobals = $globals[\FlatCms\Modules\Builder\GlobalLibrary::SECTION] ?? [];
+                        ?>
+                        <?php if ($sectionGlobals !== []): ?>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header"><?= $this->icon('global') ?> Глобальные секции</h6></li>
+                            <?php foreach ($sectionGlobals as $name => $entry): ?>
+                                <li>
+                                    <button class="dropdown-item" type="button" data-global-section-add="<?= $this->e((string) $name) ?>">
+                                        <?= $this->icon($entry['role'] !== '' ? 'section' : 'global') ?>
+                                        <?= $this->e($entry['title']) ?>
+                                        <?php if ($entry['role'] !== ''): ?>
+                                            <span class="builder__badge"><?= $this->e($entry['role'] === 'header' ? 'Шапка' : 'Подвал') ?></span>
+                                        <?php endif; ?>
+                                    </button>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </div>

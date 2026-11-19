@@ -85,6 +85,15 @@
     font-size: .84rem;
     color: #4c1d95;
 }
+.builder__global-body { position: relative; }
+.builder__global-preview {
+    padding: .5rem;
+    overflow: hidden;
+    background: #fff;
+    border-bottom: 1px solid #ddd6fe;
+}
+/* A reference is a window onto the shared copy, so clicks edit rather than select. */
+.builder__global-preview * { pointer-events: none; }
 
 /* ---- Canvas ---- */
 .builder__canvas-wrap { padding: .85rem; }
@@ -214,6 +223,54 @@
 .builder__block-body { display: flex; flex-direction: column; min-width: 0; flex: 1; }
 .builder__block-title { font-size: .88rem; font-weight: 600; }
 .builder__block-summary { font-size: .75rem; color: var(--admin-muted, #6b7280); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.builder__block-actions {
+    display: flex;
+    align-items: center;
+    gap: .1rem;
+    opacity: 0;
+    transition: opacity .12s ease;
+}
+.builder__block:hover .builder__block-actions,
+.builder__block.is-selected .builder__block-actions { opacity: 1; }
+.builder__block-actions .builder__icon-btn { padding: .1rem .25rem; }
+/* A global block reference shows the shared markup inline; it is a preview, so
+   its own controls must not intercept clicks meant for the card. */
+.builder__block-preview {
+    max-width: 12rem;
+    overflow: hidden;
+    padding: 0 .3rem;
+    border-left: 2px solid #ddd6fe;
+    color: var(--admin-muted, #6b7280);
+    font-size: .75rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.builder__block-preview * { display: inline; pointer-events: none; }
+.builder__block-preview p { margin: 0; }
+
+/* Inline "add column" target: sits at the end of the row it appends to. */
+.builder__add-col {
+    flex: 0 0 auto;
+    align-self: stretch;
+    min-width: 3.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .15rem;
+    padding: .4rem;
+    border: 2px dashed var(--admin-line, #e3e8f0);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--admin-muted, #6b7280);
+    font-size: .72rem;
+    cursor: pointer;
+}
+.builder__add-col:hover {
+    border-color: var(--admin-accent, #2563eb);
+    background: #eff6ff;
+    color: var(--admin-accent, #2563eb);
+}
 
 /* ---- Settings ---- */
 .builder__settings { padding: .85rem; position: sticky; top: 72px; }

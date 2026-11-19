@@ -250,22 +250,25 @@
 
     function renderGlobals() {
         if (!globalsEl) { return; }
-        var sectionGlobals = globalCatalog('section');
         var blockGlobals = globalCatalog('block');
         var html = '';
 
-        Object.keys(sectionGlobals).forEach(function (name) {
-            html += '<button type="button" class="builder__particle builder__particle--global" draggable="true"'
-                + ' data-global-section="' + esc(name) + '">'
-                + icon('section') + '<span>' + esc(sectionGlobals[name].title) + '</span></button>';
-        });
         Object.keys(blockGlobals).forEach(function (name) {
             html += '<button type="button" class="builder__particle builder__particle--global" draggable="true"'
                 + ' data-global-block="' + esc(name) + '">'
                 + icon('global') + '<span>' + esc(blockGlobals[name].title) + '</span></button>';
         });
 
-        globalsEl.innerHTML = html || '<p class="muted">Пока нет глобальных секций.</p>';
+        // Global sections are not particles: a section is not something you drop
+        // into a column, so they live in the "Добавить секцию" menu instead.
+        globalsEl.innerHTML = html || '<p class="muted">Пока нет глобальных элементов.</p>';
+    }
+
+    function globalPreview(kind, name) {
+        var previews = config.globalPreviews || {};
+        var bucket = previews[kind] || {};
+
+        return bucket[name] || '';
     }
 
     function renderCanvas() {
@@ -301,15 +304,26 @@
             + '<span class="builder__section-meta">' + rows.length + ' ряд. · ' + countColumns(section) + ' кол.</span>'
             + '<span class="builder-bar__spacer"></span>'
             + '<button type="button" class="builder__icon-btn" data-row-add="' + si + '" title="Добавить ряд">' + icon('add') + '</button>'
-            + '<button type="button" class="builder__icon-btn" data-section-dup="' + si + '" title="Дублировать">' + icon('copy') + '</button>'
+            + (isGlobal ? '' : '<button type="button" class="builder__icon-btn" data-promote-section="' + si + '" title="Сделать глобальной">' + icon('global') + '</button>')
+            + '<button type="button" class="builder__icon-btn" data-section-dup="' + si + '" title="Дублировать секцию">' + icon('copy') + '</button>'
             + '<button type="button" class="builder__icon-btn" data-section-del="' + si + '" title="Удалить секцию">' + icon('delete') + '</button>'
             + '</header>';
 
         if (isGlobal && rows.length === 0) {
             var ref = globalCatalog('section')[section.settings.global];
+            var preview = globalPreview('section', section.settings.global);
+            html += '<div class="builder__global-body">';
+            if (preview !== '') {
+                // The content is rendered by the server: the editor has no
+                // template engine, and a reference stores no rows of its own.
+                html += '<div class="builder__global-preview">' + preview + '</div>';
+            } else {
+                html += '<p class="builder__row-empty muted">Глобальная секция пуста.</p>';
+            }
             html += '<p class="builder__global-ref">' + icon('global') + ' Содержимое берётся из глобальной секции <strong>'
                 + esc(ref ? ref.title : section.settings.global) + '</strong>. '
                 + '<a href="/admin/builder?global=section:' + encodeURIComponent(section.settings.global) + '">Редактировать</a></p>';
+            html += '</div>';
             html += '</section>';
 
             return html;
@@ -351,7 +365,6 @@
             + '<span class="builder__row-title">' + esc(row.title || 'Ряд ' + (ri + 1)) + '</span>'
             + '<span class="builder__row-meta">' + columns.length + ' кол.</span>'
             + '<span class="builder-bar__spacer"></span>'
-            + '<button type="button" class="builder__icon-btn" data-col-add="' + si + ':' + ri + '" title="Добавить колонку">' + icon('add') + '</button>'
             + '<button type="button" class="builder__icon-btn" data-row-del="' + si + ':' + ri + '" title="Удалить ряд">' + icon('delete') + '</button>'
             + '</div>';
 
@@ -359,6 +372,10 @@
         columns.forEach(function (column, ci) {
             html += renderColumn(column, si, ri, ci);
         });
+        // The affordance sits inside the row it appends to, so the target is the
+        // button itself rather than a control in the settings panel.
+        html += '<button type="button" class="builder__add-col" data-col-add="' + si + ':' + ri + '" title="Добавить колонку">'
+            + icon('add') + '<span>Колонка</span></button>';
         html += '</div>';
 
         if (!columns.length) {
@@ -407,6 +424,9 @@
 
     function renderBlockCard(block, si, ri, ci, bi) {
         var summary = summaryFor(block);
+        var path = si + ':' + ri + ':' + ci + ':' + bi;
+        var isGlobalRef = block.type === 'global';
+        var preview = isGlobalRef ? globalPreview('block', block.settings && block.settings.name) : '';
 
         return '<article class="builder__block' + (isSelected([si, ri, ci, bi]) ? ' is-selected' : '') + '" draggable="true"'
             + ' data-drag="block" data-si="' + si + '" data-ri="' + ri + '" data-ci="' + ci + '" data-bi="' + bi + '">'
@@ -414,7 +434,12 @@
             + '<span class="builder__block-icon">' + icon(blockIcon(block)) + '</span>'
             + '<span class="builder__block-body"><span class="builder__block-title">' + esc(blockLabel(block)) + '</span>'
             + (summary ? '<span class="builder__block-summary">' + esc(summary) + '</span>' : '') + '</span>'
-            + '<button type="button" class="builder__icon-btn" data-block-del="' + si + ':' + ri + ':' + ci + ':' + bi + '" title="Удалить">' + icon('delete') + '</button>'
+            + (preview !== '' ? '<span class="builder__block-preview">' + preview + '</span>' : '')
+            + '<span class="builder__block-actions">'
+            + (isGlobalRef ? '' : '<button type="button" class="builder__icon-btn" data-block-promote="' + path + '" title="Сделать глобальным">' + icon('global') + '</button>')
+            + '<button type="button" class="builder__icon-btn" data-block-dup="' + path + '" title="Дублировать">' + icon('copy') + '</button>'
+            + '<button type="button" class="builder__icon-btn" data-block-del="' + path + '" title="Удалить">' + icon('delete') + '</button>'
+            + '</span>'
             + '</article>';
     }
 
@@ -458,7 +483,7 @@
         if (kind === 'section') {
             body.set('index', String(si));
         } else {
-            body.set('block_index', path.slice(1).join(':'));
+            body.set('block_index', path.join(':'));
         }
 
         fetch('/admin/builder/global', {
@@ -610,27 +635,16 @@
 
         html += '<div class="builder__settings-actions">';
         if (kind === 'section') {
-            html += '<button type="button" class="btn btn-sm btn-outline-secondary" data-row-add="' + path[0] + '">'
-                + icon('add') + ' Добавить ряд</button>'
-                + '<button type="button" class="btn btn-sm btn-outline-danger" data-section-del="' + path[0] + '">'
+            html += '<button type="button" class="btn btn-sm btn-outline-danger" data-section-del="' + path[0] + '">'
                 + icon('delete') + ' Удалить секцию</button>';
         } else if (kind === 'row') {
-            html += '<button type="button" class="btn btn-sm btn-outline-secondary" data-col-add="' + path[0] + ':' + path[1] + '">'
-                + icon('add') + ' Добавить колонку</button>'
-                + '<button type="button" class="btn btn-sm btn-outline-danger" data-row-del="' + path[0] + ':' + path[1] + '">'
+            html += '<button type="button" class="btn btn-sm btn-outline-danger" data-row-del="' + path[0] + ':' + path[1] + '">'
                 + icon('delete') + ' Удалить ряд</button>';
         } else if (kind === 'column') {
             html += '<button type="button" class="btn btn-sm btn-outline-danger" data-col-del="' + path.join(':') + '">'
                 + icon('delete') + ' Удалить колонку</button>';
         }
         html += '</div>';
-
-        if (kind === 'section') {
-            html += '<div class="builder__settings-actions builder__settings-actions--globals">'
-                + '<button type="button" class="btn btn-sm btn-outline-secondary" data-promote-section="' + path[0] + '">'
-                + icon('global') + ' Сделать глобальной</button>'
-                + '</div>';
-        }
 
         return html;
     }
@@ -650,18 +664,9 @@
 
         var id = path.join(':');
         html += '<div class="builder__settings-actions">'
-            + '<button type="button" class="btn btn-sm btn-outline-secondary" data-block-dup="' + id + '">'
-            + icon('duplicate') + ' Дублировать</button>'
             + '<button type="button" class="btn btn-sm btn-outline-danger" data-block-del="' + id + '">'
             + icon('delete') + ' Удалить</button>'
             + '</div>';
-
-        if (block.type !== 'global') {
-            html += '<div class="builder__settings-actions builder__settings-actions--globals">'
-                + '<button type="button" class="btn btn-sm btn-outline-secondary" data-promote-block="' + id + '">'
-                + icon('global') + ' Сделать глобальным</button>'
-                + '</div>';
-        }
 
         return html;
     }
@@ -994,9 +999,7 @@
     function onLibraryDragStart(event) {
         var button = event.target.closest('.builder__particle');
         if (!button) { return; }
-        if (button.hasAttribute('data-global-section')) {
-            drag = { kind: 'global-section', name: button.getAttribute('data-global-section') };
-        } else if (button.hasAttribute('data-global-block')) {
+        if (button.hasAttribute('data-global-block')) {
             drag = { kind: 'global-block', name: button.getAttribute('data-global-block') };
         } else {
             drag = { kind: 'new', type: button.getAttribute('data-type') };
@@ -1124,14 +1127,6 @@
             if (!same || (tci !== null && tci !== drag.ci && tci !== drag.ci + 1)) {
                 moveColumn(drag.si, drag.ri, drag.ci, tsi, tri, tci);
             }
-            drag = null;
-
-            return;
-        }
-
-        if (drag.kind === 'global-section') {
-            event.preventDefault();
-            addGlobalSection(drag.name);
             drag = null;
 
             return;
@@ -1533,6 +1528,15 @@
     }
 
     presetsEl.addEventListener('click', function (event) {
+        // Global sections are inserted from this menu, because a section is a
+        // top-level band and cannot be dropped into a column.
+        var globalSection = event.target.closest('[data-global-section-add]');
+        if (globalSection) {
+            addGlobalSection(globalSection.getAttribute('data-global-section-add'));
+
+            return;
+        }
+
         var button = event.target.closest('[data-preset]');
         if (!button) { return; }
         try {
@@ -1544,12 +1548,6 @@
 
     if (globalsEl) {
         globalsEl.addEventListener('click', function (event) {
-            var sectionButton = event.target.closest('[data-global-section]');
-            if (sectionButton) {
-                addGlobalSection(sectionButton.getAttribute('data-global-section'));
-
-                return;
-            }
             var blockButton = event.target.closest('[data-global-block]');
             if (!blockButton) { return; }
 

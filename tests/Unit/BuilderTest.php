@@ -8,8 +8,10 @@ use FlatCms\Admin\UserRepository;
 use FlatCms\Core\Request;
 use FlatCms\Modules\Builder\Block;
 use FlatCms\Modules\Builder\BuilderModule;
+use FlatCms\Modules\Builder\Column;
 use FlatCms\Modules\Builder\Layout;
 use FlatCms\Modules\Builder\LayoutRenderer;
+use FlatCms\Modules\Builder\Row;
 use FlatCms\Modules\Builder\Section;
 use FlatCms\Modules\Builder\TypeRegistry;
 use FlatCms\Tests\FlatCmsTestCase;
@@ -712,7 +714,7 @@ final class BuilderTest extends FlatCmsTestCase
         self::assertStringContainsString('Секция', $page->body());
     }
 
-    public function testPresetsIncludeHeaderAndFooterWithReadyMadeBlocks(): void
+    public function testPresetsAreBodyLayoutsOnly(): void
     {
         $app = $this->appWithBuilder(true);
         (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
@@ -728,15 +730,56 @@ final class BuilderTest extends FlatCmsTestCase
             $presets[$preset['name']] = $preset;
         }
 
-        self::assertArrayHasKey('header', $presets);
-        self::assertArrayHasKey('footer', $presets);
-        self::assertSame([3, 9], $presets['header']['widths']);
-        // The presets carry ready-made blocks so a header/footer can be dropped in.
-        self::assertSame('menu', $presets['header']['blocks'][1][0]['type']);
-        self::assertSame('menu', $presets['footer']['blocks'][1][0]['type']);
-        // Header/footer presets are ordinary sections now — no "области сайта".
-        self::assertArrayNotHasKey('region', $presets['header']);
-        self::assertArrayNotHasKey('region', $presets['footer']);
+        self::assertSame([12], $presets['one']['widths']);
+        self::assertSame([9, 3], $presets['sidebar']['widths']);
+        // Site chrome is a global section, offered from the same menu separately,
+        // so it must not appear here as a preset.
+        self::assertArrayNotHasKey('header', $presets);
+        self::assertArrayNotHasKey('footer', $presets);
+    }
+
+    public function testGlobalSectionsAreOfferedInTheAddSectionMenuNotTheLibrary(): void
+    {
+        $app = $this->appWithBuilder(true);
+        $library = $this->builder($app)->globals();
+        self::assertNotNull($library);
+        $library->save('section', 'site-header', 'Шапка сайта', [
+            'section' => (new Section([
+                new Row([new Column([new Block('text', ['body' => 'ШАПКА'])], 12)]),
+            ], ['role' => 'header']))->toArray(),
+        ]);
+
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $body = $app->handle(new Request('GET', '/admin/builder', ['id' => 'about'], [], [], [], []))->body();
+
+        // The section lives in the "Добавить секцию" dropdown...
+        self::assertStringContainsString('data-global-section-add="site-header"', $body);
+        // ...and its rendered content is shipped so the canvas can show it.
+        self::assertSame(1, preg_match("/data-builder='(.*?)'/s", $body, $m));
+        $payload = json_decode(html_entity_decode($m[1], ENT_QUOTES), true, 512, JSON_THROW_ON_ERROR);
+        self::assertArrayHasKey('site-header', $payload['globalPreviews']['section']);
+        self::assertStringContainsString('ШАПКА', $payload['globalPreviews']['section']['site-header']);
+    }
+
+    public function testGlobalBlockPreviewsAreShippedForTheCanvas(): void
+    {
+        $app = $this->appWithBuilder(true);
+        $this->builder($app)->globals()?->save('block', 'cta', 'Кнопка CTA', [
+            'block' => (new Block('button', ['text' => 'Связаться', 'url' => '/contact']))->toArray(),
+        ]);
+
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $body = $app->handle(new Request('GET', '/admin/builder', ['id' => 'about'], [], [], [], []))->body();
+
+        self::assertSame(1, preg_match("/data-builder='(.*?)'/s", $body, $m));
+        $payload = json_decode(html_entity_decode($m[1], ENT_QUOTES), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertArrayHasKey('cta', $payload['globalPreviews']['block']);
+        self::assertStringContainsString('Связаться', $payload['globalPreviews']['block']['cta']);
     }
 
     public function testHeaderAndFooterPresetsRenderAsSections(): void

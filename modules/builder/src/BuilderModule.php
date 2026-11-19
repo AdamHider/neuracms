@@ -212,6 +212,7 @@ final class BuilderModule implements Module
             'elements' => $this->elementTypes(),
             'menu' => $this->menuSources(),
             'globals' => $this->globals?->catalog() ?? [],
+            'globalPreviews' => $this->globalPreviews(),
             'media' => $app->admin->media()?->list($id) ?? [],
             'columns' => (int) $app->config->get('builder.grid_columns', 12),
             'saved' => $request->query('saved') === '1',
@@ -265,6 +266,7 @@ final class BuilderModule implements Module
             'elements' => $this->elementTypes(),
             'menu' => $this->menuSources(),
             'globals' => $library->catalog(),
+            'globalPreviews' => $this->globalPreviews(),
             'media' => [],
             'columns' => $this->gridColumns(),
             'saved' => $request->query('saved') === '1',
@@ -399,7 +401,7 @@ final class BuilderModule implements Module
             $fallback = (string) $section->get('title', 'section');
         } else {
             // Current path is section:row:column:block. A three-part path comes
-            // from layouts saved before rows existed, so it names column 0.
+            // from layouts saved before rows existed, so it names row 0.
             $path = array_map('intval', explode(':', (string) $request->input('block_index', '0:0:0:0')));
             if (count($path) >= 4) {
                 [$si, $ri, $ci, $bi] = $path;
@@ -589,14 +591,14 @@ final class BuilderModule implements Module
     }
 
     /**
-     * Ready-made sections ("presets"). Each carries a name, a title and the
-     * column widths of its first row; some also carry ready-made blocks, so the
-     * "Добавить секцию" menu can drop in a header or a footer in one click.
+     * Ready-made body sections ("presets"). Each carries a name, a title and the
+     * column widths of its first row.
      *
      * A preset is plain data: widths become one row, so nothing here needs a
-     * dedicated particle type.
+     * dedicated particle type. Site chrome is not a preset — a header or footer
+     * is a global section, offered from the same menu by the editor.
      *
-     * @return list<array{name: string, title: string, widths: list<int>, blocks?: array<int, list<array>>, icon?: string, position?: string, role?: string, settings?: array<string, mixed>}>
+     * @return list<array{name: string, title: string, widths: list<int>, icon?: string}>
      */
     private function presets(): array
     {
@@ -607,41 +609,39 @@ final class BuilderModule implements Module
             ['name' => 'three', 'title' => 'Три колонки', 'widths' => [4, 4, 4]],
             ['name' => 'four', 'title' => 'Четыре колонки', 'widths' => [3, 3, 3, 3]],
             ['name' => 'sidebar', 'title' => 'Контент + сайдбар', 'widths' => [9, 3]],
-            [
-                'name' => 'header',
-                'title' => 'Шапка сайта',
-                'icon' => 'menu',
-                'position' => 'start',
-                'role' => 'header',
-                'widths' => [3, 9],
-                'settings' => ['align' => 'center'],
-                'blocks' => [
-                    [
-                        ['type' => 'heading', 'settings' => ['text' => 'Название сайта', 'level' => 'h2']],
-                    ],
-                    [
-                        ['type' => 'menu', 'settings' => ['source' => 'pages', 'depth' => 2, 'class' => 'site-nav', 'orientation' => 'horizontal']],
-                    ],
-                ],
-            ],
-            [
-                'name' => 'footer',
-                'title' => 'Подвал сайта',
-                'icon' => 'menu',
-                'role' => 'footer',
-                'widths' => [6, 6],
-                'blocks' => [
-                    [
-                        ['type' => 'heading', 'settings' => ['text' => 'Название сайта', 'level' => 'h3']],
-                        ['type' => 'text', 'settings' => ['body' => 'Коротко о сайте.']],
-                    ],
-                    [
-                        ['type' => 'menu', 'settings' => ['source' => 'pages', 'depth' => 1, 'class' => 'site-nav--footer']],
-                        ['type' => 'text', 'settings' => ['body' => '© ' . date('Y') . ' Все права защищены.']],
-                    ],
-                ],
-            ],
         ];
+    }
+
+    /**
+     * Server-rendered markup for every global, so the canvas can show what a
+     * reference actually contains instead of a placeholder note. The editor has
+     * no template engine, so the HTML is produced here.
+     *
+     * @return array<string, array<string, string>>
+     */
+    private function globalPreviews(): array
+    {
+        $out = [GlobalLibrary::SECTION => [], GlobalLibrary::BLOCK => []];
+        $library = $this->globals;
+        $renderer = $this->renderer;
+        if ($library === null || $renderer === null) {
+            return $out;
+        }
+
+        foreach (array_keys($library->all(GlobalLibrary::SECTION)) as $name) {
+            $section = $library->section((string) $name);
+            if ($section !== null) {
+                $out[GlobalLibrary::SECTION][$name] = $renderer->renderSection($section);
+            }
+        }
+        foreach (array_keys($library->all(GlobalLibrary::BLOCK)) as $name) {
+            $block = $library->block((string) $name);
+            if ($block !== null) {
+                $out[GlobalLibrary::BLOCK][$name] = $renderer->renderBlock($block);
+            }
+        }
+
+        return $out;
     }
 
     private function save(Request $request): Response
