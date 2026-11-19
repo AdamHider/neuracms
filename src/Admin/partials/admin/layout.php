@@ -16,6 +16,7 @@ $nav = [
     ['key' => 'dashboard', 'icon' => 'dashboard', 'label' => 'Панель', 'href' => '/admin'],
     ['key' => 'pages', 'icon' => 'content', 'label' => 'Страницы', 'href' => '/admin/pages'],
     ['key' => 'elements', 'icon' => 'elements', 'label' => 'Элементы', 'href' => '/admin/elements'],
+    ['key' => 'globals', 'icon' => 'global', 'label' => 'Глобальные секции', 'href' => '/admin/globals'],
     ['key' => 'types', 'icon' => 'types', 'label' => 'Типы контента', 'href' => '/admin/types'],
     ['key' => 'docs', 'icon' => 'docs', 'label' => 'Документация', 'href' => '/admin/docs'],
 ];

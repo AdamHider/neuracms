@@ -65,4 +65,14 @@ final class TemplateContext
     {
         return $this->renderer->layout($item);
     }
+
+    /**
+     * Wrap a page body in the site chrome: the header band, the body and the
+     * footer band, all at the same level. A page that defines its own header or
+     * footer section uses it; otherwise the theme partials are used.
+     */
+    public function page(mixed $item, string $body = ''): string
+    {
+        return $this->renderer->page($item, $body);
+    }
 }

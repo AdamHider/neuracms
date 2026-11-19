@@ -1,18 +1,12 @@
 <?php
 /**
- * A page's appearance comes entirely from the builder layout. With no blocks the
- * page renders empty — the builder is the single source of truth for pages.
+ * A page renders flat: its header band, its sections and its footer band are all
+ * siblings at the top level of the body. The builder layout is the only source of
+ * the page's look, so a page without sections renders just the chrome.
  *
  * @var \FlatCms\Content\Item $item
  * @var \FlatCms\App $app
  * @var \FlatCms\Http\TemplateContext $this
  */
-$layout = $this->layout($item);
-ob_start();
-?>
-<article class="item item--<?= $this->e($item->type()) ?>">
-    <?= $layout ?>
-</article>
-<?php
-$content = ob_get_clean();
-echo $this->partial('layout', ['content' => $content, 'item' => $item, 'title' => $item->title()]);
+$body = $this->layout($item);
+echo $this->partial('layout', ['content' => $body, 'item' => $item, 'title' => $item->title()]);

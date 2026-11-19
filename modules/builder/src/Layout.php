@@ -63,10 +63,58 @@ final class Layout
     }
 
     /**
+     * The section carrying a structural role ("header"/"footer"), if any.
+     */
+    public function withRole(string $role): ?Section
+    {
+        foreach ($this->sections as $section) {
+            if ($section->role() === $role) {
+                return $section;
+            }
+        }
+
+        return null;
+    }
+
+    public function hasRole(string $role): bool
+    {
+        return $this->withRole($role) !== null;
+    }
+
+    /**
+     * Sections in page order: the header band first, the footer band last, the
+     * body in between. Editing keeps the stored order, this only normalises how
+     * the three bands are laid out when rendering and in the editor canvas.
+     *
+     * @return list<Section>
+     */
+    public function ordered(): array
+    {
+        $head = [];
+        $body = [];
+        $tail = [];
+        foreach ($this->sections as $section) {
+            $role = $section->role();
+            if ($role === 'header') {
+                $head[] = $section;
+            } elseif ($role === 'footer') {
+                $tail[] = $section;
+            } else {
+                $body[] = $section;
+            }
+        }
+
+        return [...$head, ...$body, ...$tail];
+    }
+
+    /**
      * Build a layout from the raw "layout" value of item.yaml. Accepts:
      *  - ["sections" => [...]]  (current format)
      *  - ["blocks" => [...], "grid" => [...]]  (legacy)
      *  - a plain list of blocks (legacy)
+     *
+     * A hand-written page may carry both keys; the legacy blocks are then
+     * appended as their own sections so neither half disappears.
      */
     public static function fromValue(mixed $value, int $columns = 12): self
     {
@@ -81,6 +129,15 @@ final class Layout
                 if (is_array($entry)) {
                     $sections[] = Section::fromArray($entry, $columns);
                 }
+            }
+
+            if (isset($value['blocks']) && is_array($value['blocks'])) {
+                $legacy = self::sectionsFromFlatBlocks(
+                    $value['blocks'],
+                    self::parseGrid($value['grid'] ?? null),
+                    $columns,
+                );
+                $sections = [...$sections, ...$legacy];
             }
 
             return new self($sections, $columns);

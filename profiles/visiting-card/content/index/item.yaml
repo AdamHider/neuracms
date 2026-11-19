@@ -5,7 +5,8 @@ published: true
 show_in_menu: true
 layout:
   sections:
-    - columns:
+    - settings: {role: header}
+      columns:
         - width: 4
           blocks:
             - type: heading
@@ -41,13 +42,12 @@ layout:
                   - {type: text, settings: {body: 'Обновляем и сопровождаем запущенные проекты.'}}
             - type: button
               settings: {text: 'Обсудить проект', url: /contact, style: primary}
-    - columns:
+    - settings: {role: footer}
+      columns:
         - width: 12
           blocks:
-            - type: heading
-              settings: {text: 'Подвал сайта', level: h3}
             - type: text
-              settings: {body: 'Сайты для малого бизнеса с 2016 года.'}
+              settings: {body: '© Студия «Верста». Сайты для малого бизнеса с 2016 года.'}
             - type: menu
               settings:
                 source: pages

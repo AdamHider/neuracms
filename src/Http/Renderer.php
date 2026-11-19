@@ -23,6 +23,9 @@ final class Renderer implements Subsystem
     /** @var callable|null */
     private $layoutResolver = null;
 
+    /** @var callable|null */
+    private $pageResolver = null;
+
     public function __construct(private readonly Events $events)
     {
     }
@@ -80,6 +83,25 @@ final class Renderer implements Subsystem
         }
 
         return (string) ($this->layoutResolver)($item);
+    }
+
+    /**
+     * The builder module registers a page resolver so a template can wrap its
+     * body in the site chrome (header band, body, footer band) and keep the page
+     * structure flat. Without the module the theme partials do that job.
+     */
+    public function setPageResolver(?callable $resolver): void
+    {
+        $this->pageResolver = $resolver;
+    }
+
+    public function page(mixed $item, string $body = ''): string
+    {
+        if ($this->pageResolver !== null) {
+            return (string) ($this->pageResolver)($item, $body);
+        }
+
+        return $this->partial('header', ['item' => $item]) . $body . $this->partial('footer', ['item' => $item]);
     }
 
     public function render(Item $item, array $data = []): string

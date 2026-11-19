@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FlatCms\Modules\Builder;
 
 use FlatCms\App;
+use FlatCms\Content\Item;
 use FlatCms\Content\Schema;
 use FlatCms\Contracts\Module;
 use FlatCms\Core\Request;
@@ -13,6 +14,7 @@ use FlatCms\Modules\Builder\Types\ButtonType;
 use FlatCms\Modules\Builder\Types\ColumnsType;
 use FlatCms\Modules\Builder\Types\DividerType;
 use FlatCms\Modules\Builder\Types\ElementsType;
+use FlatCms\Modules\Builder\Types\GlobalBlockType;
 use FlatCms\Modules\Builder\Types\HeadingType;
 use FlatCms\Modules\Builder\Types\HtmlType;
 use FlatCms\Modules\Builder\Types\ImageType;
@@ -35,18 +37,28 @@ final class BuilderModule implements Module
 
     private ?LayoutRenderer $renderer = null;
 
+    private ?GlobalLibrary $globals = null;
+
     public function boot(App $app): void
     {
         $this->app = $app;
-        $app->config->mergeFile('modules/builder/config/config.yaml');
+        $app->config->mergeDefaults('modules/builder/config/config.yaml');
 
         $this->types = new TypeRegistry($app->events);
         $this->registerCoreTypes();
-        $this->renderer = new LayoutRenderer($app, $this->types, $app->events);
+        $this->globals = new GlobalLibrary($app->fs);
+        $this->renderer = new LayoutRenderer($app, $this->types, $app->events, $this->globals);
 
         // Templates call $this->layout($item); the resolver renders the blocks.
         $app->renderer->setLayoutResolver(function (mixed $value) use ($app): string {
             return $this->renderer?->renderValue($value) ?? '';
+        });
+
+        // $this->page($item, $body) wraps a body in the header/body/footer bands.
+        $app->renderer->setPageResolver(function (mixed $item, string $body = ''): string {
+            // Pages without an item (cart, contact form) still get the chrome,
+            // taken from the home page.
+            return $this->renderer?->pageShell($item instanceof Item ? $item : null, $body) ?? $body;
         });
 
         $router = $app->router;
@@ -54,6 +66,8 @@ final class BuilderModule implements Module
         $router->add('POST', '/admin/builder/save', fn (Request $r) => $this->save($r));
         $router->add('POST', '/admin/builder/media', fn (Request $r) => $this->uploadMedia($r));
         $router->add('GET', '/admin/builder/types', fn (Request $r) => $this->typesApi($r));
+        $router->add('POST', '/admin/builder/global', fn (Request $r) => $this->globalAction($r));
+        $router->add('GET', '/admin/globals', fn (Request $r) => $this->globalsPage($r));
     }
 
     public function build(): void
@@ -68,6 +82,11 @@ final class BuilderModule implements Module
     public function renderer(): ?LayoutRenderer
     {
         return $this->renderer;
+    }
+
+    public function globals(): ?GlobalLibrary
+    {
+        return $this->globals;
     }
 
     private function registerCoreTypes(): void
@@ -91,6 +110,7 @@ final class BuilderModule implements Module
             new DividerType(),
             new SpacerType(),
             new HtmlType(),
+            new GlobalBlockType(),
         ] as $type) {
             $registry->register($type);
         }
@@ -148,6 +168,14 @@ final class BuilderModule implements Module
         }
 
         $app = $this->requireApp();
+
+        // A global is edited on the same canvas but saved to the library, not to
+        // a page. ?global=section:main-header or ?global=block:cta.
+        $global = (string) $request->query('global', '');
+        if ($global !== '') {
+            return $this->globalEditor($global, $request);
+        }
+
         $id = (string) $request->query('id', '');
         if ($id === '') {
             return Response::redirect('/admin/pages', 302);
@@ -175,11 +203,241 @@ final class BuilderModule implements Module
             'presets' => $this->presets(),
             'elements' => $this->elementTypes(),
             'menu' => $this->menuSources(),
+            'globals' => $this->globals?->catalog() ?? [],
             'media' => $app->admin->media()?->list($id) ?? [],
             'columns' => (int) $app->config->get('builder.grid_columns', 12),
             'saved' => $request->query('saved') === '1',
             'error' => (string) $request->query('error', ''),
         ]));
+    }
+
+    /**
+     * Editor for one global, either a shared section or a shared block. A section
+     * global is edited as a one-section layout so the canvas and the settings
+     * panel work exactly as they do for a page.
+     */
+    private function globalEditor(string $spec, Request $request): Response
+    {
+        $app = $this->requireApp();
+        [$kind, $name] = $this->splitGlobal($spec);
+        $library = $this->globals;
+        if ($library === null || $name === '') {
+            return Response::redirect('/admin/globals', 303);
+        }
+
+        if ($kind === GlobalLibrary::SECTION) {
+            $stored = $library->read(GlobalLibrary::SECTION, $name);
+            if ($stored === null || !is_array($stored['section'] ?? null)) {
+                return Response::html($app->renderer->renderTemplate('admin/404', ['title' => 'Не найдено']), 404);
+            }
+            $layout = new Layout([Section::fromArray($stored['section'])], $this->gridColumns());
+        } else {
+            $block = $library->block($name);
+            if ($block === null) {
+                return Response::html($app->renderer->renderTemplate('admin/404', ['title' => 'Не найдено']), 404);
+            }
+            $layout = new Layout([
+                new Section([new Column([$block], $this->gridColumns())]),
+            ], $this->gridColumns());
+        }
+
+        $data = $library->read($kind, $name) ?? [];
+
+        return Response::html($app->renderer->renderTemplate('admin/builder', [
+            'item' => null,
+            'id' => '',
+            'global' => $kind . ':' . $name,
+            'globalTitle' => (string) ($data['title'] ?? $name),
+            'globalKind' => $kind,
+            'globalName' => $name,
+            'layout' => $layout,
+            'types' => $this->types?->all() ?? [],
+            'categories' => $this->categories(),
+            'presets' => $this->presets(),
+            'elements' => $this->elementTypes(),
+            'menu' => $this->menuSources(),
+            'globals' => $library->catalog(),
+            'media' => [],
+            'columns' => $this->gridColumns(),
+            'saved' => $request->query('saved') === '1',
+            'error' => (string) $request->query('error', ''),
+        ]));
+    }
+
+    /**
+     * The list of reusable sections and blocks, so an author can see what exists
+     * and jump straight into editing one.
+     */
+    private function globalsPage(Request $request): Response
+    {
+        if (!$this->isAdmin()) {
+            return Response::redirect('/admin/login', 302);
+        }
+
+        $app = $this->requireApp();
+        $catalog = $this->globals?->catalog() ?? [GlobalLibrary::SECTION => [], GlobalLibrary::BLOCK => []];
+
+        // Usage counts: how many pages reference each global.
+        $usage = [];
+        foreach ($app->storage->scan() as $id) {
+            $item = $app->storage->load($id);
+            if ($item === null) {
+                continue;
+            }
+            $layout = Layout::fromValue($item->get('layout'), $this->gridColumns());
+            foreach ($layout->sections() as $section) {
+                $ref = trim((string) $section->get('global', ''));
+                if ($ref !== '') {
+                    $usage[GlobalLibrary::SECTION . ':' . $ref] = ($usage[GlobalLibrary::SECTION . ':' . $ref] ?? 0) + 1;
+                }
+            }
+            foreach ($layout->blocks() as $block) {
+                if ($block->type !== GlobalBlockType::NAME) {
+                    continue;
+                }
+                $ref = trim((string) $block->get('name', ''));
+                if ($ref !== '') {
+                    $usage[GlobalLibrary::BLOCK . ':' . $ref] = ($usage[GlobalLibrary::BLOCK . ':' . $ref] ?? 0) + 1;
+                }
+            }
+        }
+
+        return Response::html($app->renderer->renderTemplate('admin/globals', [
+            'globals' => $catalog,
+            'usage' => $usage,
+            'saved' => $request->query('saved') === '1',
+            'error' => (string) $request->query('error', ''),
+        ]));
+    }
+
+    /**
+     * Promote, update or drop a global. The editor posts the whole canvas, so the
+     * same action covers "make this section global" and "save the global".
+     */
+    private function globalAction(Request $request): Response
+    {
+        if (!$this->isAdmin()) {
+            return Response::redirect('/admin/login', 302);
+        }
+
+        $app = $this->requireApp();
+        $library = $this->globals;
+        if ($library === null) {
+            return Response::json(['error' => 'Модуль не загружен.'], 500);
+        }
+
+        $action = (string) $request->input('action', 'save');
+        [$kind, $name] = $this->splitGlobal((string) $request->input('global', ''));
+        $back = (string) $request->input('back', '');
+
+        if ($action === 'delete') {
+            $library->delete($kind, $name);
+
+            return $this->globalRedirect($back, $request, 'deleted=1');
+        }
+
+        if ($action === 'promote') {
+            return $this->promote($request, $library);
+        }
+
+        $title = trim((string) $request->input('title', ''));
+        $layout = $this->sanitize($this->readLayout($request), $this->gridColumns());
+
+        if ($kind === GlobalLibrary::SECTION) {
+            $section = $layout->sections()[0] ?? null;
+            if ($section === null) {
+                return $this->globalRedirect($back, $request, 'error=' . rawurlencode('Пустая секция.'));
+            }
+            if ($name === '') {
+                $name = $library->uniqueName(GlobalLibrary::SECTION, $title !== '' ? $title : $section->get('title', 'section'));
+            }
+            $payload = ['section' => $section->toArray()];
+        } else {
+            $block = $layout->blocks()[0] ?? null;
+            if ($block === null) {
+                return $this->globalRedirect($back, $request, 'error=' . rawurlencode('Пустой элемент.'));
+            }
+            if ($name === '') {
+                $name = $library->uniqueName(GlobalLibrary::BLOCK, $title !== '' ? $title : $block->type);
+            }
+            $payload = ['block' => $block->toArray()];
+        }
+
+        $library->save($kind, $name, $title !== '' ? $title : $name, $payload);
+
+        return $this->globalRedirect($back, $request, 'saved=1');
+    }
+
+    /**
+     * Copy one section or block out of a page layout into the library and answer
+     * with the name the editor should reference. The editor then replaces its
+     * local copy with that reference, so the page stops carrying a duplicate.
+     */
+    private function promote(Request $request, GlobalLibrary $library): Response
+    {
+        $kind = (string) $request->input('kind', GlobalLibrary::SECTION) === GlobalLibrary::BLOCK
+            ? GlobalLibrary::BLOCK
+            : GlobalLibrary::SECTION;
+        $title = trim((string) $request->input('title', ''));
+        $layout = $this->sanitize($this->readLayout($request), $this->gridColumns());
+
+        if ($kind === GlobalLibrary::SECTION) {
+            $index = (int) $request->input('index', -1);
+            $section = $layout->sections()[$index] ?? null;
+            if ($section === null) {
+                return Response::json(['error' => 'Секция не найдена.'], 422);
+            }
+            $payload = ['section' => $section->toArray()];
+            $fallback = (string) $section->get('title', 'section');
+        } else {
+            $path = explode(':', (string) $request->input('block_index', '0:0'));
+            $si = (int) ($path[0] ?? 0);
+            $ci = (int) ($path[1] ?? 0);
+            $bi = (int) ($path[2] ?? 0);
+            $columns = $layout->sections()[$si]?->columns() ?? [];
+            $block = $columns[$ci]?->blocks()[$bi] ?? null;
+            if ($block === null) {
+                return Response::json(['error' => 'Элемент не найден.'], 422);
+            }
+            $payload = ['block' => $block->toArray()];
+            $fallback = $block->type;
+        }
+
+        $name = $library->uniqueName($kind, $title !== '' ? $title : $fallback);
+        $library->save($kind, $name, $title !== '' ? $title : $name, $payload);
+
+        return Response::json(['name' => $name, 'kind' => $kind, 'title' => $title !== '' ? $title : $name]);
+    }
+
+    private function globalRedirect(string $back, Request $request, string $query): Response
+    {
+        $separator = str_contains($back, '?') ? '&' : '?';
+        if ($back !== '') {
+            return Response::redirect($back . $separator . $query, 303);
+        }
+
+        return Response::redirect('/admin/globals?' . $query, 303);
+    }
+
+    /**
+     * @return array{0: string, 1: string}
+     */
+    private function splitGlobal(string $spec): array
+    {
+        $spec = trim($spec);
+        if ($spec === '') {
+            return [GlobalLibrary::SECTION, ''];
+        }
+        $parts = explode(':', $spec, 2);
+        $kind = $parts[0] === GlobalLibrary::BLOCK ? GlobalLibrary::BLOCK : GlobalLibrary::SECTION;
+        $name = trim($parts[1] ?? '');
+
+        return [$kind, $this->globals?->slug($name) ?? $name];
+    }
+
+    private function gridColumns(): int
+    {
+        return (int) $this->requireApp()->config->get('builder.grid_columns', 12);
     }
 
     /**
@@ -256,6 +514,7 @@ final class BuilderModule implements Module
                 'title' => 'Шапка сайта',
                 'icon' => 'menu',
                 'position' => 'start',
+                'role' => 'header',
                 'widths' => [4, 8],
                 'blocks' => [
                     [
@@ -270,6 +529,7 @@ final class BuilderModule implements Module
                 'name' => 'footer',
                 'title' => 'Подвал сайта',
                 'icon' => 'menu',
+                'role' => 'footer',
                 'widths' => [6, 6],
                 'blocks' => [
                     [
@@ -292,6 +552,13 @@ final class BuilderModule implements Module
         }
 
         $app = $this->requireApp();
+
+        // Saving from a global editor writes to the library, not to a page.
+        $global = (string) $request->input('global', '');
+        if ($global !== '') {
+            return $this->globalAction($request);
+        }
+
         $id = (string) $request->input('id', '');
         $item = $app->storage->load($id);
         if ($item === null) {
@@ -451,12 +718,14 @@ final class BuilderModule implements Module
             $columnsData[] = new Column($blocks, $columns);
         }
 
-        if ($columnsData === []) {
-            return null;
-        }
-
         $settings = $this->sanitizeSettings($raw['settings'] ?? []);
         $id = isset($raw['id']) && is_string($raw['id']) ? $raw['id'] : null;
+
+        // A section that only points at a global keeps no columns of its own.
+        $isGlobalRef = trim((string) ($settings['global'] ?? '')) !== '';
+        if ($columnsData === [] && !$isGlobalRef) {
+            return null;
+        }
 
         return new Section($columnsData, $settings, $id);
     }

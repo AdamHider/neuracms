@@ -58,6 +58,7 @@ final class Icons
         'list' => 'list-ul',
         'menu' => 'menu-button-wide',
         'docs' => 'journal-richtext',
+        'global' => 'globe2',
         'duplicate' => 'copy',
         'move-up' => 'arrow-up',
         'move-down' => 'arrow-down',

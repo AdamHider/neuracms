@@ -13,7 +13,7 @@ ob_start();
 
     <?php if ($lines === []): ?>
         <p>Корзина пуста.</p>
-        <p><a href="<?= $this->e($this->url('/products')) ?>">Перейти в каталог</a></p>
+        <p><a href="<?= $this->e($this->url((string) $app->config->get('shop.catalog_url', '/products'))) ?>">Перейти в каталог</a></p>
     <?php else: ?>
         <form method="post" action="<?= $this->e($this->url('/cart/update')) ?>">
             <table class="cart__table">
@@ -23,7 +23,14 @@ ob_start();
                 <tbody>
                 <?php foreach ($lines as $sku => $line): ?>
                     <tr>
-                        <td><a href="<?= $this->e($this->url('/product/' . $line->itemId)) ?>"><?= $this->e($line->title) ?></a></td>
+                        <?php $product = $app->storage->load($line->itemId); ?>
+                        <td>
+                            <?php if ($product !== null): ?>
+                                <a href="<?= $this->e($this->url($product->url())) ?>"><?= $this->e($line->title) ?></a>
+                            <?php else: ?>
+                                <?= $this->e($line->title) ?>
+                            <?php endif; ?>
+                        </td>
                         <td><?= $this->e(number_format($line->price, 0, '.', ' ')) ?> <?= $this->e($currency) ?></td>
                         <td><input type="number" name="qty[<?= $this->e($sku) ?>]" value="<?= (int) $line->qty ?>" min="0"></td>
                         <td><?= $this->e(number_format($line->total(), 0, '.', ' ')) ?> <?= $this->e($currency) ?></td>

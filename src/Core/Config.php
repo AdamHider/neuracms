@@ -56,4 +56,13 @@ final class Config implements Subsystem
     {
         $this->data = Arr::merge($this->data, $this->fs->readYaml($path, []));
     }
+
+    /**
+     * Merge module defaults, which lose to values already loaded from
+     * config/site.yaml so a site can always override a module setting.
+     */
+    public function mergeDefaults(string $path): void
+    {
+        $this->data = Arr::merge($this->fs->readYaml($path, []), $this->data);
+    }
 }

@@ -6,6 +6,8 @@ cache:
   enabled: true
   check: true
 debug: true
+shop:
+  catalog_url: /catalog
 modules:
   builder: { enabled: true }
   shop: { enabled: true }

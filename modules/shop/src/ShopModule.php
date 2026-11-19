@@ -34,7 +34,7 @@ final class ShopModule implements Module
     public function boot(App $app): void
     {
         $this->app = $app;
-        $app->config->mergeFile('modules/shop/config/config.yaml');
+        $app->config->mergeDefaults('modules/shop/config/config.yaml');
 
         $this->cart = new Cart($app->session());
         $this->orders = new OrderRepository($app->fs);

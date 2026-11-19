@@ -107,20 +107,55 @@ final class ProfilesTest extends FlatCmsTestCase
 
         $body = $this->get($app, '/')->body();
 
-        // No "области сайта" anymore: the theme's own header/footer partials
-        // render the site chrome, and a page can carry header/footer sections.
-        self::assertStringContainsString('site-header__inner', $body);
+        // The page carries its own header/footer sections, so they replace the
+        // theme chrome instead of stacking on top of it.
+        self::assertSame(1, substr_count($body, '<header'));
+        self::assertSame(1, substr_count($body, '<footer'));
         self::assertStringContainsString('site-nav', $body);
         self::assertStringContainsString('site-footer', $body);
 
         // Header/footer builder sections live on the page, like any other section.
         self::assertStringContainsString('block--menu', $body);
-        self::assertStringContainsString('Подвал сайта', $body);
         self::assertStringContainsString('Сайты для малого бизнеса с 2016 года.', $body);
+        self::assertSame(1, substr_count($body, '<header class="site-header"'));
+        self::assertSame(1, substr_count($body, '<footer class="site-footer"'));
 
         // The menu particle is sourced from pages filtered by the "Показывать в
         // меню" property, so a page that opts in shows up in the navigation.
         self::assertStringContainsString('>Услуги<', $body);
+    }
+
+    public function testModuleNavLinkDoesNotRepeatAContentPage(): void
+    {
+        $app = $this->install('corporate');
+
+        $body = $this->get($app, '/')->body();
+
+        // /contacts is a content page and the contact-form module also injects a
+        // "Контакты" link; only one of them may reach the menu.
+        self::assertSame(1, substr_count($body, '>Контакты</a>'));
+    }
+
+    public function testSiteConfigOverridesModuleDefaults(): void
+    {
+        $app = $this->install('shop');
+
+        self::assertSame('/catalog', $app->config->get('shop.catalog_url'));
+
+        $body = $this->get($app, '/cart')->body();
+        self::assertStringContainsString('href="/catalog"', $body);
+        self::assertStringNotContainsString('href="/products"', $body);
+    }
+
+    public function testProfilePagesKeepTheDocumentShell(): void
+    {
+        foreach (['visiting-card' => '/', 'corporate' => '/about', 'shop' => '/catalog/teapot'] as $profile => $path) {
+            $body = $this->get($this->install($profile), $path)->body();
+
+            self::assertStringStartsWith('<!DOCTYPE html>', $body, $profile);
+            self::assertStringContainsString('<head>', $body, $profile);
+            self::assertStringContainsString('</body>', $body, $profile);
+        }
     }
 
     public function testCorporateProfileDisablesTheShop(): void

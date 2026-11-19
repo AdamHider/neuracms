@@ -49,6 +49,18 @@ final class Section
     }
 
     /**
+     * Structural role of the section: "header" and "footer" render as the site
+     * chrome instead of an ordinary band, everything else is a plain section.
+     * Roles also tell the builder where a section belongs in the page order.
+     */
+    public function role(): string
+    {
+        $role = (string) $this->get('role', '');
+
+        return in_array($role, ['header', 'footer'], true) ? $role : '';
+    }
+
+    /**
      * @return list<Block>
      */
     public function blocks(): array

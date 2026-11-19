@@ -22,7 +22,7 @@ final class ContactFormModule implements Module
     {
         $this->app = $app;
 
-        $app->config->mergeFile('modules/contact-form/config/config.yaml');
+        $app->config->mergeDefaults('modules/contact-form/config/config.yaml');
 
         $app->router->add('GET', '/contact', fn (Request $request, array $params): Response => $this->page($request));
         $app->router->add('POST', '/contact', fn (Request $request, array $params): Response => $this->submit($request));

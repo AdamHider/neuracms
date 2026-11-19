@@ -7,6 +7,11 @@
  *
  * @var \FlatCms\Content\Item|null $item
  * @var string $id
+ * @var string|null $global      "section:name" / "block:name" when editing a global
+ * @var string|null $globalTitle
+ * @var string|null $globalKind
+ * @var string|null $globalName
+ * @var array<string, array<string, array>>|null $globals
  * @var \FlatCms\Modules\Builder\Layout $layout
  * @var array<string, \FlatCms\Modules\Builder\BlockType> $types
  * @var array<string, list<array>> $categories
@@ -19,6 +24,10 @@
  * @var string $error
  * @var \FlatCms\Http\TemplateContext $this
  */
+$global = $global ?? null;
+$globalKind = $globalKind ?? null;
+$globalName = $globalName ?? null;
+$isGlobal = $global !== null && $global !== '';
 $payload = [
     'layout' => $layout->toArray(),
     'types' => array_values(array_map(static fn ($t): array => $t->toArray(), $types)),
@@ -27,13 +36,17 @@ $payload = [
     'elements' => $elements ?? [],
     'menu' => $menu ?? [],
     'media' => array_values($media ?? []),
+    'globals' => $globals ?? [],
+    'global' => $global,
     'uploadUrl' => '/admin/builder/media',
     'pageId' => $id,
     'mediaId' => $id,
     'columns' => $columns,
     'icons' => \FlatCms\Admin\Icons::all(),
 ];
-$title = 'Конструктор: ' . $item?->title();
+$title = $isGlobal
+    ? 'Глобальная ' . ($globalKind === \FlatCms\Modules\Builder\GlobalLibrary::BLOCK ? 'элемент' : 'секция') . ': ' . ($globalTitle ?? $globalName)
+    : 'Конструктор: ' . $item?->title();
 ob_start();
 ?>
 <?php if (!empty($saved)): ?><p class="notice"><?= $this->icon('check') ?> Сохранено.</p><?php endif; ?>
@@ -42,17 +55,32 @@ ob_start();
 <div class="builder-bar">
     <button type="button" class="btn btn-sm btn-outline-secondary" data-builder-back="1"><?= $this->icon('up') ?> Назад</button>
     <span class="muted">
-        <?= $this->icon('builder') ?> Страница <code><?= $this->e($id) ?></code>
+        <?= $this->icon($isGlobal ? 'global' : 'builder') ?>
+        <?php if ($isGlobal): ?>
+            Глобальная <?= $globalKind === \FlatCms\Modules\Builder\GlobalLibrary::BLOCK ? 'элемент' : 'секция' ?>
+            <code><?= $this->e($global) ?></code>
+        <?php else: ?>
+            Страница <code><?= $this->e($id) ?></code>
+        <?php endif; ?>
     </span>
     <span class="builder-bar__spacer"></span>
-    <a class="btn btn-sm btn-outline-secondary" href="<?= $this->e($this->url($item->url())) ?>" target="_blank" rel="noopener"><?= $this->icon('view') ?> Открыть</a>
-    <a class="btn btn-sm btn-outline-secondary" href="<?= $this->e($this->url('/admin/content/edit?id=' . rawurlencode($id))) ?>"><?= $this->icon('edit') ?> Обычное редактирование</a>
+    <?php if ($isGlobal): ?>
+        <a class="btn btn-sm btn-outline-secondary" href="<?= $this->e($this->url('/admin/globals')) ?>"><?= $this->icon('global') ?> Все глобальные</a>
+    <?php else: ?>
+        <a class="btn btn-sm btn-outline-secondary" href="<?= $this->e($this->url($item->url())) ?>" target="_blank" rel="noopener"><?= $this->icon('view') ?> Открыть</a>
+        <a class="btn btn-sm btn-outline-secondary" href="<?= $this->e($this->url('/admin/content/edit?id=' . rawurlencode($id))) ?>"><?= $this->icon('edit') ?> Обычное редактирование</a>
+    <?php endif; ?>
     <button type="button" class="btn btn-sm btn-outline-secondary" data-builder-toggle="json"><?= $this->icon('html') ?> JSON</button>
     <button type="submit" form="builder-form" class="btn btn-sm btn-primary"><?= $this->icon('save') ?> Сохранить</button>
 </div>
 
 <form method="post" action="<?= $this->e($this->url('/admin/builder/save')) ?>" id="builder-form">
     <input type="hidden" name="id" value="<?= $this->e($id) ?>">
+    <?php if ($isGlobal): ?>
+        <input type="hidden" name="global" value="<?= $this->e($global) ?>">
+        <input type="hidden" name="back" value="<?= $this->e('/admin/builder?global=' . rawurlencode($global)) ?>">
+        <input type="hidden" name="title" value="<?= $this->e($globalTitle ?? $globalName) ?>">
+    <?php endif; ?>
 
     <div class="builder" id="builder"
          data-builder='<?= $this->e((string) json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?>'>
@@ -61,6 +89,15 @@ ob_start();
             <h2><?= $this->icon('grid') ?> Элементы</h2>
             <input type="search" class="builder__search" id="builder-search" placeholder="Поиск…" aria-label="Поиск элементов">
             <div id="builder-library"></div>
+
+            <div class="builder__globals">
+                <h2><?= $this->icon('global') ?> Глобальные</h2>
+                <p class="muted">Один раз создали — используете на любой странице.</p>
+                <div id="builder-globals"></div>
+                <a class="btn btn-sm btn-outline-secondary w-100 mt-2" href="<?= $this->e($this->url('/admin/globals')) ?>">
+                    <?= $this->icon('global') ?> Управление глобальными
+                </a>
+            </div>
         </aside>
 
         <div class="builder__canvas-wrap">

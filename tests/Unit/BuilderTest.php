@@ -212,6 +212,20 @@ final class BuilderTest extends FlatCmsTestCase
         self::assertCount(1, $layout->blocks());
     }
 
+    public function testLegacyBlocksAreKeptNextToExplicitSections(): void
+    {
+        $layout = Layout::fromValue([
+            'sections' => [
+                ['settings' => ['role' => 'header'], 'columns' => [['width' => 12, 'blocks' => [['type' => 'menu']]]]],
+            ],
+            'blocks' => [['type' => 'text', 'settings' => ['body' => 'Hand-written body']]],
+        ]);
+
+        self::assertCount(2, $layout->sections());
+        self::assertCount(2, $layout->blocks());
+        self::assertSame('Hand-written body', $layout->blocks()[1]->get('body'));
+    }
+
     public function testBlockDefaultsAreApplied(): void
     {
         $app = $this->appWithBuilder();

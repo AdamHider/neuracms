@@ -24,8 +24,9 @@
     var countEl = document.getElementById('builder-count');
     var searchEl = document.getElementById('builder-search');
     var presetsEl = document.getElementById('builder-presets');
+    var globalsEl = document.getElementById('builder-globals');
 
-    var config = { layout: { sections: [] }, types: [], categories: {}, presets: [], columns: 12 };
+    var config = { layout: { sections: [] }, types: [], categories: {}, presets: [], globals: {}, columns: 12 };
     try {
         config = JSON.parse(root.getAttribute('data-builder')) || config;
     } catch (e) {
@@ -97,6 +98,34 @@
     function sectionAt(index) { return sections()[index]; }
     function columnAt(si, ci) { var s = sectionAt(si); return s && s.columns ? s.columns[ci] : null; }
 
+    function sectionRole(section) {
+        var role = section && section.settings ? section.settings.role : '';
+        return role === 'header' || role === 'footer' ? role : '';
+    }
+
+    function roleLabel(role) {
+        return role === 'header' ? 'Шапка сайта' : (role === 'footer' ? 'Подвал сайта' : '');
+    }
+
+    function globalCatalog(kind) {
+        return (config.globals && config.globals[kind]) || {};
+    }
+
+    // Header and footer bands always come first and last, matching the order the
+    // renderer uses. Returns the stored index next to the section.
+    function displayOrder() {
+        var head = [];
+        var body = [];
+        var tail = [];
+        sections().forEach(function (section, si) {
+            var role = sectionRole(section);
+            if (role === 'header') { head.push({ si: si, section: section }); }
+            else if (role === 'footer') { tail.push({ si: si, section: section }); }
+            else { body.push({ si: si, section: section }); }
+        });
+        return head.concat(body, tail);
+    }
+
     function blockLabel(block) {
         return (types[block.type] && types[block.type].title) || block.type;
     }
@@ -107,6 +136,7 @@
 
     function render() {
         renderLibrary();
+        renderGlobals();
         renderCanvas();
         renderSettings();
         syncJson();
@@ -139,6 +169,26 @@
         libraryEl.innerHTML = html || '<p class="muted">Ничего не найдено.</p>';
     }
 
+    function renderGlobals() {
+        if (!globalsEl) { return; }
+        var sectionsGlobals = globalCatalog('section');
+        var blockGlobals = globalCatalog('block');
+        var html = '';
+
+        Object.keys(sectionsGlobals).forEach(function (name) {
+            html += '<button type="button" class="builder__particle builder__particle--global" draggable="true"'
+                + ' data-global-section="' + esc(name) + '">'
+                + icon('section') + '<span>' + esc(sectionsGlobals[name].title) + '</span></button>';
+        });
+        Object.keys(blockGlobals).forEach(function (name) {
+            html += '<button type="button" class="builder__particle builder__particle--global" draggable="true"'
+                + ' data-global-block="' + esc(name) + '">'
+                + icon('global') + '<span>' + esc(blockGlobals[name].title) + '</span></button>';
+        });
+
+        globalsEl.innerHTML = html || '<p class="muted">Пока нет глобальных секций.</p>';
+    }
+
     function renderCanvas() {
         if (!sections().length) {
             canvas.innerHTML = '<div class="builder__empty">'
@@ -149,17 +199,32 @@
         }
 
         var html = '';
-        sections().forEach(function (section, si) {
+        displayOrder().forEach(function (entry) {
+            var section = entry.section;
+            var si = entry.si;
+            var role = sectionRole(section);
+            var isGlobal = !!(section.settings && section.settings.global);
             var selected = selection && selection.kind === 'section' && selection.path[0] === si;
-            html += '<section class="builder__section' + (selected ? ' is-selected' : '') + '" data-si="' + si + '">';
+            html += '<section class="builder__section' + (selected ? ' is-selected' : '')
+                + (role ? ' builder__section--' + role : '') + '" data-si="' + si + '">';
             html += '<header class="builder__section-head">'
                 + '<span class="builder__handle" draggable="true" data-drag="section" data-si="' + si + '" title="Перетащить секцию">' + icon('drag') + '</span>'
-                + '<span class="builder__section-title">Секция ' + (si + 1) + '</span>'
+                + '<span class="builder__section-title">' + (role ? esc(roleLabel(role)) : 'Секция ' + (si + 1)) + '</span>'
+                + (isGlobal ? '<span class="builder__badge">' + icon('global') + ' глобальная</span>' : '')
                 + '<span class="builder__section-meta">' + (section.columns || []).length + ' кол.</span>'
                 + '<span class="builder-bar__spacer"></span>'
                 + '<button type="button" class="builder__icon-btn" data-section-dup="' + si + '" title="Дублировать">' + icon('copy') + '</button>'
                 + '<button type="button" class="builder__icon-btn" data-section-del="' + si + '" title="Удалить секцию">' + icon('delete') + '</button>'
                 + '</header>';
+
+            if (isGlobal && !(section.columns || []).length) {
+                var ref = globalCatalog('section')[section.settings.global];
+                html += '<p class="builder__global-ref">' + icon('global') + ' Содержимое берётся из глобальной секции <strong>'
+                    + esc(ref ? ref.title : section.settings.global) + '</strong>. '
+                    + '<a href="/admin/builder?global=section:' + encodeURIComponent(section.settings.global) + '">Редактировать</a></p>';
+                html += '</section>';
+                return;
+            }
 
             html += '<div class="builder__columns">';
             (section.columns || []).forEach(function (column, ci) {
@@ -196,6 +261,10 @@
     }
 
     function summaryFor(block) {
+        if (block.type === 'global' && block.settings && block.settings.name) {
+            var ref = globalCatalog('block')[block.settings.name];
+            return ref ? ref.title : block.settings.name;
+        }
         var type = types[block.type];
         if (!type || !type.fields || !block.settings) {
             return '';
@@ -208,6 +277,66 @@
             }
         }
         return '';
+    }
+
+    /**
+     * Promote the selected section or block to a global, then swap the local copy
+     * for a reference and save the page. The page keeps only a pointer, so later
+     * edits to the global show up here without a second copy.
+     */
+    function promote(kind, si, ci, bi) {
+        var title = window.prompt(kind === 'section'
+            ? 'Название глобальной секции (например, «Шапка сайта»)'
+            : 'Название глобального элемента', kind === 'section' ? 'Шапка сайта' : '');
+        if (title === null) { return; }
+
+        var body = new URLSearchParams();
+        body.set('action', 'promote');
+        body.set('kind', kind);
+        body.set('title', title);
+        body.set('layout_json', JSON.stringify(model()));
+        if (kind === 'section') {
+            body.set('index', String(si));
+        } else {
+            body.set('block_index', String(ci) + ':' + String(bi));
+        }
+
+        fetch('/admin/builder/global', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+            credentials: 'same-origin',
+            body: body.toString()
+        }).then(function (response) { return response.json(); }).then(function (result) {
+            if (!result || !result.name) {
+                window.alert((result && result.error) || 'Не удалось сделать глобальным.');
+                return;
+            }
+            replaceWithReference(kind, si, ci, bi, result.name);
+            config.globals = config.globals || {};
+            config.globals[kind] = config.globals[kind] || {};
+            config.globals[kind][result.name] = { name: result.name, title: title, kind: kind };
+            render();
+            if (form) { form.submit(); }
+        }).catch(function () {
+            window.alert('Не удалось сделать глобальным.');
+        });
+    }
+
+    function replaceWithReference(kind, si, ci, bi, name) {
+        if (kind === 'section') {
+            var section = sectionAt(si);
+            if (section) {
+                var settings = { global: name };
+                var role = sectionRole(section);
+                if (role) { settings.role = role; }
+                sections()[si] = { id: section.id || uid(), settings: settings, columns: [] };
+            }
+            return;
+        }
+        var column = columnAt(si, ci);
+        if (column && column.blocks && column.blocks[bi]) {
+            column.blocks[bi] = { type: 'global', id: column.blocks[bi].id || uid(), settings: { name: name } };
+        }
     }
 
     function renderSettings() {
@@ -226,7 +355,24 @@
         var section = sectionAt(si);
         if (!section) { return; }
         var s = section.settings || (section.settings = {});
-        var html = '<div class="builder__settings-title">' + icon('section') + ' Секция ' + (si + 1) + '</div>';
+        var role = sectionRole(section);
+        var globalName = String(s.global || '');
+        var html = '<div class="builder__settings-title">' + icon('section') + ' '
+            + (role ? esc(roleLabel(role)) : 'Секция ' + (si + 1)) + '</div>';
+
+        if (globalName) {
+            html += '<div class="builder__global-note">'
+                + icon('global') + ' Глобальная секция <code>' + esc(globalName) + '</code>'
+                + '<p class="muted">Правки здесь видны на всех страницах, где она используется.</p>'
+                + '</div>';
+        }
+
+        html += '<label class="builder__setting">Роль'
+            + '<select data-setting="section:role">'
+            + option('', 'Обычная секция', role)
+            + option('header', 'Шапка сайта', role)
+            + option('footer', 'Подвал сайта', role)
+            + '</select></label>';
 
         html += '<label class="builder__setting">Ширина'
             + '<select data-setting="section:width">'
@@ -251,6 +397,11 @@
         html += '<div class="builder__settings-actions">'
             + '<button type="button" class="btn btn-sm btn-outline-secondary" data-col-add="' + si + '">' + icon('columns') + ' Добавить колонку</button>'
             + '<button type="button" class="btn btn-sm btn-outline-danger" data-section-del="' + si + '">' + icon('delete') + ' Удалить секцию</button>'
+            + '</div>';
+
+        html += '<div class="builder__settings-actions builder__settings-actions--globals">'
+            + '<button type="button" class="btn btn-sm btn-outline-secondary" data-promote-section="' + si + '">'
+            + icon('global') + ' Сделать глобальной</button>'
             + '</div>';
 
         settingsBody.innerHTML = html;
@@ -399,6 +550,13 @@
             + '<button type="button" class="btn btn-sm btn-outline-danger" data-block-del="' + si + ':' + ci + ':' + bi + '">' + icon('delete') + ' Удалить</button>'
             + '</div>';
 
+        if (block.type !== 'global') {
+            html += '<div class="builder__settings-actions builder__settings-actions--globals">'
+                + '<button type="button" class="btn btn-sm btn-outline-secondary" data-promote-block="' + si + ':' + ci + ':' + bi + '">'
+                + icon('global') + ' Сделать глобальным</button>'
+                + '</div>';
+        }
+
         settingsBody.innerHTML = html;
     }
 
@@ -430,12 +588,37 @@
             });
             return { width: w, blocks: blocks };
         });
-        var section = { id: uid(), settings: {}, columns: columns };
+        var settings = {};
+        if (!Array.isArray(preset) && (preset.role === 'header' || preset.role === 'footer')) {
+            settings.role = preset.role;
+        }
+        var section = { id: uid(), settings: settings, columns: columns };
         // A "start" preset (the header) goes above the existing sections.
         if (!Array.isArray(preset) && preset.position === 'start') {
             sections().unshift(section);
         } else {
             sections().push(section);
+        }
+        render();
+    }
+
+    /**
+     * Insert a reference to a global section. The reference carries only the name
+     * and an optional local override; the renderer fills in the shared content.
+     */
+    function addGlobalSection(name) {
+        var reference = {
+            id: uid(),
+            settings: { global: name },
+            columns: []
+        };
+        // A header global belongs at the top and a footer at the bottom.
+        var entry = globalCatalog('section')[name];
+        var role = entry && entry.role ? entry.role : '';
+        if (role === 'footer') {
+            sections().push(reference);
+        } else {
+            sections().unshift(reference);
         }
         render();
     }
@@ -490,13 +673,22 @@
         render();
     }
 
-    libraryEl.addEventListener('dragstart', function (event) {
+    (globalsEl || libraryEl).addEventListener('dragstart', onLibraryDragStart);
+    libraryEl.addEventListener('dragstart', onLibraryDragStart);
+
+    function onLibraryDragStart(event) {
         var button = event.target.closest('.builder__particle');
         if (!button) { return; }
-        drag = { kind: 'new', type: button.getAttribute('data-type') };
+        if (button.hasAttribute('data-global-section')) {
+            drag = { kind: 'global-section', name: button.getAttribute('data-global-section') };
+        } else if (button.hasAttribute('data-global-block')) {
+            drag = { kind: 'global-block', name: button.getAttribute('data-global-block') };
+        } else {
+            drag = { kind: 'new', type: button.getAttribute('data-type') };
+        }
         event.dataTransfer.effectAllowed = 'copy';
-        event.dataTransfer.setData('text/plain', drag.type);
-    });
+        event.dataTransfer.setData('text/plain', 'builder-particle');
+    }
 
     canvas.addEventListener('dragstart', function (event) {
         var handle = event.target.closest('[data-drag="section"]');
@@ -549,6 +741,15 @@
             var index = dropIndex(drop, event);
             if (drag && drag.kind === 'new') {
                 addBlock(drag.type, si, ci, index);
+            } else if (drag && drag.kind === 'global-block') {
+                addBlock('global', si, ci, index);
+                var col = columnAt(si, ci);
+                var added = col && col.blocks ? col.blocks[index === null ? col.blocks.length - 1 : index] : null;
+                if (added) {
+                    added.settings = added.settings || {};
+                    added.settings.name = drag.name;
+                }
+                render();
             } else if (drag && drag.kind === 'block') {
                 if (drag.si === si && drag.ci === ci && (index === null || index === drag.bi || index === drag.bi + 1)) {
                     drag = null;
@@ -561,6 +762,12 @@
         }
 
         var section = event.target.closest('.builder__section');
+        if (drag && drag.kind === 'global-section') {
+            event.preventDefault();
+            addGlobalSection(drag.name);
+            drag = null;
+            return;
+        }
         if (drag && drag.kind === 'section' && section) {
             event.preventDefault();
             var to = parseInt(section.getAttribute('data-si'), 10);
@@ -609,6 +816,17 @@
                 list.splice(parseInt(filterRemove.getAttribute('data-filter-remove'), 10), 1);
                 renderSettings();
             }
+            return;
+        }
+        var promoteSection = event.target.closest('[data-promote-section]');
+        if (promoteSection) {
+            promote('section', parseInt(promoteSection.getAttribute('data-promote-section'), 10), null, null);
+            return;
+        }
+        var promoteBlock = event.target.closest('[data-promote-block]');
+        if (promoteBlock) {
+            var pp = promoteBlock.getAttribute('data-promote-block').split(':').map(Number);
+            promote('block', pp[0], pp[1], pp[2]);
             return;
         }
         var del = event.target.closest('[data-block-del]');
@@ -816,6 +1034,38 @@
             addSection([grid]);
         }
     });
+
+    if (globalsEl) {
+        globalsEl.addEventListener('click', function (event) {
+            var section = event.target.closest('[data-global-section]');
+            if (section) {
+                addGlobalSection(section.getAttribute('data-global-section'));
+                return;
+            }
+            var block = event.target.closest('[data-global-block]');
+            if (block) {
+                // Add to the first column of the last body section, or start one.
+                var target = null;
+                displayOrder().forEach(function (entry) {
+                    if (!sectionRole(entry.section)) { target = entry; }
+                });
+                if (!target) {
+                    addSection([grid]);
+                    target = { si: sections().length - 1 };
+                }
+                var column = columnAt(target.si, 0);
+                if (column) {
+                    addBlock('global', target.si, 0, column.blocks.length);
+                    var added = columnAt(target.si, 0).blocks.slice(-1)[0];
+                    if (added) {
+                        added.settings = added.settings || {};
+                        added.settings.name = block.getAttribute('data-global-block');
+                    }
+                    render();
+                }
+            }
+        });
+    }
 
     if (searchEl) {
         searchEl.addEventListener('input', function () {
