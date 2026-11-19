@@ -57,32 +57,37 @@ final class LayoutRenderer
      * own content (a child list, a cart table) use this to keep the same header
      * and footer.
      *
-     * With no item (a cart, a contact form) the chrome comes from the home page,
-     * so a header promoted to a global there applies to those pages too. A band
-     * comes from the page's own header/footer section when it has one and from
-     * the theme partials otherwise, so a page never loses its navigation.
+     * The header and footer are sections and nothing else: a page without a
+     * header section renders without a header, and there is no theme fallback.
+     * That keeps the builder the single source of truth for the page chrome, so
+     * deleting the header in the editor removes it from the site.
+     *
+     * A template with no content item behind it (a cart, a contact form) borrows
+     * the bands from the home page, so those pages match the rest of the site.
      */
     public function pageShell(?Item $item, string $body): string
     {
-        $chrome = $item ?? $this->app->storage->load('index');
-        if ($chrome === null) {
-            return $this->themeChrome('header', null) . $body . $this->themeChrome('footer', null);
+        $own = $item === null ? null : $this->resolveLayout($this->layoutOf($item));
+        $header = $own?->withRole('header');
+        $footer = $own?->withRole('footer');
+
+        // A template with no content item behind it (a cart, a contact form) has
+        // no layout of its own, so it borrows the bands from the home page. A
+        // real page never borrows: its own sections are the whole truth.
+        if ($item === null) {
+            $home = $this->app->storage->load('index');
+            if ($home !== null) {
+                $shared = $this->resolveLayout($this->layoutOf($home));
+                $header = $shared->withRole('header');
+                $footer = $shared->withRole('footer');
+            }
         }
 
-        $layout = $this->resolveLayout($this->layoutOf($chrome));
-        $data = ['item' => $chrome];
+        $data = ['item' => $item];
 
-        $header = $layout->withRole('header');
-        $footer = $layout->withRole('footer');
-
-        $head = $header !== null
-            ? $this->renderSection($header, $data)
-            : $this->themeChrome('header', $chrome);
-        $foot = $footer !== null
-            ? $this->renderSection($footer, $data)
-            : $this->themeChrome('footer', $chrome);
-
-        return $head . $body . $foot;
+        return ($header !== null ? $this->renderSection($header, $data) : '')
+            . $body
+            . ($footer !== null ? $this->renderSection($footer, $data) : '');
     }
 
     /**
@@ -127,7 +132,6 @@ final class LayoutRenderer
     {
         $section = $this->resolveSection($section);
 
-        $grid = $this->columns();
         $role = $section->role();
         $tag = match ($role) {
             'header' => 'header',
@@ -148,24 +152,62 @@ final class LayoutRenderer
         if (($padding = (string) $section->get('padding', '')) !== '') {
             $style[] = '--g-padding:' . $padding;
         }
-        $styleAttr = $style === [] ? '' : ' style="' . htmlspecialchars(implode(';', $style), ENT_QUOTES) . '"';
-
-        $inner = '';
-        foreach ($section->columns() as $column) {
-            $width = $column->width() > 0 ? $column->width() : $grid;
-            $inner .= '<div class="g-col" style="--g-span:' . $width . '">';
-            foreach ($column->blocks() as $block) {
-                $inner .= $this->renderBlock($block, $data);
-            }
-            $inner .= '</div>';
+        if (($justify = Structure::justify($section->get('justify'))) !== '') {
+            $style[] = '--g-justify:' . $justify;
         }
+        if (($align = Structure::align($section->get('align'))) !== '') {
+            $style[] = '--g-align:' . $align;
+        }
+        $styleAttr = $style === [] ? '' : ' style="' . htmlspecialchars(implode(';', $style), ENT_QUOTES) . '"';
 
         $container = (string) $section->get('width', 'boxed');
         $wrapperClass = $container === 'full' ? 'g-container g-container--full' : 'g-container';
 
-        return '<' . $tag . ' class="' . implode(' ', $classes) . '"' . $styleAttr . '>'
-            . '<div class="' . $wrapperClass . '"><div class="g-row">' . $inner . '</div></div>'
-            . '</' . $tag . '>';
+        $inner = '';
+        foreach ($section->rows() as $row) {
+            $inner .= $this->renderRow($row, $data);
+        }
+
+        return '<' . $tag . ' class="' . Structure::classes(implode(' ', $classes), $section->cssClass()) . '"'
+            . $styleAttr . '><div class="' . $wrapperClass . '">' . $inner . '</div></' . $tag . '>';
+    }
+
+    /**
+     * A row is a flex line of columns. Its own justify/align control how those
+     * columns sit on the line, which is the horizontal axis here.
+     *
+     * @param array<string, mixed> $data
+     */
+    public function renderRow(Row $row, array $data = []): string
+    {
+        $inner = '';
+        foreach ($row->columns() as $column) {
+            $inner .= $this->renderColumn($column, $data);
+        }
+
+        return '<div class="' . Structure::classes('g-row', $row->cssClass()) . '"'
+            . Structure::style($row->settings()) . '>' . $inner . '</div>';
+    }
+
+    /**
+     * A column is a vertical stack of blocks, so its justify/align work on the
+     * vertical axis.
+     *
+     * @param array<string, mixed> $data
+     */
+    public function renderColumn(Column $column, array $data = []): string
+    {
+        $width = $column->width() > 0 ? $column->width() : $this->columns();
+
+        $inner = '';
+        foreach ($column->blocks() as $block) {
+            $inner .= $this->renderBlock($block, $data);
+        }
+
+        return '<div class="' . Structure::classes('g-col', $column->cssClass()) . '"'
+            . ' style="--g-span:' . $width . (($align = Structure::align($column->get('align'))) !== '' ? ';--g-align:' . $align : '')
+            . (($justify = Structure::justify($column->get('justify'))) !== '' ? ';--g-justify:' . $justify : '')
+            . '">' . $inner . '</div>';
     }
 
     /**
@@ -190,7 +232,15 @@ final class LayoutRenderer
         $data['renderer'] = $this;
         $this->events->emit('builder.block.before', $block, $type);
 
-        return $this->app->renderer->renderTemplate($type->template(), $data);
+        $html = $this->app->renderer->renderTemplate($type->template(), $data);
+
+        // A block's own class goes on a wrapper, because each particle template
+        // owns its root tag and they differ (h2, nav, figure, section...).
+        if ($block->cssClass !== '' && trim($html) !== '') {
+            return '<div class="' . Structure::classes('g-block', $block->cssClass()) . '">' . $html . '</div>';
+        }
+
+        return $html;
     }
 
     public function globals(): ?GlobalLibrary
@@ -238,7 +288,15 @@ final class LayoutRenderer
             $settings['role'] = $shared->get('role', '');
         }
 
-        return new Section($shared->columns(), $settings, $section->id());
+        // The reference keeps its own title/class so a page can label the band
+        // locally without editing the shared copy.
+        return new Section(
+            $shared->rows(),
+            $settings,
+            $section->id(),
+            $section->title() !== '' ? $section->title() : $shared->title(),
+            Structure::classes($shared->cssClass(), $section->cssClass()),
+        );
     }
 
     private function resolveGlobalBlock(Block $block): ?Block
@@ -249,23 +307,6 @@ final class LayoutRenderer
         }
 
         return $this->globals->block($name);
-    }
-
-    /**
-     * Theme header/footer for pages that do not define their own band.
-     */
-    private function themeChrome(string $name, ?Item $item): string
-    {
-        $navigation = $this->app->query()
-            ->kind(\FlatCms\Content\Schema::KIND_PAGE)
-            ->sort('order')
-            ->limit(10)
-            ->find();
-
-        return $this->app->renderer->partial($name, [
-            'navigation' => $navigation,
-            'item' => $item,
-        ]);
     }
 
     private function layoutOf(Item $item): Layout

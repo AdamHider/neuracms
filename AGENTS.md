@@ -108,11 +108,23 @@ php -S localhost:8000 -t public   # dev server
 
 ## Page builder (Gantry-style sections)
 
-- Model: `Layout` → `Section` → `Column` → `Block` (was a flat block list + grid).
-- `Layout::fromValue()` upgrades legacy `{blocks, grid}` and bare block lists to
-  sections on read, so old content keeps rendering. Saving writes `sections:`.
+- Model: `Layout` → `Section` → `Row` → `Column` → `Block`, matching Gantry 5
+  (was a flat block list + grid, then sections → columns). Rows let one band
+  carry several layouts, which is why there is no multi-column particle.
+- Every structural node carries `title` (an editor label, never printed) and
+  `class` (extra CSS classes on the rendered wrapper) as top-level fields.
+- `Layout::fromValue()` upgrades legacy `{blocks, grid}`, bare block lists and
+  section→columns shapes to sections on read, so old content keeps rendering.
+  Saving writes `sections:`.
+- A section that only references a global (`settings: {global: name}`) keeps
+  zero rows; the global's payload is swapped in at render time.
+- `toArray()` omits what it does not need: an `id` is written only when one was
+  actually supplied, and empty `settings`/`rows`/`columns`/`blocks` keys are
+  dropped. A second save is therefore byte-identical to the first.
 - `LayoutRenderer` emits `.g-section` > `.g-container` > `.g-row` > `.g-col`
   (`--g-span` custom property); theme styles these in `themes/default/.../main.css`.
+- `Structure` holds the shared `justify`/`align` vocabulary: every node is a flex
+  container, so one pair of dropdowns covers sections, rows and columns.
 - Block types carry `category` and `icon`; registry exposes categories and
   section presets. New types: `quote`, `divider`, `spacer`.
 - `BuilderModule::presets()` lists ready-made sections for "Добавить секцию": the
@@ -129,8 +141,8 @@ php -S localhost:8000 -t public   # dev server
 
 - There is no separate "regions" subsystem and no `menu-item` type. Header and
   footer are ordinary **sections** on a page (the **Шапка сайта** / **Подвал
-  сайта** presets), and the theme's own `header`/`footer` partials render the
-  site chrome.
+  сайта** presets). They are the only source of the site chrome: there is no
+  theme fallback, so a page with no header section renders without a header.
 - `menu` particle (`Types/MenuType.php`, `templates/blocks/menu.php`) renders
   navigation from content items. `source: pages` (default) lists items of a
   chosen `content_type`, ordered by `order`, optionally narrowed by any number of
@@ -165,9 +177,10 @@ php -S localhost:8000 -t public   # dev server
   section or block off a page into the library.
 - `role` on a section (`header` / `footer`) makes it a chrome band rather than
   body content: `LayoutRenderer::pageShell()` renders it as `<header>`/`<footer>`
-  next to the body, and `renderLayout()` skips role sections in the body. A page
-  without a band falls back to the theme `header`/`footer` partials; an item-less
-  page (cart, contact form) borrows the chrome from the home page.
+  next to the body, and `renderLayout()` skips role sections in the body. The
+  builder is the single source of the chrome: a page without a band renders
+  without one (no theme partials). An item-less page (cart, contact form) has no
+  layout of its own, so it borrows the bands from the home page.
 
 ## Gotchas
 

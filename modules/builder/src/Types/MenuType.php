@@ -25,6 +25,7 @@ final class MenuType extends BlockType
             'content_type' => ['type' => 'string', 'label' => 'Тип контента', 'default' => 'page'],
             'root' => ['type' => 'string', 'label' => 'Родительский элемент (id)', 'default' => ''],
             'depth' => ['type' => 'int', 'label' => 'Глубина вложенности', 'default' => 1],
+            'orientation' => ['type' => 'select', 'label' => 'Расположение', 'options' => ['horizontal', 'vertical'], 'default' => 'horizontal'],
             'filters' => ['type' => 'filters', 'label' => 'Фильтры по свойствам', 'default' => []],
             'items' => ['type' => 'text', 'label' => 'Свои ссылки (Заголовок | /адрес, по строке)', 'default' => ''],
             'class' => ['type' => 'string', 'label' => 'CSS-класс', 'default' => 'site-nav'],

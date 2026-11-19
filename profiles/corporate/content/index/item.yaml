@@ -2,12 +2,51 @@ type: page
 title: Главная
 order: 0
 published: true
+show_in_menu: true
 layout:
-  blocks:
-    - type: heading
-      settings: {text: 'ГК «Северный Ветер»', level: h1}
-    - type: text
-      settings:
-        body: 'Проектируем и строим логистические комплексы с 2004 года. Работаем по всей России и СНГ.'
-    - type: products
-      settings: {title: 'Наши услуги', limit: 3}
+  sections:
+    - settings: {global: site-header}
+    - rows:
+        - columns:
+            - width: 12
+              blocks:
+                - type: heading
+                  settings: {text: 'ГК «Северный Ветер»', level: h1}
+                - type: text
+                  settings:
+                    body: 'Проектируем и строим логистические комплексы с 2004 года. Работаем по всей России и СНГ.'
+        - columns:
+            - width: 4
+              blocks:
+                - type: heading
+                  settings: {text: 'Проектирование', level: h3}
+                - type: text
+                  settings: {body: 'Считаем нагрузки и готовим рабочую документацию.'}
+            - width: 4
+              blocks:
+                - type: heading
+                  settings: {text: 'Строительство', level: h3}
+                - type: text
+                  settings: {body: 'Возводим склады и распределительные центры под ключ.'}
+            - width: 4
+              blocks:
+                - type: heading
+                  settings: {text: 'Обслуживание', level: h3}
+                - type: text
+                  settings: {body: 'Следим за инженерными системами после сдачи.'}
+        - columns:
+            - width: 12
+              blocks:
+                - type: heading
+                  settings: {text: 'Наши услуги', level: h2}
+                - type: elements
+                  settings:
+                    element_type: product
+                    title: ''
+                    limit: 3
+                    sort: order
+                    direction: asc
+                    map_title: title
+                    map_price: price
+                    columns: '3'
+    - settings: {global: site-footer}

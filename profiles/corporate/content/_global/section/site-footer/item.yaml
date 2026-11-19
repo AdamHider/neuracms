@@ -1,0 +1,21 @@
+title: Подвал сайта
+kind: section
+section:
+  settings: {role: footer}
+  rows:
+    - columns:
+        - width: 6
+          blocks:
+            - type: text
+              settings: {body: '© ГК «Северный Ветер». Логистические комплексы с 2004 года.'}
+        - width: 6
+          blocks:
+            - type: menu
+              settings:
+                source: pages
+                content_type: page
+                depth: 1
+                orientation: horizontal
+                filters:
+                  - {field: show_in_menu, op: '=', value: '1'}
+                class: site-nav--footer

@@ -10,6 +10,7 @@ use FlatCms\Modules\Builder\Block;
 use FlatCms\Modules\Builder\Column;
 use FlatCms\Modules\Builder\GlobalLibrary;
 use FlatCms\Modules\Builder\Layout;
+use FlatCms\Modules\Builder\Row;
 use FlatCms\Modules\Builder\Section;
 use FlatCms\Tests\FlatCmsTestCase;
 
@@ -40,7 +41,7 @@ final class GlobalsTest extends FlatCmsTestCase
         $app = $this->appWithBuilder();
         $library = new GlobalLibrary($app->fs);
 
-        $section = new Section([new Column([new Block('heading', ['text' => 'Меню', 'level' => 'h2'])], 12)], ['role' => 'header']);
+        $section = new Section([new Row([new Column([new Block('heading', ['text' => 'Меню', 'level' => 'h2'])], 12)])], ['role' => 'header']);
         self::assertTrue($library->save(GlobalLibrary::SECTION, 'Шапка сайта', 'Шапка сайта', ['section' => $section->toArray()]));
 
         $names = array_keys($library->all(GlobalLibrary::SECTION));
@@ -58,14 +59,14 @@ final class GlobalsTest extends FlatCmsTestCase
         $app = $this->appWithBuilder();
         $library = new GlobalLibrary($app->fs);
         $shared = new Section(
-            [new Column([new Block('heading', ['text' => 'Глобальный заголовок', 'level' => 'h1'])], 12)],
+            [new Row([new Column([new Block('heading', ['text' => 'Глобальный заголовок', 'level' => 'h1'])], 12)])],
             ['role' => 'header']
         );
         $library->save(GlobalLibrary::SECTION, 'header-global', 'Глобальная шапка', ['section' => $shared->toArray()]);
 
         $layout = new Layout([
             new Section([], ['global' => 'header-global']),
-            new Section([new Column([new Block('text', ['body' => 'Страница'])], 12)]),
+            new Section([new Row([new Column([new Block('text', ['body' => 'Страница'])], 12)])]),
         ]);
         $this->write('content/about/item.yaml', "type: page\ntitle: About\norder: 10\nlayout:\n" . $this->yamlLayout($layout));
 
@@ -197,9 +198,9 @@ final class GlobalsTest extends FlatCmsTestCase
         $library = new GlobalLibrary($app->fs);
 
         $layout = new Layout([
-            new Section([new Column([new Block('text', ['body' => 'ТЕЛО-СТРАНИЦЫ'])], 12)]),
-            new Section([new Column([new Block('text', ['body' => 'ПОДВАЛ'])], 12)], ['role' => 'footer']),
-            new Section([new Column([new Block('text', ['body' => 'ШАПКА'])], 12)], ['role' => 'header']),
+            new Section([new Row([new Column([new Block('text', ['body' => 'ТЕЛО-СТРАНИЦЫ'])], 12)])]),
+            new Section([new Row([new Column([new Block('text', ['body' => 'ПОДВАЛ'])], 12)])], ['role' => 'footer']),
+            new Section([new Row([new Column([new Block('text', ['body' => 'ШАПКА'])], 12)])], ['role' => 'header']),
         ]);
 
         $ordered = [];
@@ -210,18 +211,47 @@ final class GlobalsTest extends FlatCmsTestCase
         self::assertSame(['ШАПКА', 'ТЕЛО-СТРАНИЦЫ', 'ПОДВАЛ'], $ordered);
     }
 
-    public function testPageWithoutItemStillGetsChrome(): void
+    public function testPageWithoutItemBorrowsChromeFromTheHomePage(): void
     {
         $app = $this->appWithBuilder();
         $renderer = $app->module('builder')->renderer();
         self::assertNotNull($renderer);
 
+        $layout = new Layout([
+            new Section([new Row([new Column([new Block('text', ['body' => 'ШАПКА'])], 12)])], ['role' => 'header']),
+        ]);
+        $this->write('content/index/item.yaml', "type: page\ntitle: Home\norder: 0\nlayout:\n" . $this->yamlLayout($layout));
+        $app->build();
+
         $html = $app->renderer->page(null, '<p>Тело</p>');
 
         self::assertStringContainsString('site-header', $html);
         self::assertStringContainsString('<p>Тело</p>', $html);
-        self::assertStringContainsString('site-footer', $html);
         self::assertLessThan(strpos($html, '<p>Тело</p>'), strpos($html, 'site-header'));
+    }
+
+    /**
+     * The header is a section, not a theme fallback: a page whose layout has no
+     * header section and no home page to borrow from renders without one.
+     */
+    public function testPageWithoutHeaderSectionRendersNoHeader(): void
+    {
+        $app = $this->appWithBuilder();
+        $renderer = $app->module('builder')->renderer();
+        self::assertNotNull($renderer);
+
+        $layout = new Layout([
+            new Section([new Row([new Column([new Block('text', ['body' => 'Только тело'])], 12)])]),
+        ]);
+
+        $html = $renderer->renderLayout($layout);
+        self::assertStringNotContainsString('site-header', $html);
+
+        $item = new \FlatCms\Content\Item('about', ['type' => 'page', 'title' => 'About', 'layout' => $layout->toArray()]);
+        $page = $renderer->pageShell($item, '<p>Тело</p>');
+
+        self::assertStringNotContainsString('site-header', $page);
+        self::assertStringContainsString('<p>Тело</p>', $page);
     }
 
     public function testGlobalsPageListsPromotedItems(): void

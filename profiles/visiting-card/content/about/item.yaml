@@ -4,17 +4,59 @@ order: 1
 published: true
 show_in_menu: true
 layout:
-  blocks:
-    - type: heading
-      settings: {text: 'Кто мы', level: h2}
-    - type: text
-      settings:
-        body: 'Мы делаем сайты для малого бизнеса: быстро, аккуратно и без лишних согласований.'
-    - type: heading
-      settings: {text: 'Как работаем', level: h2}
-    - type: text
-      settings:
-        body: |
-          1. Обсуждаем задачу.
-          2. Показываем прототип.
-          3. Собираем сайт и передаём доступы.
+  sections:
+    - settings: {global: site-header}
+      rows:
+        - columns:
+            - width: 4
+              blocks:
+                - type: heading
+                  settings: {text: 'Студия «Верста»', level: h2}
+            - width: 8
+              blocks:
+                - type: menu
+                  settings:
+                    source: pages
+                    content_type: page
+                    depth: 1
+                    orientation: horizontal
+                    filters:
+                      - {field: show_in_menu, op: '=', value: '1'}
+                    class: site-nav
+    - rows:
+        - columns:
+            - width: 7
+              blocks:
+                - type: heading
+                  settings: {text: 'Кто мы', level: h1}
+                - type: text
+                  settings:
+                    body: 'Мы делаем сайты для малого бизнеса: быстро, аккуратно и без лишних согласований.'
+            - width: 5
+              blocks:
+                - type: heading
+                  settings: {text: 'Как работаем', level: h2}
+                - type: text
+                  settings:
+                    body: |
+                      1. Обсуждаем задачу.
+                      2. Показываем прототип.
+                      3. Собираем сайт и передаём доступы.
+    - settings: {global: site-footer}
+      rows:
+        - columns:
+            - width: 6
+              blocks:
+                - type: text
+                  settings: {body: '© Студия «Верста». Сайты для малого бизнеса с 2016 года.'}
+            - width: 6
+              blocks:
+                - type: menu
+                  settings:
+                    source: pages
+                    content_type: page
+                    depth: 1
+                    orientation: horizontal
+                    filters:
+                      - {field: show_in_menu, op: '=', value: '1'}
+                    class: site-nav--footer

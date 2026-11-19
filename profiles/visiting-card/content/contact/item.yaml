@@ -5,20 +5,27 @@ published: true
 show_in_menu: true
 layout:
   sections:
-    - columns:
-        - width: 12
-          blocks:
-            - type: heading
-              settings: {text: 'Свяжитесь с нами', level: h1}
-            - type: text
-              settings:
-                body: |
-                  Расскажите о задаче — ответим в течение рабочего дня.
+    - settings: {global: site-header}
+    - rows:
+        - columns:
+            - width: 7
+              blocks:
+                - type: heading
+                  settings: {text: 'Свяжитесь с нами', level: h1}
+                - type: text
+                  settings:
+                    body: |
+                      Расскажите о задаче — ответим в течение рабочего дня.
 
-                  **Телефон:** +7 812 000-00-00
+                      **Телефон:** +7 812 000-00-00
 
-                  **Почта:** hello@versta.example
+                      **Почта:** hello@versta.example
 
-                  **Адрес:** Санкт-Петербург, набережная Реки Карповки, 5
-            - type: button
-              settings: {text: 'Написать нам', url: /contact, style: primary}
+                      **Адрес:** Санкт-Петербург, набережная Реки Карповки, 5
+            - width: 5
+              blocks:
+                - type: heading
+                  settings: {text: 'Написать', level: h2}
+                - type: button
+                  settings: {text: 'Написать нам', url: /contact, style: primary}
+    - settings: {global: site-footer}

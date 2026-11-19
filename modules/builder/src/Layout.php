@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace FlatCms\Modules\Builder;
 
 /**
- * A page layout: an ordered list of sections. Each section holds columns, and
- * each column holds blocks (the Gantry 5 "section > column > particle" shape).
+ * A page layout: an ordered list of sections. Each section holds rows, each row
+ * holds columns and each column holds blocks (the Gantry 5
+ * "section > row > column > particle" shape).
  *
  * A legacy layout may still be a flat list of blocks or carry a "grid"; both are
  * upgraded to sections on read so old content keeps rendering.
@@ -185,7 +186,10 @@ final class Layout
         }
 
         if ($grid === null || $grid === []) {
-            return array_map(static fn (Block $b): Section => new Section([new Column([$b], $columns)]), $blocks);
+            return array_map(
+                static fn (Block $b): Section => new Section([new Row([new Column([$b], $columns)])]),
+                $blocks
+            );
         }
 
         $sections = [];
@@ -203,14 +207,14 @@ final class Layout
                 $rowColumns[] = new Column([$block], max(1, (int) ($row[$index] ?? 1)));
             }
             if ($rowColumns !== []) {
-                $sections[] = new Section($rowColumns);
+                $sections[] = new Section([new Row($rowColumns)]);
             }
         }
 
         // Any blocks beyond the grid keep rendering as their own sections.
         if ($cursor < count($blocks)) {
             foreach (array_slice($blocks, $cursor) as $block) {
-                $sections[] = new Section([new Column([$block], $columns)]);
+                $sections[] = new Section([new Row([new Column([$block], $columns)])]);
             }
         }
 

@@ -2,15 +2,22 @@ type: page
 title: Контакты
 order: 4
 published: true
+show_in_menu: true
 layout:
-  blocks:
-    - type: heading
-      settings: {text: 'Контакты', level: h2}
-    - type: text
-      settings:
-        body: |
-          **Офис:** Санкт-Петербург, набережная Реки Карповки, 5
+  sections:
+    - settings: {global: site-header}
+    - rows:
+        - columns:
+            - width: 7
+              blocks:
+                - type: heading
+                  settings: {text: 'Контакты', level: h1}
+                - type: text
+                  settings:
+                    body: |
+                      **Офис:** Санкт-Петербург, набережная Реки Карповки, 5
 
-          **Телефон:** +7 812 000-00-00
+                      **Телефон:** +7 812 000-00-00
 
-          **Почта:** hello@example.com
+                      **Почта:** hello@example.com
+    - settings: {global: site-footer}

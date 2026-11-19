@@ -15,6 +15,7 @@ $cssClass = trim((string) ($settings['class'] ?? 'site-nav'));
 if ($cssClass === '') {
     $cssClass = 'site-nav';
 }
+$orientation = ($settings['orientation'] ?? 'horizontal') === 'vertical' ? 'vertical' : 'horizontal';
 
 /**
  * @param list<array{title: string, url: string, children: list<array>}> $entries
@@ -158,6 +159,6 @@ if ($entries === []) {
     return;
 }
 ?>
-<nav class="block block--menu <?= $this->e($cssClass) ?>-wrap">
+<nav class="block block--menu block--menu-<?= $orientation ?> <?= $this->e($cssClass) ?>-wrap">
     <?= $render($entries, 1, $depth, $cssClass, $render) ?>
 </nav>

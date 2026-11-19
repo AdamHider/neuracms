@@ -10,6 +10,7 @@ use FlatCms\Modules\Builder\Block;
 use FlatCms\Modules\Builder\BuilderModule;
 use FlatCms\Modules\Builder\Layout;
 use FlatCms\Modules\Builder\LayoutRenderer;
+use FlatCms\Modules\Builder\Section;
 use FlatCms\Modules\Builder\TypeRegistry;
 use FlatCms\Tests\FlatCmsTestCase;
 
@@ -46,7 +47,7 @@ final class BuilderTest extends FlatCmsTestCase
         $types = $this->builder($app)->types();
 
         self::assertInstanceOf(TypeRegistry::class, $types);
-        foreach (['heading', 'text', 'image', 'button', 'quote', 'columns', 'products', 'elements', 'media', 'divider', 'spacer', 'html'] as $name) {
+        foreach (['heading', 'text', 'image', 'button', 'quote', 'elements', 'media', 'divider', 'spacer', 'html', 'menu'] as $name) {
             self::assertTrue($types->has($name), "Missing block type: {$name}");
         }
     }
@@ -331,33 +332,213 @@ final class BuilderTest extends FlatCmsTestCase
         self::assertStringContainsString('--g-span:6', $html);
     }
 
-    public function testNestedColumnsBlockRendersChildren(): void
+    /**
+     * The columns particle is gone: rows and columns are structure, so the same
+     * 8/4 split is expressed as a row with two columns.
+     */
+    public function testColumnsParticleIsReplacedByRows(): void
     {
         $app = $this->appWithBuilder();
         $renderer = $this->builder($app)->renderer();
         self::assertNotNull($renderer);
 
-        $html = $renderer->renderBlock(new Block('columns', [
-            'ratio' => '8-4',
-            'left' => [['type' => 'heading', 'settings' => ['text' => 'Внутри']]],
-            'right' => [['type' => 'text', 'settings' => ['body' => 'Текст']]],
-        ]));
+        $section = Section::fromArray([
+            'rows' => [[
+                'columns' => [
+                    ['width' => 8, 'blocks' => [['type' => 'heading', 'settings' => ['text' => 'Внутри']]]],
+                    ['width' => 4, 'blocks' => [['type' => 'text', 'settings' => ['body' => 'Текст']]]],
+                ],
+            ]],
+        ], 12);
 
-        self::assertStringContainsString('--left:8;--right:4', $html);
+        $html = $renderer->renderSection($section);
+
+        self::assertStringContainsString('--g-span:8', $html);
+        self::assertStringContainsString('--g-span:4', $html);
         self::assertStringContainsString('Внутри', $html);
         self::assertStringContainsString('Текст', $html);
     }
 
-    public function testProductsBlockListsProducts(): void
+    /**
+     * The products particle is gone: an element list over the "product" type
+     * shows the same cards, and it works for any element type.
+     */
+    public function testElementListRendersProducts(): void
     {
         $app = $this->appWithBuilder();
         $renderer = $this->builder($app)->renderer();
         self::assertNotNull($renderer);
 
-        $html = $renderer->renderBlock(new Block('products', ['limit' => 5]));
+        $html = $renderer->renderBlock(new Block('elements', [
+            'element_type' => 'product',
+            'limit' => 5,
+            'map_price' => 'price',
+        ]));
 
         self::assertStringContainsString('Teapot', $html);
-        self::assertStringContainsString('1 200 ₽', $html);
+        self::assertStringContainsString('1200', $html);
+    }
+
+    /**
+     * A section can hold several rows, each with its own column split: that is
+     * what replaced the old multi-column particle.
+     */
+    public function testSectionHoldsSeveralRowsWithOwnSplits(): void
+    {
+        $app = $this->appWithBuilder();
+        $renderer = $this->builder($app)->renderer();
+        self::assertNotNull($renderer);
+
+        $section = Section::fromArray([
+            'rows' => [
+                ['columns' => [
+                    ['width' => 12, 'blocks' => [['type' => 'heading', 'settings' => ['text' => 'Заголовок']]]],
+                ]],
+                ['columns' => [
+                    ['width' => 6, 'blocks' => [['type' => 'text', 'settings' => ['body' => 'Слева']]]],
+                    ['width' => 6, 'blocks' => [['type' => 'text', 'settings' => ['body' => 'Справа']]]],
+                ]],
+            ],
+        ], 12);
+
+        self::assertCount(2, $section->rows());
+        self::assertCount(3, $section->columns());
+
+        $html = $renderer->renderSection($section);
+        self::assertSame(2, substr_count($html, 'class="g-row"'));
+        self::assertStringContainsString('Слева', $html);
+        self::assertStringContainsString('Справа', $html);
+    }
+
+    public function testRowAndColumnCarryTheirOwnTitleAndClass(): void
+    {
+        $app = $this->appWithBuilder();
+        $renderer = $this->builder($app)->renderer();
+        self::assertNotNull($renderer);
+
+        $section = Section::fromArray([
+            'title' => 'Герой',
+            'class' => 'hero-band',
+            'rows' => [[
+                'title' => 'Верхний ряд',
+                'class' => 'hero-row',
+                'columns' => [[
+                    'width' => 12,
+                    'class' => 'hero-col',
+                    'blocks' => [['type' => 'heading', 'settings' => ['text' => 'Привет']]],
+                ]],
+            ]],
+        ], 12);
+
+        self::assertSame('Герой', $section->title());
+        self::assertSame('hero-band', $section->cssClass());
+        self::assertSame('Верхний ряд', $section->rows()[0]->title());
+        self::assertSame('hero-col', $section->columns()[0]->cssClass());
+
+        $html = $renderer->renderSection($section);
+        self::assertStringContainsString('hero-band', $html);
+        self::assertStringContainsString('hero-row', $html);
+        self::assertStringContainsString('hero-col', $html);
+    }
+
+    public function testBlockTitleAndClassRoundTripThroughSave(): void
+    {
+        $app = $this->appWithBuilder(true);
+        $this->write('content/landing/item.yaml', "type: page\ntitle: Landing\n");
+        $app->build();
+
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $layout = [
+            'sections' => [[
+                'title' => 'Герой',
+                'rows' => [[
+                    'columns' => [[
+                        'width' => 12,
+                        'blocks' => [[
+                            'type' => 'heading',
+                            'title' => 'Главный заголовок',
+                            'class' => 'hero-title',
+                            'settings' => ['text' => 'Привет'],
+                        ]],
+                    ]],
+                ]],
+            ]],
+        ];
+
+        $response = $app->handle(new Request('POST', '/admin/builder/save', [], [
+            'id' => 'landing',
+            'layout_json' => json_encode($layout),
+        ], [], [], []));
+        self::assertSame(303, $response->status());
+
+        $saved = $app->storage->load('landing');
+        self::assertNotNull($saved);
+        $section = $saved->get('layout')['sections'][0];
+        self::assertSame('Герой', $section['title']);
+        self::assertSame('hero-title', $section['rows'][0]['columns'][0]['blocks'][0]['class']);
+        self::assertSame('Главный заголовок', $section['rows'][0]['columns'][0]['blocks'][0]['title']);
+    }
+
+    public function testColumnAlignmentAndJustifyReachTheMarkup(): void
+    {
+        $app = $this->appWithBuilder();
+        $renderer = $this->builder($app)->renderer();
+        self::assertNotNull($renderer);
+
+        $section = Section::fromArray([
+            'rows' => [[
+                'settings' => ['justify' => 'between', 'align' => 'center'],
+                'columns' => [[
+                    'width' => 6,
+                    'settings' => ['justify' => 'end', 'align' => 'center'],
+                    'blocks' => [['type' => 'text', 'settings' => ['body' => 'Текст']]],
+                ]],
+            ]],
+        ], 12);
+
+        $html = $renderer->renderSection($section);
+
+        self::assertStringContainsString('--g-justify:space-between', $html);
+        self::assertStringContainsString('--g-align:center', $html);
+        self::assertStringContainsString('--g-justify:flex-end', $html);
+    }
+
+    /**
+     * A section that only points at a global has no rows of its own. Reading it
+     * back must not invent an empty row, or every save would grow the file.
+     */
+    public function testGlobalSectionReferenceKeepsNoRows(): void
+    {
+        $layout = Layout::fromValue([
+            'sections' => [['settings' => ['global' => 'site-header']]],
+        ], 12);
+
+        $section = $layout->sections()[0];
+        self::assertSame([], $section->rows());
+        self::assertSame('site-header', $section->get('global'));
+        self::assertArrayNotHasKey('rows', $section->toArray());
+    }
+
+    public function testNodeIdsAreUniqueAcrossLevels(): void
+    {
+        $section = Section::fromArray([
+            'rows' => [['columns' => [['width' => 12, 'blocks' => []]]]],
+        ], 12);
+
+        $ids = [$section->id(), $section->rows()[0]->id(), $section->columns()[0]->id()];
+        self::assertSame($ids, array_unique($ids));
+    }
+
+    public function testEmptySettingsAreNotPersisted(): void
+    {
+        $section = Section::fromArray(['rows' => [['columns' => [['width' => 12, 'blocks' => []]]]]], 12);
+        $array = $section->toArray();
+
+        self::assertArrayNotHasKey('settings', $array);
+        self::assertArrayNotHasKey('settings', $array['rows'][0]);
+        self::assertArrayNotHasKey('settings', $array['rows'][0]['columns'][0]);
     }
 
     public function testPageLayoutRendersThroughTemplate(): void
@@ -549,7 +730,7 @@ final class BuilderTest extends FlatCmsTestCase
 
         self::assertArrayHasKey('header', $presets);
         self::assertArrayHasKey('footer', $presets);
-        self::assertSame([4, 8], $presets['header']['widths']);
+        self::assertSame([3, 9], $presets['header']['widths']);
         // The presets carry ready-made blocks so a header/footer can be dropped in.
         self::assertSame('menu', $presets['header']['blocks'][1][0]['type']);
         self::assertSame('menu', $presets['footer']['blocks'][1][0]['type']);

@@ -2,10 +2,17 @@ type: section
 title: Услуги
 order: 2
 published: true
+show_in_menu: true
 layout:
-  blocks:
-    - type: heading
-      settings: {text: 'Услуги', level: h1}
-    - type: text
-      settings:
-        body: 'Выберите направление, чтобы узнать подробности.'
+  sections:
+    - settings: {global: site-header}
+    - rows:
+        - columns:
+            - width: 12
+              blocks:
+                - type: heading
+                  settings: {text: 'Услуги', level: h1}
+                - type: text
+                  settings:
+                    body: 'Выберите направление, чтобы узнать подробности.'
+    - settings: {global: site-footer}

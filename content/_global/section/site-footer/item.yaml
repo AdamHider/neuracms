@@ -1,0 +1,22 @@
+title: Подвал сайта
+kind: section
+order: 1
+section:
+  settings: {role: footer}
+  rows:
+    - columns:
+        - width: 6
+          blocks:
+            - type: text
+              settings: {body: '© FlatCMS. Плоская CMS на файлах.'}
+        - width: 6
+          blocks:
+            - type: menu
+              settings:
+                source: pages
+                content_type: page
+                depth: 1
+                orientation: horizontal
+                filters:
+                  - {field: show_in_menu, op: '=', value: '1'}
+                class: site-nav--footer

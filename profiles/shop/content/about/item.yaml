@@ -2,10 +2,17 @@ type: page
 title: О магазине
 order: 2
 published: true
+show_in_menu: true
 layout:
-  blocks:
-    - type: heading
-      settings: {text: 'О магазине', level: h2}
-    - type: text
-      settings:
-        body: 'Мы работаем с небольшими обжарщиками и чайными плантациями напрямую.'
+  sections:
+    - settings: {global: site-header}
+    - rows:
+        - columns:
+            - width: 7
+              blocks:
+                - type: heading
+                  settings: {text: 'О магазине', level: h1}
+                - type: text
+                  settings:
+                    body: 'Мы работаем с небольшими обжарщиками и чайными плантациями напрямую.'
+    - settings: {global: site-footer}

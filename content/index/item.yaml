@@ -2,17 +2,33 @@ type: page
 title: Главная
 order: 0
 published: true
+show_in_menu: true
 layout:
-  blocks:
-    - type: heading
-      settings: {text: 'Добро пожаловать в FlatCMS', level: h1}
-    - type: text
+  sections:
+    -
       settings:
-        body: |
-          Это маленькая CMS без базы данных. Контент лежит в папке `content/`, каждый элемент описывается набором свойств в `item.yaml`.
-
-          - Простое ядро без тяжёлого фреймворка
-          - Всё есть Item: страница, товар и запись блога отличаются только полем `type`
-          - Модули расширяют систему через хуки и маршруты
-    - type: button
-      settings: {text: 'О проекте', url: /about, style: primary}
+        global: site-header
+    -
+      rows:
+        -
+          columns:
+            -
+              width: 12
+              blocks: [{ type: heading, settings: { text: 'Добро пожаловать в FlatCMS', level: h1 } }]
+    -
+      rows:
+        -
+          columns:
+            -
+              width: 12
+              blocks: [{ type: text, settings: { body: "Это маленькая CMS без базы данных. Контент лежит в папке `content/`, каждый элемент описывается набором свойств в `item.yaml`.\n\n- Простое ядро без тяжёлого фреймворка\n- Всё есть Item: страница, товар и запись блога отличаются только полем `type`\n- Модули расширяют систему через хуки и маршруты\n" } }]
+    -
+      rows:
+        -
+          columns:
+            -
+              width: 12
+              blocks: [{ type: button, settings: { text: 'О проекте', url: /about, style: primary } }]
+    -
+      settings:
+        global: site-footer

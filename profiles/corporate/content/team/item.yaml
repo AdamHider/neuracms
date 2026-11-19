@@ -2,13 +2,33 @@ type: page
 title: Команда
 order: 3
 published: true
+show_in_menu: true
 layout:
-  blocks:
-    - type: heading
-      settings: {text: 'Руководство', level: h2}
-    - type: text
-      settings:
-        body: |
-          - Анна Ветрова — генеральный директор
-          - Игорь Логинов — технический директор
-          - Мария Полева — финансовый директор
+  sections:
+    - settings: {global: site-header}
+    - rows:
+        - columns:
+            - width: 12
+              blocks:
+                - type: heading
+                  settings: {text: 'Руководство', level: h1}
+        - columns:
+            - width: 4
+              blocks:
+                - type: heading
+                  settings: {text: 'Анна Ветрова', level: h3}
+                - type: text
+                  settings: {body: 'Генеральный директор'}
+            - width: 4
+              blocks:
+                - type: heading
+                  settings: {text: 'Игорь Логинов', level: h3}
+                - type: text
+                  settings: {body: 'Технический директор'}
+            - width: 4
+              blocks:
+                - type: heading
+                  settings: {text: 'Мария Полева', level: h3}
+                - type: text
+                  settings: {body: 'Финансовый директор'}
+    - settings: {global: site-footer}

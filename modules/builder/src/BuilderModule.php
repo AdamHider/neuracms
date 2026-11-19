@@ -11,7 +11,6 @@ use FlatCms\Contracts\Module;
 use FlatCms\Core\Request;
 use FlatCms\Core\Response;
 use FlatCms\Modules\Builder\Types\ButtonType;
-use FlatCms\Modules\Builder\Types\ColumnsType;
 use FlatCms\Modules\Builder\Types\DividerType;
 use FlatCms\Modules\Builder\Types\ElementsType;
 use FlatCms\Modules\Builder\Types\GlobalBlockType;
@@ -20,7 +19,6 @@ use FlatCms\Modules\Builder\Types\HtmlType;
 use FlatCms\Modules\Builder\Types\ImageType;
 use FlatCms\Modules\Builder\Types\MediaType;
 use FlatCms\Modules\Builder\Types\MenuType;
-use FlatCms\Modules\Builder\Types\ProductsType;
 use FlatCms\Modules\Builder\Types\QuoteType;
 use FlatCms\Modules\Builder\Types\SpacerType;
 use FlatCms\Modules\Builder\Types\TextType;
@@ -59,6 +57,18 @@ final class BuilderModule implements Module
             // Pages without an item (cart, contact form) still get the chrome,
             // taken from the home page.
             return $this->renderer?->pageShell($item instanceof Item ? $item : null, $body) ?? $body;
+        });
+
+        // A brand-new page starts with a header section, so every page has a
+        // header by default. It is an ordinary section: deleting it in the
+        // builder removes the header from that page.
+        $app->events->on('item.created', function (array $data): array {
+            $type = (string) ($data['type'] ?? 'page');
+            if (!isset($data['layout']) && $this->requireApp()->schema->isPage($type)) {
+                $data['layout'] = $this->defaultLayout($type);
+            }
+
+            return $data;
         });
 
         $router = $app->router;
@@ -103,8 +113,6 @@ final class BuilderModule implements Module
             new MediaType(),
             new ButtonType(),
             new QuoteType(),
-            new ColumnsType(),
-            new ProductsType(),
             new ElementsType(),
             new MenuType(),
             new DividerType(),
@@ -237,7 +245,7 @@ final class BuilderModule implements Module
                 return Response::html($app->renderer->renderTemplate('admin/404', ['title' => 'Не найдено']), 404);
             }
             $layout = new Layout([
-                new Section([new Column([$block], $this->gridColumns())]),
+                new Section([new Row([new Column([$block], $this->gridColumns())])]),
             ], $this->gridColumns());
         }
 
@@ -390,11 +398,19 @@ final class BuilderModule implements Module
             $payload = ['section' => $section->toArray()];
             $fallback = (string) $section->get('title', 'section');
         } else {
-            $path = explode(':', (string) $request->input('block_index', '0:0'));
-            $si = (int) ($path[0] ?? 0);
-            $ci = (int) ($path[1] ?? 0);
-            $bi = (int) ($path[2] ?? 0);
-            $columns = $layout->sections()[$si]?->columns() ?? [];
+            // Current path is section:row:column:block. A three-part path comes
+            // from layouts saved before rows existed, so it names column 0.
+            $path = array_map('intval', explode(':', (string) $request->input('block_index', '0:0:0:0')));
+            if (count($path) >= 4) {
+                [$si, $ri, $ci, $bi] = $path;
+            } else {
+                $si = $path[0] ?? 0;
+                $ri = 0;
+                $ci = $path[1] ?? 0;
+                $bi = $path[2] ?? 0;
+            }
+            $rows = $layout->sections()[$si]?->rows() ?? [];
+            $columns = $rows[$ri]?->columns() ?? [];
             $block = $columns[$ci]?->blocks()[$bi] ?? null;
             if ($block === null) {
                 return Response::json(['error' => 'Элемент не найден.'], 422);
@@ -438,6 +454,85 @@ final class BuilderModule implements Module
     private function gridColumns(): int
     {
         return (int) $this->requireApp()->config->get('builder.grid_columns', 12);
+    }
+
+    /**
+     * The layout a new page starts with: a header section and one empty body
+     * section. The header is a normal section, so it can be edited or deleted
+     * like any other.
+     *
+     * @return array<string, mixed>
+     */
+    private function defaultLayout(string $type): array
+    {
+        $configured = $this->requireApp()->config->get('builder.defaults.' . $type, null);
+        if (is_array($configured) && $configured !== []) {
+            return $configured;
+        }
+
+        $presets = [];
+        foreach ($this->presets() as $preset) {
+            $presets[$preset['name']] = $preset;
+        }
+
+        $sections = [];
+        foreach (['header', 'one'] as $name) {
+            $preset = $presets[$name] ?? null;
+            if ($preset === null) {
+                continue;
+            }
+            $sections[] = $this->sectionFromPreset($preset);
+        }
+
+        return (new Layout($this->sanitizeSections($sections), $this->gridColumns()))->toArray();
+    }
+
+    /**
+     * Turn a preset into a section payload, which is what the editor and the
+     * layout model both read.
+     *
+     * @param array<string, mixed> $preset
+     *
+     * @return array<string, mixed>
+     */
+    private function sectionFromPreset(array $preset): array
+    {
+        $blocks = is_array($preset['blocks'] ?? null) ? $preset['blocks'] : [];
+        $columns = [];
+        foreach ($preset['widths'] ?? [$this->gridColumns()] as $ci => $width) {
+            $columnBlocks = [];
+            foreach ($blocks[$ci] ?? [] as $entry) {
+                if (is_array($entry) && isset($entry['type'])) {
+                    $columnBlocks[] = $entry;
+                }
+            }
+            $columns[] = ['width' => (int) $width, 'blocks' => $columnBlocks];
+        }
+
+        $settings = is_array($preset['settings'] ?? null) ? $preset['settings'] : [];
+        if (($preset['role'] ?? '') !== '') {
+            $settings['role'] = (string) $preset['role'];
+        }
+
+        return ['settings' => $settings, 'rows' => [['columns' => $columns]]];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $sections
+     *
+     * @return list<Section>
+     */
+    private function sanitizeSections(array $sections): array
+    {
+        $clean = [];
+        foreach ($sections as $entry) {
+            $section = $this->sanitizeSection($entry, $this->gridColumns());
+            if ($section !== null) {
+                $clean[] = $section;
+            }
+        }
+
+        return $clean;
     }
 
     /**
@@ -495,10 +590,13 @@ final class BuilderModule implements Module
 
     /**
      * Ready-made sections ("presets"). Each carries a name, a title and the
-     * column widths; some also carry ready-made blocks, so the "Добавить секцию"
-     * menu can drop in a header or a footer in one click.
+     * column widths of its first row; some also carry ready-made blocks, so the
+     * "Добавить секцию" menu can drop in a header or a footer in one click.
      *
-     * @return list<array{name: string, title: string, widths: list<int>, blocks?: array<int, list<array>>, icon?: string, position?: string}>
+     * A preset is plain data: widths become one row, so nothing here needs a
+     * dedicated particle type.
+     *
+     * @return list<array{name: string, title: string, widths: list<int>, blocks?: array<int, list<array>>, icon?: string, position?: string, role?: string, settings?: array<string, mixed>}>
      */
     private function presets(): array
     {
@@ -515,13 +613,14 @@ final class BuilderModule implements Module
                 'icon' => 'menu',
                 'position' => 'start',
                 'role' => 'header',
-                'widths' => [4, 8],
+                'widths' => [3, 9],
+                'settings' => ['align' => 'center'],
                 'blocks' => [
                     [
                         ['type' => 'heading', 'settings' => ['text' => 'Название сайта', 'level' => 'h2']],
                     ],
                     [
-                        ['type' => 'menu', 'settings' => ['source' => 'pages', 'depth' => 2, 'class' => 'site-nav']],
+                        ['type' => 'menu', 'settings' => ['source' => 'pages', 'depth' => 2, 'class' => 'site-nav', 'orientation' => 'horizontal']],
                     ],
                 ],
             ],
@@ -686,7 +785,54 @@ final class BuilderModule implements Module
             return null;
         }
 
-        $columnsData = [];
+        $rows = [];
+        foreach (is_array($raw['rows'] ?? null) ? $raw['rows'] : [] as $entry) {
+            if (!is_array($entry)) {
+                continue;
+            }
+            $row = $this->sanitizeRow($entry, $columns);
+            if ($row !== null) {
+                $rows[] = $row;
+            }
+        }
+
+        // Sections written before rows existed carry a flat "columns" list.
+        if ($rows === [] && isset($raw['columns']) && is_array($raw['columns'])) {
+            $legacy = $this->sanitizeRow(['columns' => $raw['columns']], $columns);
+            if ($legacy !== null) {
+                $rows[] = $legacy;
+            }
+        }
+
+        // A section given as a flat block list keeps working.
+        if ($rows === [] && isset($raw['blocks']) && is_array($raw['blocks'])) {
+            $legacy = $this->sanitizeRow(['blocks' => $raw['blocks']], $columns);
+            if ($legacy !== null) {
+                $rows[] = $legacy;
+            }
+        }
+
+        $settings = $this->sanitizeSettings($raw['settings'] ?? []);
+        $id = isset($raw['id']) && is_string($raw['id']) ? $raw['id'] : null;
+        $title = isset($raw['title']) && is_string($raw['title']) ? trim($raw['title']) : '';
+        $class = isset($raw['class']) && is_string($raw['class']) ? trim($raw['class']) : '';
+
+        // A section that only points at a global keeps no rows of its own.
+        $isGlobalRef = trim((string) ($settings['global'] ?? '')) !== '';
+        if ($rows === [] && !$isGlobalRef) {
+            return null;
+        }
+
+        return new Section($rows, $settings, $id, $title, $class);
+    }
+
+    private function sanitizeRow(mixed $raw, int $columns): ?Row
+    {
+        if (!is_array($raw)) {
+            return null;
+        }
+
+        $rowColumns = [];
         foreach (is_array($raw['columns'] ?? null) ? $raw['columns'] : [] as $column) {
             if (!is_array($column)) {
                 continue;
@@ -701,11 +847,15 @@ final class BuilderModule implements Module
                 }
             }
             $width = isset($column['width']) ? max(0, min($columns, (int) $column['width'])) : 0;
-            $columnsData[] = new Column($blocks, $width);
+            $settings = $this->sanitizeSettings($column['settings'] ?? []);
+            $id = isset($column['id']) && is_string($column['id']) ? $column['id'] : null;
+            $title = isset($column['title']) && is_string($column['title']) ? trim($column['title']) : '';
+            $class = isset($column['class']) && is_string($column['class']) ? trim($column['class']) : '';
+            $rowColumns[] = new Column($blocks, $width, $settings, $id, $title, $class);
         }
 
-        // A section given as a flat block list keeps working.
-        if ($columnsData === [] && isset($raw['blocks']) && is_array($raw['blocks'])) {
+        // A row given as a flat block list gets one full-width column.
+        if ($rowColumns === [] && isset($raw['blocks']) && is_array($raw['blocks'])) {
             $blocks = [];
             foreach ($raw['blocks'] as $entry) {
                 if (is_array($entry)) {
@@ -715,19 +865,19 @@ final class BuilderModule implements Module
                     }
                 }
             }
-            $columnsData[] = new Column($blocks, $columns);
+            $rowColumns[] = new Column($blocks, $columns);
+        }
+
+        if ($rowColumns === []) {
+            return null;
         }
 
         $settings = $this->sanitizeSettings($raw['settings'] ?? []);
         $id = isset($raw['id']) && is_string($raw['id']) ? $raw['id'] : null;
+        $title = isset($raw['title']) && is_string($raw['title']) ? trim($raw['title']) : '';
+        $class = isset($raw['class']) && is_string($raw['class']) ? trim($raw['class']) : '';
 
-        // A section that only points at a global keeps no columns of its own.
-        $isGlobalRef = trim((string) ($settings['global'] ?? '')) !== '';
-        if ($columnsData === [] && !$isGlobalRef) {
-            return null;
-        }
-
-        return new Section($columnsData, $settings, $id);
+        return new Row($rowColumns, $settings, $id, $title, $class);
     }
 
     private function sanitizeBlock(mixed $entry): ?Block
@@ -743,8 +893,10 @@ final class BuilderModule implements Module
 
         $settings = $this->sanitizeSettings($entry['settings'] ?? []);
         $id = isset($entry['id']) && is_string($entry['id']) ? $entry['id'] : null;
+        $title = isset($entry['title']) && is_string($entry['title']) ? trim($entry['title']) : '';
+        $class = isset($entry['class']) && is_string($entry['class']) ? trim($entry['class']) : '';
 
-        return new Block($type, $settings, $id);
+        return new Block($type, $settings, $id, $title, $class);
     }
 
     /**

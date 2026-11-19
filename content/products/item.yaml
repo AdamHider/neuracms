@@ -2,7 +2,19 @@ type: section
 title: Товары
 order: 20
 published: true
+show_in_menu: true
 layout:
-  blocks:
-    - type: heading
-      settings: {text: 'Товары', level: h1}
+  sections:
+    -
+      settings:
+        global: site-header
+    -
+      rows:
+        -
+          columns:
+            -
+              width: 12
+              blocks: [{ type: heading, settings: { text: Товары, level: h1 } }]
+    -
+      settings:
+        global: site-footer

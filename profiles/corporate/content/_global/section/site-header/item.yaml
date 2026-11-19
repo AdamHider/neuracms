@@ -1,0 +1,21 @@
+title: Шапка сайта
+kind: section
+section:
+  settings: {role: header, align: center}
+  rows:
+    - columns:
+        - width: 4
+          blocks:
+            - type: heading
+              settings: {text: 'ГК «Северный Ветер»', level: h2}
+        - width: 8
+          blocks:
+            - type: menu
+              settings:
+                source: pages
+                content_type: page
+                depth: 2
+                orientation: horizontal
+                filters:
+                  - {field: show_in_menu, op: '=', value: '1'}
+                class: site-nav

@@ -84,7 +84,10 @@ final class ProfilesTest extends FlatCmsTestCase
         $body = $this->get($app, '/')->body();
 
         self::assertStringContainsString('Студия «Верста»', $body);
-        self::assertStringContainsString('block--columns', $body);
+        // Header row, two body rows in one section, footer row.
+        self::assertSame(4, substr_count($body, 'class="g-row"'));
+        self::assertStringContainsString('--g-span:7', $body);
+        self::assertStringContainsString('--g-span:5', $body);
         self::assertStringContainsString('block--media', $body);
         self::assertStringContainsString('/media/index/logo.svg', $body);
         self::assertStringContainsString('/contact', $body);
@@ -125,6 +128,28 @@ final class ProfilesTest extends FlatCmsTestCase
         self::assertStringContainsString('>Услуги<', $body);
     }
 
+    /**
+     * The stock install (the content/ folder in the repository) must ship with
+     * working chrome too: the builder is the only source of the header and
+     * footer, so a demo page without a chrome reference would render bare.
+     */
+    public function testStockContentShipsWithHeaderAndFooter(): void
+    {
+        (new Fs($this->root))->deleteDir('content');
+        $this->copyFromProject('content');
+
+        $app = $this->app();
+
+        foreach (['/', '/about', '/products', '/blog/first-post'] as $path) {
+            $body = $this->get($app, $path)->body();
+
+            self::assertSame(1, substr_count($body, '<header class="site-header"'), $path);
+            self::assertSame(1, substr_count($body, '<footer class="site-footer"'), $path);
+        }
+
+        self::assertStringContainsString('site-nav', $this->get($app, '/')->body());
+    }
+
     public function testModuleNavLinkDoesNotRepeatAContentPage(): void
     {
         $app = $this->install('corporate');
@@ -132,8 +157,10 @@ final class ProfilesTest extends FlatCmsTestCase
         $body = $this->get($app, '/')->body();
 
         // /contacts is a content page and the contact-form module also injects a
-        // "Контакты" link; only one of them may reach the menu.
-        self::assertSame(1, substr_count($body, '>Контакты</a>'));
+        // "Контакты" link; only one of them may reach the header menu. The footer
+        // has its own page menu, so count inside the header only.
+        $header = substr($body, (int) strpos($body, '<header'), (int) strpos($body, '</header>'));
+        self::assertSame(1, substr_count($header, '>Контакты</a>'));
     }
 
     public function testSiteConfigOverridesModuleDefaults(): void

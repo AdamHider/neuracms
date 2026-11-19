@@ -2,10 +2,27 @@ type: page
 title: О компании
 order: 1
 published: true
+show_in_menu: true
 layout:
-  blocks:
-    - type: heading
-      settings: {text: 'О компании', level: h2}
-    - type: text
-      settings:
-        body: 'Более 120 реализованных проектов и 300 сотрудников в четырёх регионах.'
+  sections:
+    - settings: {global: site-header}
+    - rows:
+        - columns:
+            - width: 7
+              blocks:
+                - type: heading
+                  settings: {text: 'О компании', level: h1}
+                - type: text
+                  settings:
+                    body: 'Более 120 реализованных проектов и 300 сотрудников в четырёх регионах.'
+            - width: 5
+              blocks:
+                - type: heading
+                  settings: {text: 'Цифры', level: h2}
+                - type: text
+                  settings:
+                    body: |
+                      - 120+ проектов
+                      - 300 сотрудников
+                      - 4 региона
+    - settings: {global: site-footer}

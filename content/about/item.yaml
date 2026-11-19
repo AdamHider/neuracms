@@ -1,12 +1,27 @@
 type: page
-title: О проекте
+title: 'О проекте'
 order: 10
 published: true
+show_in_menu: true
 layout:
-  blocks:
-    - type: heading
-      settings: {text: 'О проекте', level: h1}
-    - type: text
+  sections:
+    -
       settings:
-        body: |
-          FlatCMS собирается из ядра и модулей. Ядро отвечает за чтение контента, маршрутизацию, шаблоны и запросы, а всё остальное выносится в модули.
+        global: site-header
+    -
+      rows:
+        -
+          columns:
+            -
+              width: 12
+              blocks: [{ type: heading, settings: { text: 'О проекте', level: h1 } }]
+    -
+      rows:
+        -
+          columns:
+            -
+              width: 12
+              blocks: [{ type: text, settings: { body: "FlatCMS собирается из ядра и модулей. Ядро отвечает за чтение контента, маршрутизацию, шаблоны и запросы, а всё остальное выносится в модули.\n" } }]
+    -
+      settings:
+        global: site-footer

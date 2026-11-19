@@ -2,10 +2,26 @@ type: section
 title: Каталог
 order: 1
 published: true
+show_in_menu: true
 layout:
-  blocks:
-    - type: heading
-      settings: {text: 'Каталог', level: h1}
-    - type: text
-      settings:
-        body: 'Все товары магазина.'
+  sections:
+    - settings: {global: site-header}
+    - rows:
+        - columns:
+            - width: 12
+              blocks:
+                - type: heading
+                  settings: {text: 'Каталог', level: h1}
+                - type: text
+                  settings:
+                    body: 'Все товары магазина.'
+                - type: elements
+                  settings:
+                    element_type: product
+                    limit: 24
+                    sort: order
+                    direction: asc
+                    map_title: title
+                    map_price: price
+                    columns: '3'
+    - settings: {global: site-footer}

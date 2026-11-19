@@ -543,6 +543,13 @@ final class AdminPanel implements Subsystem
             $body = '';
         }
 
+        // Modules may seed a new item (the builder adds a default header section
+        // to a fresh page). Only for new items: an existing layout is never
+        // touched here.
+        if ($existing === null) {
+            $data = $app->events->filter('item.created', $data);
+        }
+
         $item = new Item('', $data, $body);
         $errors = $app->schema->validate($item);
         if ($data['title'] === '') {
