@@ -186,8 +186,15 @@ php -S localhost:8000 -t public   # dev server
 
 - Local `flatcms` branch tracks `origin/flatcms`; `master` is untouched, no PRs.
 - The injected `GITHUB_TOKEN` is a GitHub App token with read-only contents, so
-  `git push` with it fails with 403. Push with a PAT inline instead, keeping it
-  out of `.git/config`: `git push https://x-access-token:$PAT@github.com/...`.
+  `git push` with it fails with 403. Push with a write-scoped PAT instead, keeping
+  it out of `.git/config`.
+- A PAT alone is not enough: `~/.gitconfig` sets
+  `credential.https://github.com.helper=!/home/openhands/.openhands/git-credential-helper`,
+  which overrides `-c credential.helper=...` and injects the read-only App token.
+  Clear the list before adding yours:
+  `git -c credential.helper= -c credential.helper="store --file=$CRED" push origin flatcms:flatcms`.
+  Symptom of getting this wrong: the API accepts a write (blob POST returns 201)
+  while `git push` still reports `Permission to <owner>/<repo>.git denied`.
 - `var/users/` is gitignored — admin credentials are never committed.
 - The stock `content/` folder is a real install target, not just a fixture: a
   change that only touches `profiles/` leaves a fresh checkout of the repo
