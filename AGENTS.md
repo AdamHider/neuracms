@@ -185,4 +185,11 @@ php -S localhost:8000 -t public   # dev server
 ## Gotchas
 
 - Local `flatcms` branch tracks `origin/flatcms`; `master` is untouched, no PRs.
+- Pushing to `origin` fails with 403 in the sandbox: the injected `GITHUB_TOKEN`
+  is a GitHub App token with read-only contents, so commits stay local until a
+  push-capable credential is available.
 - `var/users/` is gitignored — admin credentials are never committed.
+- The stock `content/` folder is a real install target, not just a fixture: a
+  change that only touches `profiles/` leaves a fresh checkout of the repo
+  without chrome. Keep `content/_global/` and `profiles/*/content/_global/` in
+  step, and cover both in `ProfilesTest`.
