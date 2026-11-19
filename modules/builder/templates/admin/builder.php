@@ -12,7 +12,7 @@
  * @var string|null $globalKind
  * @var string|null $globalName
  * @var array<string, array<string, array>>|null $globals
- * @var array<string, array<string, string>>|null $globalPreviews
+ * @var array<string, array<string, array<string, mixed>>>|null $globalStructures
  * @var \FlatCms\Modules\Builder\Layout $layout
  * @var array<string, \FlatCms\Modules\Builder\BlockType> $types
  * @var array<string, list<array>> $categories
@@ -38,7 +38,7 @@ $payload = [
     'menu' => $menu ?? [],
     'media' => array_values($media ?? []),
     'globals' => $globals ?? [],
-    'globalPreviews' => $globalPreviews ?? [],
+    'globalStructures' => $globalStructures ?? [],
     'global' => $global,
     'uploadUrl' => '/admin/builder/media',
     'pageId' => $id,

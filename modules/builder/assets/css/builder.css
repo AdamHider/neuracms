@@ -86,14 +86,38 @@
     color: #4c1d95;
 }
 .builder__global-body { position: relative; }
-.builder__global-preview {
+/* A global reference redraws the shared structure with the ordinary editor
+   cards, handles and inline controls, so it looks exactly like the band did on
+   the page it came from. The controls are disabled: the content lives in the
+   global, and "Редактировать" opens the real editor for it. */
+.builder__global-shared {
     padding: .5rem;
-    overflow: hidden;
-    background: #fff;
+    background: #fbfaff;
     border-bottom: 1px solid #ddd6fe;
 }
-/* A reference is a window onto the shared copy, so clicks edit rather than select. */
-.builder__global-preview * { pointer-events: none; }
+.builder__global-shared .builder__row,
+.builder__global-shared .builder__column { background: transparent; }
+.builder__global-shared .builder__handle { cursor: default; opacity: .45; }
+.builder__global-shared .builder__block { cursor: default; }
+.builder__global-shared .builder__icon-btn:disabled,
+.builder__global-shared .builder__add-col:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+.builder__global-shared .builder__drop-hint { visibility: hidden; }
+.builder__block-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .15rem .6rem;
+    margin-left: auto;
+    padding: 0 .4rem;
+    font-size: .74rem;
+    color: var(--admin-muted, #6b7280);
+}
+.builder__field { display: inline-flex; gap: .25rem; align-items: baseline; }
+.builder__field-label { opacity: .75; }
+.builder__field-value { color: var(--admin-ink, #1f2430); font-weight: 500; }
 
 /* ---- Canvas ---- */
 .builder__canvas-wrap { padding: .85rem; }

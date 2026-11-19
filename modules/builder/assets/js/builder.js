@@ -264,11 +264,14 @@
         globalsEl.innerHTML = html || '<p class="muted">Пока нет глобальных элементов.</p>';
     }
 
-    function globalPreview(kind, name) {
-        var previews = config.globalPreviews || {};
-        var bucket = previews[kind] || {};
+    // The stored structure of a global, so a reference can be drawn with the same
+    // section/row/column/block cards as the page itself. Rendering the front end
+    // here would show published markup instead of something you can inspect.
+    function globalStructure(kind, name) {
+        var structures = config.globalStructures || {};
+        var bucket = structures[kind] || {};
 
-        return bucket[name] || '';
+        return bucket[name] || null;
     }
 
     function renderCanvas() {
@@ -311,12 +314,20 @@
 
         if (isGlobal && rows.length === 0) {
             var ref = globalCatalog('section')[section.settings.global];
-            var preview = globalPreview('section', section.settings.global);
+            var structure = globalStructure('section', section.settings.global);
+            var sharedRows = (structure && structure.rows) || [];
             html += '<div class="builder__global-body">';
-            if (preview !== '') {
-                // The content is rendered by the server: the editor has no
-                // template engine, and a reference stores no rows of its own.
-                html += '<div class="builder__global-preview">' + preview + '</div>';
+            if (sharedRows.length) {
+                // Draw the shared rows exactly as the source page draws them —
+                // same cards, handles and inline controls — so a global band is
+                // recognisable at a glance. The controls are disabled here and
+                // the band links to the global editor, because the content lives
+                // in the global rather than in this page.
+                html += '<div class="builder__global-shared" data-global-shared="' + esc(section.settings.global) + '">';
+                sharedRows.forEach(function (row, ri) {
+                    html += renderRow(row, si, ri, true);
+                });
+                html += '</div>';
             } else {
                 html += '<p class="builder__row-empty muted">Глобальная секция пуста.</p>';
             }
@@ -355,26 +366,30 @@
         }, 0);
     }
 
-    function renderRow(row, si, ri) {
+    // "shared" draws a global's own structure inside a reference. It must look
+    // like the source page's editable state — same cards, handles and inline
+    // controls — but the content belongs to the global, so the controls are
+    // disabled and the whole band links to the global editor instead.
+    function renderRow(row, si, ri, shared) {
         var columns = row.columns || [];
 
-        var html = '<div class="builder__row' + (isSelected([si, ri]) ? ' is-selected' : '')
+        var html = '<div class="builder__row' + (!shared && isSelected([si, ri]) ? ' is-selected' : '')
             + '" data-si="' + si + '" data-ri="' + ri + '">';
         html += '<div class="builder__row-head">'
-            + '<span class="builder__handle" draggable="true" data-drag="row" data-si="' + si + '" data-ri="' + ri + '" title="Перетащить ряд">' + icon('drag') + '</span>'
+            + '<span class="builder__handle"' + (shared ? '' : ' draggable="true" data-drag="row" data-si="' + si + '" data-ri="' + ri + '"') + ' title="Перетащить ряд">' + icon('drag') + '</span>'
             + '<span class="builder__row-title">' + esc(row.title || 'Ряд ' + (ri + 1)) + '</span>'
             + '<span class="builder__row-meta">' + columns.length + ' кол.</span>'
             + '<span class="builder-bar__spacer"></span>'
-            + '<button type="button" class="builder__icon-btn" data-row-del="' + si + ':' + ri + '" title="Удалить ряд">' + icon('delete') + '</button>'
+            + '<button type="button" class="builder__icon-btn" data-row-del="' + si + ':' + ri + '" title="Удалить ряд"' + (shared ? ' disabled' : '') + '>' + icon('delete') + '</button>'
             + '</div>';
 
-        html += '<div class="builder__row-columns" data-drop="columns" data-si="' + si + '" data-ri="' + ri + '">';
+        html += '<div class="builder__row-columns"' + (shared ? '' : ' data-drop="columns" data-si="' + si + '" data-ri="' + ri + '"') + '>';
         columns.forEach(function (column, ci) {
-            html += renderColumn(column, si, ri, ci);
+            html += renderColumn(column, si, ri, ci, shared);
         });
         // The affordance sits inside the row it appends to, so the target is the
         // button itself rather than a control in the settings panel.
-        html += '<button type="button" class="builder__add-col" data-col-add="' + si + ':' + ri + '" title="Добавить колонку">'
+        html += '<button type="button" class="builder__add-col" data-col-add="' + si + ':' + ri + '" title="Добавить колонку"' + (shared ? ' disabled' : '') + '>'
             + icon('add') + '<span>Колонка</span></button>';
         html += '</div>';
 
@@ -396,24 +411,24 @@
         return 'flex:0 0 ' + pct + '%;max-width:' + pct + '%;min-width:120px';
     }
 
-    function renderColumn(column, si, ri, ci) {
+    function renderColumn(column, si, ri, ci, shared) {
         var span = column.width > 0 ? column.width : 0;
         var blocks = column.blocks || [];
 
-        var html = '<div class="builder__column' + (isSelected([si, ri, ci]) ? ' is-selected' : '') + '"'
+        var html = '<div class="builder__column' + (!shared && isSelected([si, ri, ci]) ? ' is-selected' : '') + '"'
             + ' data-si="' + si + '" data-ri="' + ri + '" data-ci="' + ci + '"'
             + ' style="' + columnFlex(span) + '">';
         html += '<div class="builder__column-head">'
-            + '<span class="builder__handle" draggable="true" data-drag="column" data-si="' + si + '" data-ri="' + ri + '" data-ci="' + ci + '" title="Перетащить колонку">' + icon('drag') + '</span>'
+            + '<span class="builder__handle"' + (shared ? '' : ' draggable="true" data-drag="column" data-si="' + si + '" data-ri="' + ri + '" data-ci="' + ci + '"') + ' title="Перетащить колонку">' + icon('drag') + '</span>'
             + '<span class="builder__column-title">' + esc(column.title || (span > 0 ? span + '/' + grid : 'авто')) + '</span>'
             + '<span class="builder-bar__spacer"></span>'
-            + '<button type="button" class="builder__icon-btn" data-col-width-down="' + si + ':' + ri + ':' + ci + '" title="Уже">' + icon('minus') + '</button>'
-            + '<button type="button" class="builder__icon-btn" data-col-width-up="' + si + ':' + ri + ':' + ci + '" title="Шире">' + icon('plus') + '</button>'
-            + '<button type="button" class="builder__icon-btn" data-col-del="' + si + ':' + ri + ':' + ci + '" title="Удалить колонку">' + icon('close') + '</button>'
+            + '<button type="button" class="builder__icon-btn" data-col-width-down="' + si + ':' + ri + ':' + ci + '" title="Уже"' + (shared ? ' disabled' : '') + '>' + icon('minus') + '</button>'
+            + '<button type="button" class="builder__icon-btn" data-col-width-up="' + si + ':' + ri + ':' + ci + '" title="Шире"' + (shared ? ' disabled' : '') + '>' + icon('plus') + '</button>'
+            + '<button type="button" class="builder__icon-btn" data-col-del="' + si + ':' + ri + ':' + ci + '" title="Удалить колонку"' + (shared ? ' disabled' : '') + '>' + icon('close') + '</button>'
             + '</div>';
-        html += '<div class="builder__drop" data-drop="blocks" data-si="' + si + '" data-ri="' + ri + '" data-ci="' + ci + '">';
+        html += '<div class="builder__drop"' + (shared ? '' : ' data-drop="blocks" data-si="' + si + '" data-ri="' + ri + '" data-ci="' + ci + '"') + '>';
         blocks.forEach(function (block, bi) {
-            html += renderBlockCard(block, si, ri, ci, bi);
+            html += renderBlockCard(block, si, ri, ci, bi, shared);
         });
         html += '</div>';
         html += '<div class="builder__drop-hint">Перетащите элемент сюда</div>';
@@ -422,25 +437,45 @@
         return html;
     }
 
-    function renderBlockCard(block, si, ri, ci, bi) {
+    function renderBlockCard(block, si, ri, ci, bi, shared) {
         var summary = summaryFor(block);
         var path = si + ':' + ri + ':' + ci + ':' + bi;
         var isGlobalRef = block.type === 'global';
-        var preview = isGlobalRef ? globalPreview('block', block.settings && block.settings.name) : '';
+        var structure = isGlobalRef ? globalStructure('block', block.settings && block.settings.name) : null;
 
-        return '<article class="builder__block' + (isSelected([si, ri, ci, bi]) ? ' is-selected' : '') + '" draggable="true"'
-            + ' data-drag="block" data-si="' + si + '" data-ri="' + ri + '" data-ci="' + ci + '" data-bi="' + bi + '">'
+        return '<article class="builder__block' + (!shared && isSelected([si, ri, ci, bi]) ? ' is-selected' : '') + '"'
+            + (shared ? '' : ' draggable="true" data-drag="block" data-si="' + si + '" data-ri="' + ri + '" data-ci="' + ci + '" data-bi="' + bi + '"') + '>'
             + '<span class="builder__handle">' + icon('drag') + '</span>'
             + '<span class="builder__block-icon">' + icon(blockIcon(block)) + '</span>'
             + '<span class="builder__block-body"><span class="builder__block-title">' + esc(blockLabel(block)) + '</span>'
             + (summary ? '<span class="builder__block-summary">' + esc(summary) + '</span>' : '') + '</span>'
-            + (preview !== '' ? '<span class="builder__block-preview">' + preview + '</span>' : '')
+            // A global block shows what the shared block holds, using the same
+            // field labels the block editor would show.
+            + (structure ? '<span class="builder__block-fields">' + blockFieldsHtml(structure) + '</span>' : '')
             + '<span class="builder__block-actions">'
-            + (isGlobalRef ? '' : '<button type="button" class="builder__icon-btn" data-block-promote="' + path + '" title="Сделать глобальным">' + icon('global') + '</button>')
-            + '<button type="button" class="builder__icon-btn" data-block-dup="' + path + '" title="Дублировать">' + icon('copy') + '</button>'
-            + '<button type="button" class="builder__icon-btn" data-block-del="' + path + '" title="Удалить">' + icon('delete') + '</button>'
+            + (isGlobalRef ? '' : '<button type="button" class="builder__icon-btn" data-promote-block="' + path + '" title="Сделать глобальным"' + (shared ? ' disabled' : '') + '>' + icon('global') + '</button>')
+            + '<button type="button" class="builder__icon-btn" data-block-dup="' + path + '" title="Дублировать"' + (shared ? ' disabled' : '') + '>' + icon('copy') + '</button>'
+            + '<button type="button" class="builder__icon-btn" data-block-del="' + path + '" title="Удалить"' + (shared ? ' disabled' : '') + '>' + icon('delete') + '</button>'
             + '</span>'
             + '</article>';
+    }
+
+    // A compact read-only view of a block's settings, so a global block reads as
+    // content instead of as a bare name.
+    function blockFieldsHtml(block) {
+        var type = types[block.type];
+        var settings = block.settings || {};
+        if (!type || !type.fields) { return ''; }
+        var parts = [];
+        Object.keys(type.fields).forEach(function (key) {
+            var value = settings[key];
+            if (value === undefined || value === null || typeof value === 'object' || String(value) === '') { return; }
+            parts.push('<span class="builder__field"><span class="builder__field-label">'
+                + esc(type.fields[key].label || key) + '</span><span class="builder__field-value">'
+                + esc(String(value).slice(0, 80)) + '</span></span>');
+        });
+
+        return parts.join('');
     }
 
     function summaryFor(block) {
@@ -1206,6 +1241,15 @@
     }
 
     function onEditorClick(event) {
+        // Shared markup belongs to a global, so a click in it opens that global
+        // instead of selecting a node of this page (whose indices do not apply).
+        var shared = event.target.closest('[data-global-shared]');
+        if (shared && !event.target.closest('a')) {
+            window.location.href = '/admin/builder?global=section:' + encodeURIComponent(shared.getAttribute('data-global-shared'));
+
+            return;
+        }
+
         var filterAdd = event.target.closest('[data-filter-add]');
         if (filterAdd) {
             var filters = currentBlockFilters();

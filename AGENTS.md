@@ -196,6 +196,20 @@ php -S localhost:8000 -t public   # dev server
   Symptom of getting this wrong: the API accepts a write (blob POST returns 201)
   while `git push` still reports `Permission to <owner>/<repo>.git denied`.
 - `var/users/` is gitignored — admin credentials are never committed.
+- The builder payload ships `globalStructures` (stored `Section::toArray()` /
+  `Block::toArray()`), never rendered HTML. The canvas redraws a global reference
+  with its normal row/column/block cards so it looks like the band did on the
+  page it came from; a frontend preview would show published markup instead.
+  Don't reintroduce `LayoutRenderer::renderSection()/renderBlock()` here.
+- A reference draws its shared cards in "shared" mode: handles and inline
+  controls stay visible (so the band is recognisable) but are `disabled`, and a
+  click on the band opens `/admin/builder?global=section:<name>`. The page's own
+  indices do not address nodes inside a global, so never let shared cards select
+  or mutate page state.
+- Promote controls are delegated: the card emits `data-promote-block` and
+  `onEditorClick` listens for the same attribute. These names once diverged
+  (`data-block-promote`), which silently killed module promotion;
+  `testPromoteButtonAttributeMatchesTheClickHandler` guards it.
 - The stock `content/` folder is a real install target, not just a fixture: a
   change that only touches `profiles/` leaves a fresh checkout of the repo
   without chrome. Keep `content/_global/` and `profiles/*/content/_global/` in

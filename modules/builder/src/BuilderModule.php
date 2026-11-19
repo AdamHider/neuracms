@@ -212,7 +212,7 @@ final class BuilderModule implements Module
             'elements' => $this->elementTypes(),
             'menu' => $this->menuSources(),
             'globals' => $this->globals?->catalog() ?? [],
-            'globalPreviews' => $this->globalPreviews(),
+            'globalStructures' => $this->globalStructures(),
             'media' => $app->admin->media()?->list($id) ?? [],
             'columns' => (int) $app->config->get('builder.grid_columns', 12),
             'saved' => $request->query('saved') === '1',
@@ -266,7 +266,7 @@ final class BuilderModule implements Module
             'elements' => $this->elementTypes(),
             'menu' => $this->menuSources(),
             'globals' => $library->catalog(),
-            'globalPreviews' => $this->globalPreviews(),
+            'globalStructures' => $this->globalStructures(),
             'media' => [],
             'columns' => $this->gridColumns(),
             'saved' => $request->query('saved') === '1',
@@ -613,31 +613,31 @@ final class BuilderModule implements Module
     }
 
     /**
-     * Server-rendered markup for every global, so the canvas can show what a
-     * reference actually contains instead of a placeholder note. The editor has
-     * no template engine, so the HTML is produced here.
+     * The stored structure of every global, so the canvas can draw a reference
+     * with the same section/row/column/block cards it uses for the page itself.
+     * Shipping the structure rather than rendered markup is what keeps a global
+     * looking like the original in the editor instead of like the front end.
      *
-     * @return array<string, array<string, string>>
+     * @return array<string, array<string, array<string, mixed>>>
      */
-    private function globalPreviews(): array
+    private function globalStructures(): array
     {
         $out = [GlobalLibrary::SECTION => [], GlobalLibrary::BLOCK => []];
         $library = $this->globals;
-        $renderer = $this->renderer;
-        if ($library === null || $renderer === null) {
+        if ($library === null) {
             return $out;
         }
 
         foreach (array_keys($library->all(GlobalLibrary::SECTION)) as $name) {
             $section = $library->section((string) $name);
             if ($section !== null) {
-                $out[GlobalLibrary::SECTION][$name] = $renderer->renderSection($section);
+                $out[GlobalLibrary::SECTION][$name] = $section->toArray();
             }
         }
         foreach (array_keys($library->all(GlobalLibrary::BLOCK)) as $name) {
             $block = $library->block((string) $name);
             if ($block !== null) {
-                $out[GlobalLibrary::BLOCK][$name] = $renderer->renderBlock($block);
+                $out[GlobalLibrary::BLOCK][$name] = $block->toArray();
             }
         }
 

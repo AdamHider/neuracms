@@ -9,6 +9,7 @@ use FlatCms\Core\Request;
 use FlatCms\Modules\Builder\Block;
 use FlatCms\Modules\Builder\BuilderModule;
 use FlatCms\Modules\Builder\Column;
+use FlatCms\Modules\Builder\GlobalLibrary;
 use FlatCms\Modules\Builder\Layout;
 use FlatCms\Modules\Builder\LayoutRenderer;
 use FlatCms\Modules\Builder\Row;
@@ -756,14 +757,19 @@ final class BuilderTest extends FlatCmsTestCase
 
         // The section lives in the "Добавить секцию" dropdown...
         self::assertStringContainsString('data-global-section-add="site-header"', $body);
-        // ...and its rendered content is shipped so the canvas can show it.
+        // ...and its stored structure is shipped so the canvas can redraw it as
+        // editor cards instead of dumping the published markup.
         self::assertSame(1, preg_match("/data-builder='(.*?)'/s", $body, $m));
         $payload = json_decode(html_entity_decode($m[1], ENT_QUOTES), true, 512, JSON_THROW_ON_ERROR);
-        self::assertArrayHasKey('site-header', $payload['globalPreviews']['section']);
-        self::assertStringContainsString('ШАПКА', $payload['globalPreviews']['section']['site-header']);
+        self::assertArrayHasKey('site-header', $payload['globalStructures']['section']);
+        $structure = $payload['globalStructures']['section']['site-header'];
+        self::assertSame('header', $structure['settings']['role']);
+        self::assertSame('ШАПКА', $structure['rows'][0]['columns'][0]['blocks'][0]['settings']['body']);
+        // The editor must receive structure, not rendered HTML.
+        self::assertStringNotContainsString('<section', json_encode($structure));
     }
 
-    public function testGlobalBlockPreviewsAreShippedForTheCanvas(): void
+    public function testGlobalBlockStructuresAreShippedForTheCanvas(): void
     {
         $app = $this->appWithBuilder(true);
         $this->builder($app)->globals()?->save('block', 'cta', 'Кнопка CTA', [
@@ -778,8 +784,69 @@ final class BuilderTest extends FlatCmsTestCase
         self::assertSame(1, preg_match("/data-builder='(.*?)'/s", $body, $m));
         $payload = json_decode(html_entity_decode($m[1], ENT_QUOTES), true, 512, JSON_THROW_ON_ERROR);
 
-        self::assertArrayHasKey('cta', $payload['globalPreviews']['block']);
-        self::assertStringContainsString('Связаться', $payload['globalPreviews']['block']['cta']);
+        self::assertArrayHasKey('cta', $payload['globalStructures']['block']);
+        $structure = $payload['globalStructures']['block']['cta'];
+        self::assertSame('button', $structure['type']);
+        self::assertSame('Связаться', $structure['settings']['text']);
+        self::assertSame('/contact', $structure['settings']['url']);
+    }
+
+    /**
+     * A module-provided block must survive promotion intact. The editor button
+     * that starts the flow emitted "data-block-promote" while the click handler
+     * listened for "data-promote-block", so the control did nothing at all.
+     */
+    public function testModuleBlockPromotesWithItsSettingsIntact(): void
+    {
+        $app = $this->appWithBuilder(true);
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $layout = [
+            'sections' => [
+                [
+                    'rows' => [['columns' => [[
+                        'width' => 12,
+                        'blocks' => [[
+                            'type' => 'menu',
+                            'settings' => [
+                                'source' => 'pages',
+                                'class' => 'site-nav',
+                                'orientation' => 'horizontal',
+                                'filters' => [['field' => 'show_in_menu', 'op' => '=', 'value' => '1']],
+                            ],
+                        ]],
+                    ]]]],
+                ],
+            ],
+        ];
+
+        $response = $app->handle(new Request('POST', '/admin/builder/global', [], [
+            'action' => 'promote',
+            'kind' => 'block',
+            'title' => 'Меню шапки',
+            'block_index' => '0:0:0:0',
+            'layout_json' => json_encode($layout),
+        ], [], [], []));
+
+        self::assertSame(200, $response->status());
+        $block = (new GlobalLibrary($app->fs))->block('menyu-shapki');
+        self::assertNotNull($block);
+        self::assertSame('menu', $block->type);
+        self::assertSame('site-nav', $block->get('class'));
+        self::assertSame([['field' => 'show_in_menu', 'op' => '=', 'value' => '1']], $block->get('filters'));
+    }
+
+    public function testPromoteButtonAttributeMatchesTheClickHandler(): void
+    {
+        $js = (string) file_get_contents(__DIR__ . '/../../modules/builder/assets/js/builder.js');
+
+        // Whatever the card emits, the delegated handler has to listen for it.
+        $emitted = preg_match_all('/data-(promote-block|block-promote)=/', $js, $m) ? $m[1] : [];
+        self::assertNotEmpty($emitted, 'the block card must render a promote control');
+        $attribute = 'data-' . $emitted[0] . '=';
+
+        self::assertStringContainsString("closest('[" . rtrim($attribute, '=') . "]')", $js);
     }
 
     public function testHeaderAndFooterPresetsRenderAsSections(): void
