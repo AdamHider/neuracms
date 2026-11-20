@@ -97,7 +97,7 @@ final class BuilderTest extends FlatCmsTestCase
         self::assertStringContainsString('element-card', $html);
         self::assertStringContainsString('Сайт', $html);
         self::assertStringContainsString('Описание', $html);
-        self::assertStringContainsString('30000', $html);
+        self::assertStringContainsString('30 000 ₽', $html);
         self::assertStringContainsString('href="/contact"', $html);
     }
 
@@ -379,7 +379,7 @@ final class BuilderTest extends FlatCmsTestCase
         ]));
 
         self::assertStringContainsString('Teapot', $html);
-        self::assertStringContainsString('1200', $html);
+        self::assertStringContainsString('1 200 ₽', $html);
     }
 
     /**

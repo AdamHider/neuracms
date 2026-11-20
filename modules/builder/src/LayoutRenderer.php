@@ -64,6 +64,8 @@ final class LayoutRenderer
      *
      * A template with no content item behind it (a cart, a contact form) borrows
      * the bands from the home page, so those pages match the rest of the site.
+     * An element (a product, a blog post) has no layout either, so it borrows
+     * them too and reads as part of the same site.
      */
     public function pageShell(?Item $item, string $body): string
     {
@@ -71,10 +73,9 @@ final class LayoutRenderer
         $header = $own?->withRole('header');
         $footer = $own?->withRole('footer');
 
-        // A template with no content item behind it (a cart, a contact form) has
-        // no layout of its own, so it borrows the bands from the home page. A
-        // real page never borrows: its own sections are the whole truth.
-        if ($item === null) {
+        // A real page never borrows: its own sections are the whole truth.
+        $borrows = $item === null || $this->app->schema->isElement($item->type());
+        if ($borrows) {
             $home = $this->app->storage->load('index');
             if ($home !== null) {
                 $shared = $this->resolveLayout($this->layoutOf($home));

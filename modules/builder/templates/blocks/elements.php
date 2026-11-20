@@ -33,6 +33,15 @@ $scalar = static function (mixed $value): string {
 
     return is_scalar($value) ? (string) $value : '';
 };
+
+// A mapped price is money, so it reads the same on a card as on the item page.
+$money = static function (string $value) use ($app): string {
+    if ($value === '' || !is_numeric($value)) {
+        return $value;
+    }
+
+    return number_format((float) $value, 0, '.', ' ') . ' ' . (string) $app->config->get('shop.currency_symbol', '₽');
+};
 ?>
 <section class="block block--elements">
     <?php if (($settings['title'] ?? '') !== ''): ?>
@@ -67,7 +76,7 @@ $scalar = static function (mixed $value): string {
                         <p class="element-card__description"><?= $this->e($description) ?></p>
                     <?php endif; ?>
                     <?php if ($price !== ''): ?>
-                        <p class="element-card__price"><?= $this->e($price) ?></p>
+                        <p class="element-card__price"><?= $this->e($money($price)) ?></p>
                     <?php endif; ?>
                 </article>
             <?php endforeach; ?>

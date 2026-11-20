@@ -101,7 +101,7 @@ final class ProfilesTest extends FlatCmsTestCase
 
         self::assertStringContainsString('element-card', $body);
         self::assertStringContainsString('Сайт-визитка', $body);
-        self::assertStringContainsString('30000', $body);
+        self::assertStringContainsString('30 000 ₽', $body);
     }
 
     public function testVisitingCardHeaderAndFooterAreSections(): void
@@ -172,6 +172,35 @@ final class ProfilesTest extends FlatCmsTestCase
         $body = $this->get($app, '/cart')->body();
         self::assertStringContainsString('href="/catalog"', $body);
         self::assertStringNotContainsString('href="/products"', $body);
+    }
+
+    /**
+     * An element (a product, a service) carries no layout of its own, so it must
+     * still render inside the site chrome instead of as a bare fragment.
+     */
+    public function testElementPagesBorrowTheSiteChrome(): void
+    {
+        foreach (['corporate' => '/services/design', 'shop' => '/catalog/teapot'] as $profile => $path) {
+            $body = $this->get($this->install($profile), $path)->body();
+
+            self::assertSame(1, substr_count($body, '<header class="site-header"'), $profile);
+            self::assertSame(1, substr_count($body, '<footer class="site-footer"'), $profile);
+        }
+    }
+
+    /**
+     * A menu that lists only "page" items silently drops a section page such as
+     * /services or /catalog from the navigation. Every profile page marked
+     * "Показывать в меню" must reach the header menu.
+     */
+    public function testProfileMenuListsEveryPageMarkedForTheMenu(): void
+    {
+        foreach (['corporate' => 'Услуги', 'shop' => 'Каталог'] as $profile => $entry) {
+            $body = $this->get($this->install($profile), '/')->body();
+            $header = substr($body, (int) strpos($body, '<header'), (int) strpos($body, '</header>'));
+
+            self::assertStringContainsString('>' . $entry . '</a>', $header, $profile);
+        }
     }
 
     public function testProfilePagesKeepTheDocumentShell(): void

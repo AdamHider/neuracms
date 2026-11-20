@@ -13,7 +13,7 @@ section:
             - type: menu
               settings:
                 source: pages
-                content_type: page
+                content_type: ''
                 depth: 2
                 orientation: horizontal
                 filters:
