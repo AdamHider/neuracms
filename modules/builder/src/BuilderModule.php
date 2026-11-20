@@ -437,9 +437,28 @@ final class BuilderModule implements Module
             ? GlobalLibrary::BLOCK
             : GlobalLibrary::SECTION;
         $title = trim((string) $request->input('title', ''));
-        $layout = $this->sanitize($this->readLayout($request), $this->gridColumns());
+        $node = $this->promotionNode($request);
 
-        if ($kind === GlobalLibrary::SECTION) {
+        if ($node !== null) {
+            // The editor sent the node itself, so the indexes in the request
+            // name a position in the full canvas and are meaningless here.
+            if ($kind === GlobalLibrary::SECTION) {
+                $section = $this->sanitizeSection($node, $this->gridColumns());
+                if ($section === null) {
+                    return Response::json(['error' => 'Секция не найдена.'], 422);
+                }
+                $payload = ['section' => $section->toArray()];
+                $fallback = (string) $section->get('title', 'section');
+            } else {
+                $block = $this->sanitizeBlock($node);
+                if ($block === null) {
+                    return Response::json(['error' => 'Элемент не найден.'], 422);
+                }
+                $payload = ['block' => $block->toArray()];
+                $fallback = $block->type;
+            }
+        } elseif ($kind === GlobalLibrary::SECTION) {
+            $layout = $this->sanitize($this->readLayout($request), $this->gridColumns());
             $index = (int) $request->input('index', -1);
             $section = $layout->sections()[$index] ?? null;
             if ($section === null) {
@@ -448,6 +467,7 @@ final class BuilderModule implements Module
             $payload = ['section' => $section->toArray()];
             $fallback = (string) $section->get('title', 'section');
         } else {
+            $layout = $this->sanitize($this->readLayout($request), $this->gridColumns());
             // Current path is section:row:column:block. A three-part path comes
             // from layouts saved before rows existed, so it names row 0.
             $path = array_map('intval', explode(':', (string) $request->input('block_index', '0:0:0:0')));
@@ -472,7 +492,36 @@ final class BuilderModule implements Module
         $name = $library->uniqueName($kind, $title !== '' ? $title : $fallback);
         $library->save($kind, $name, $title !== '' ? $title : $name, $payload);
 
-        return Response::json(['name' => $name, 'kind' => $kind, 'title' => $title !== '' ? $title : $name]);
+        // Answer with what was stored, in the same shape as the read endpoint.
+        // The editor swaps its local copy for a reference right away, and a
+        // reference without rows would read as an empty global on the next save.
+        $structure = $kind === GlobalLibrary::SECTION
+            ? ($library->section($name)?->toArray() ?? [])
+            : ($library->block($name)?->toArray() ?? []);
+
+        return Response::json([
+            'name' => $name,
+            'kind' => $kind,
+            'title' => $title !== '' ? $title : $name,
+            'structure' => $structure,
+        ]);
+    }
+
+    /**
+     * The single section or block the editor is promoting, or null when the
+     * request carries a whole canvas instead. Sending one node keeps the
+     * request small and stops unrelated parts of the canvas from being copied.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function promotionNode(Request $request): ?array
+    {
+        $payload = $request->input('payload', null);
+        if (is_string($payload) && $payload !== '') {
+            $payload = json_decode($payload, true);
+        }
+
+        return is_array($payload) && $payload !== [] ? $payload : null;
     }
 
     private function gridColumns(): int
@@ -713,6 +762,22 @@ final class BuilderModule implements Module
         $settings = is_array($section['settings'] ?? null) ? $section['settings'] : [];
         unset($settings['global']);
         $rows = $this->collapseRows($section['rows'] ?? [], $library);
+
+        // A reference that arrives with no rows says nothing about the shared
+        // content: it means the editor never expanded it. Writing it back would
+        // empty the band and drop settings such as its role, so leave the stored
+        // global alone.
+        if ($rows === []) {
+            $existing = $library->section($name);
+            if ($existing !== null && $existing->rows() !== []) {
+                $reference = ['settings' => ['global' => $name]];
+                if (isset($section['id'])) {
+                    $reference['id'] = $section['id'];
+                }
+
+                return $reference;
+            }
+        }
 
         $payload = ['settings' => $settings, 'rows' => $rows];
         if (($section['title'] ?? '') !== '') {

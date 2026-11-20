@@ -450,6 +450,193 @@ final class GlobalsTest extends FlatCmsTestCase
     }
 
     /**
+     * Promotion used to post the whole canvas and then reload the page, so the
+     * editor threw away everything the user had typed and came back from the
+     * server. The request must not reload, and it must not drag the rest of the
+     * canvas along either.
+     */
+    public function testPromotingASectionDoesNotReloadOrPostTheWholeCanvas(): void
+    {
+        $app = $this->appWithBuilder();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $js = (string) file_get_contents(__DIR__ . '/../../modules/builder/assets/js/builder.js');
+        $promote = $this->functionBody($js, 'function promote(');
+
+        self::assertStringNotContainsString('form.submit()', $promote, 'promotion must not reload the page');
+        self::assertStringContainsString('X-Requested-With', $promote);
+    }
+
+    /**
+     * The library copy has to carry the section's content. Promotion used to
+     * store a section that the sanitiser had already dropped for having no
+     * rows, which is why the band came back empty.
+     */
+    public function testPromoteSectionKeepsTheRowsItCopies(): void
+    {
+        $app = $this->appWithBuilder();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $layout = ['sections' => [[
+            'id' => 's1',
+            'settings' => ['role' => 'header'],
+            'rows' => [['columns' => [[
+                'width' => 12,
+                'blocks' => [
+                    ['type' => 'heading', 'settings' => ['text' => 'Логотип', 'level' => 'h2']],
+                    ['type' => 'menu', 'settings' => ['source' => 'pages', 'class' => 'site-nav']],
+                ],
+            ]]]],
+        ]]];
+
+        $response = $app->handle(new Request('POST', '/admin/builder/global', [], [
+            'action' => 'promote',
+            'kind' => 'section',
+            'title' => 'Шапка',
+            'index' => '0',
+            'layout_json' => json_encode($layout),
+        ], [], [], []));
+
+        self::assertSame(200, $response->status());
+        $result = json_decode($response->body(), true);
+        self::assertSame('shapka', $result['name']);
+
+        $stored = (new GlobalLibrary($app->fs))->section('shapka');
+        self::assertNotNull($stored);
+        self::assertCount(1, $stored->rows(), 'promotion must keep the rows it copies');
+        $blocks = $stored->rows()[0]->columns()[0]->blocks();
+        self::assertCount(2, $blocks);
+        self::assertSame('Логотип', $blocks[0]->get('text'));
+        self::assertSame('site-nav', $blocks[1]->get('class'));
+
+        // ...and the answer must carry them too, so the editor can expand the
+        // new reference without a second round trip.
+        self::assertSame('Логотип', $result['structure']['rows'][0]['columns'][0]['blocks'][0]['settings']['text'] ?? null);
+    }
+
+    /**
+     * A page can be saved while a global reference has not been expanded yet
+     * (a failed fetch, or a save that races the editor). An empty row list then
+     * means "nothing loaded", never "the shared band is empty", so the stored
+     * content has to survive.
+     */
+    public function testSavingAnUnexpandedReferenceKeepsTheSharedContent(): void
+    {
+        $app = $this->appWithBuilder();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $library = new GlobalLibrary($app->fs);
+        $library->save(GlobalLibrary::SECTION, 'site-header', 'Шапка сайта', [
+            'section' => (new Section([
+                new Row([new Column([new Block('heading', ['text' => 'Логотип', 'level' => 'h2'])], 12)]),
+            ], ['role' => 'header']))->toArray(),
+        ]);
+        $this->write('content/about/item.yaml', "type: page
+title: About
+layout:
+  sections:
+    - settings: {global: site-header}
+");
+
+        $app->handle(new Request('POST', '/admin/builder/save', [], [
+            'id' => 'about',
+            'layout_json' => json_encode(['sections' => [[
+                'settings' => ['global' => 'site-header', 'role' => 'header'],
+                'rows' => [],
+            ]]]),
+        ], [], [], []));
+
+        $stored = (new GlobalLibrary($app->fs))->section('site-header');
+        self::assertNotNull($stored);
+        self::assertCount(1, $stored->rows(), 'saving must not empty a global it could not expand');
+        self::assertSame('Логотип', $stored->rows()[0]->columns()[0]->blocks()[0]->get('text'));
+        // Settings the editor never showed must survive too: losing "role"
+        // would silently turn the site header into an ordinary band.
+        self::assertSame('header', $stored->role());
+    }
+
+    /**
+     * The editor posts the node on its own, so its position on the canvas is
+     * irrelevant. Reading it through the index used to work only for the first
+     * section and for a block at 0:0:0:0.
+     */
+    public function testPromoteFromASingleNodeIgnoresTheCanvasPosition(): void
+    {
+        $app = $this->appWithBuilder();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $section = [
+            'settings' => ['role' => 'footer'],
+            'rows' => [['columns' => [[
+                'width' => 12,
+                'blocks' => [['type' => 'text', 'settings' => ['body' => 'Подвал']]],
+            ]]]],
+        ];
+
+        $response = $app->handle(new Request('POST', '/admin/builder/global', [], [
+            'action' => 'promote',
+            'kind' => 'section',
+            'title' => 'Подвал',
+            'index' => '3',
+            'payload' => json_encode($section),
+        ], [], [], []));
+
+        self::assertSame(200, $response->status());
+        $stored = (new GlobalLibrary($app->fs))->section('podval');
+        self::assertNotNull($stored);
+        self::assertSame('footer', $stored->role());
+        self::assertSame('Подвал', $stored->rows()[0]->columns()[0]->blocks()[0]->get('body'));
+    }
+
+    public function testPromoteBlockFromASingleNodeIgnoresTheCanvasPosition(): void
+    {
+        $app = $this->appWithBuilder();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $response = $app->handle(new Request('POST', '/admin/builder/global', [], [
+            'action' => 'promote',
+            'kind' => 'block',
+            'title' => 'Кнопка CTA',
+            'block_index' => '2:1:0:3',
+            'payload' => json_encode([
+                'type' => 'menu',
+                'settings' => ['source' => 'pages', 'class' => 'site-nav'],
+            ]),
+        ], [], [], []));
+
+        self::assertSame(200, $response->status());
+        $block = (new GlobalLibrary($app->fs))->block('knopka-cta');
+        self::assertNotNull($block);
+        self::assertSame('menu', $block->type);
+        self::assertSame('site-nav', $block->get('class'));
+    }
+
+    private function functionBody(string $js, string $signature): string
+    {
+        $start = strpos($js, $signature);
+        self::assertNotFalse($start, 'missing ' . $signature);
+        $open = strpos($js, '{', $start);
+        $depth = 0;
+        for ($i = $open, $len = strlen($js); $i < $len; $i++) {
+            if ($js[$i] === '{') {
+                $depth++;
+            } elseif ($js[$i] === '}') {
+                $depth--;
+                if ($depth === 0) {
+                    return substr($js, $open, $i - $open + 1);
+                }
+            }
+        }
+
+        return substr($js, $open);
+    }
+
+    /**
      * A global block is edited as the block it really is: its own type and
      * settings, not a list of the reference's properties.
      */

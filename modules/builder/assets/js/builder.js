@@ -16,7 +16,6 @@
         return;
     }
 
-    var form = document.getElementById('builder-form');
     var canvas = document.getElementById('builder-canvas');
     var libraryEl = document.getElementById('builder-library');
     var settingsBody = document.getElementById('builder-settings-body');
@@ -440,8 +439,9 @@
     }
 
     /**
-     * Promote the selected section or block to a global, then swap the local copy
-     * for a reference and save the page.
+     * Promote the selected section or block to a global and swap the local copy
+     * for a reference. The promotion happens in place: the canvas is not posted
+     * and the page is not reloaded, so nothing the user has typed is lost.
      */
     function promote(kind, path) {
         var si = path[0];
@@ -450,11 +450,16 @@
             : 'Название глобального элемента', kind === 'section' ? 'Шапка сайта' : '');
         if (title === null) { return; }
 
+        // Send only the thing being promoted, so the server copies exactly what
+        // is on the canvas and the rest of the layout is left alone.
+        var node = nodeAt(path);
+        if (!node) { return; }
+
         var body = new URLSearchParams();
         body.set('action', 'promote');
         body.set('kind', kind);
         body.set('title', title);
-        body.set('layout_json', JSON.stringify(model()));
+        body.set('payload', JSON.stringify(node));
         if (kind === 'section') {
             body.set('index', String(si));
         } else {
@@ -463,7 +468,10 @@
 
         fetch('/admin/builder/global', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             credentials: 'same-origin',
             body: body.toString()
         }).then(function (response) { return response.json(); }).then(function (result) {
@@ -473,11 +481,24 @@
                 return;
             }
             replaceWithReference(kind, path, result.name);
+            // The new reference opens expanded, like any other global on the
+            // page, so its blocks stay visible and editable.
+            var reference = kind === 'section' ? sectionAt(path[0]) : blockAt(path[0], path[1], path[2], path[3]);
+            if (reference && result.structure) {
+                if (kind === 'section') {
+                    reference.rows = result.structure.rows || [];
+                    reference.settings = result.structure.settings || reference.settings;
+                    reference.settings.global = result.name;
+                } else {
+                    reference.type = result.structure.type || reference.type;
+                    reference.settings = result.structure.settings || {};
+                    reference.settings.global = result.name;
+                }
+            }
             config.globals = config.globals || {};
             config.globals[kind] = config.globals[kind] || {};
             config.globals[kind][result.name] = { name: result.name, title: title, kind: kind };
             render();
-            if (form) { form.submit(); }
         }).catch(function () {
             window.alert('Не удалось сделать глобальным.');
         });

@@ -147,6 +147,13 @@ the page as ordinary, editable rows and blocks, marked with a "глобальн�
 badge. Saving collapses them back into references and writes the edits to the
 shared global, so changing the header on one page changes it everywhere.
 
+Promoting a section or block works the same way and happens in place: the
+editor posts only the node being promoted, the library answers with what it
+stored, and the canvas swaps that node for a reference already expanded. The
+page is not reloaded, so unsaved edits elsewhere on the canvas survive. A
+reference that reaches the server without its rows was never expanded, so it
+leaves the stored global untouched rather than emptying it.
+
 The theme ships no `header`/`footer` partial and there is no fallback: a page
 with no header section renders without a header, which keeps the builder the
 single source of truth for the chrome. A template with no item behind it (a
