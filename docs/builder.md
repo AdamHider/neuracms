@@ -136,9 +136,22 @@ hard-coded in a theme.
 ## Header and footer
 
 There is no separate "regions" subsystem: the header and footer are ordinary
-**sections** on a page. The **Шапка сайта** / **Подвал сайта** section presets
-drop in a working header/footer section (a heading plus a `menu` particle), and
-the theme's own `header`/`footer` partials still render the site chrome.
+**sections** on a page, marked with the `header` and `footer` role. A section
+with `role: header` renders as the site header band and `role: footer` as the
+footer band, in the order the page lists them.
+
+To share one header across the site, save the section as a **global** in the
+global library and reference it from each page's layout. Globals are not edited
+in a separate screen: opening the builder expands every referenced global into
+the page as ordinary, editable rows and blocks, marked with a "глобальная"
+badge. Saving collapses them back into references and writes the edits to the
+shared global, so changing the header on one page changes it everywhere.
+
+The theme ships no `header`/`footer` partial and there is no fallback: a page
+with no header section renders without a header, which keeps the builder the
+single source of truth for the chrome. A template with no item behind it (a
+cart, a checkout form) borrows the bands from the home page, and so does an
+element (a product, a blog post), which has no layout of its own.
 
 ## Rendering
 
@@ -252,5 +265,4 @@ header) is inserted above the existing sections instead of appended:
 
 Presets are sections: adding a header/footer preset puts an editable section at
 the top or bottom of the current layout. To show the same chrome on every page,
-either put the section on each page or let the theme's `header`/`footer` partials
-render it.
+save the section as a global and reference it from the other pages.

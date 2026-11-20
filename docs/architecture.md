@@ -54,8 +54,10 @@ blocks). Without the builder module the resolver is empty and the helper returns
 an empty string, so themes can call it unconditionally.
 
 The header and footer are ordinary sections on a page (there is no separate
-"regions" subsystem); a theme's own `header`/`footer` partials render the site
-chrome.
+"regions" subsystem). A section carrying the `header` or `footer` role becomes
+that band of the page; there is no theme fallback, so the builder is the only
+source of the chrome. Templates with no item behind them, and elements such as
+products, borrow the bands from the home page.
 
 ## Content index
 
