@@ -316,7 +316,26 @@ final class GlobalsTest extends FlatCmsTestCase
         self::assertStringContainsString('<p>Тело</p>', $page);
     }
 
-    public function testGlobalsPageListsPromotedItems(): void
+    /**
+     * The separate globals page is gone: shared content is edited on whatever
+     * page shows it, so its URL must not exist any more.
+     */
+    public function testGlobalsPageIsGone(): void
+    {
+        $app = $this->appWithBuilder();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $response = $app->handle(new Request('GET', '/admin/globals', [], [], [], [], []));
+
+        self::assertSame(404, $response->status());
+    }
+
+    /**
+     * A shared section opens expanded on the page that references it, so its
+     * blocks can be edited right there instead of on a separate screen.
+     */
+    public function testGlobalSectionOpensExpandedInThePageEditor(): void
     {
         $app = $this->appWithBuilder();
         (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
@@ -324,33 +343,178 @@ final class GlobalsTest extends FlatCmsTestCase
 
         $library = new GlobalLibrary($app->fs);
         $library->save(GlobalLibrary::SECTION, 'site-header', 'Шапка сайта', [
-            'section' => ['settings' => ['role' => 'header'], 'columns' => [['width' => 12, 'blocks' => []]]],
+            'section' => (new Section([
+                new Row([new Column([new Block('heading', ['text' => 'ШАПКА', 'level' => 'h2'])], 12)]),
+            ], ['role' => 'header']))->toArray(),
         ]);
+        $this->write('content/about/item.yaml', "type: page\ntitle: About\nlayout:\n  sections:\n    - settings: {global: site-header}\n");
 
-        $response = $app->handle(new Request('GET', '/admin/globals', [], [], [], [], []));
+        $body = $app->handle(new Request('GET', '/admin/builder', ['id' => 'about'], [], [], [], []))->body();
 
-        self::assertSame(200, $response->status());
-        self::assertStringContainsString('Шапка сайта', $response->body());
-        self::assertStringContainsString('site-header', $response->body());
+        self::assertSame(1, preg_match("/data-builder='(.*?)'/s", $body, $m));
+        $payload = json_decode(html_entity_decode($m[1], ENT_QUOTES), true, 512, JSON_THROW_ON_ERROR);
+
+        $section = $payload['layout']['sections'][0];
+        // The reference is still marked as a reference...
+        self::assertSame('site-header', $section['settings']['global']);
+        // ...but its rows are the shared ones, not an empty list.
+        self::assertSame('ШАПКА', $section['rows'][0]['columns'][0]['blocks'][0]['settings']['text']);
     }
 
-    public function testDeleteGlobalRemovesItFromTheLibrary(): void
+    /**
+     * Editing a shared band on one page writes the new content to the library
+     * and leaves a reference on the page, so every other page picks it up.
+     */
+    public function testEditingAGlobalInPlaceUpdatesTheLibraryAndKeepsAReference(): void
     {
         $app = $this->appWithBuilder();
         (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
         $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
 
         $library = new GlobalLibrary($app->fs);
-        $library->save(GlobalLibrary::SECTION, 'temp', 'Временная', [
-            'section' => ['settings' => [], 'columns' => [['width' => 12, 'blocks' => []]]],
+        $library->save(GlobalLibrary::SECTION, 'site-header', 'Шапка сайта', [
+            'section' => (new Section([
+                new Row([new Column([new Block('heading', ['text' => 'СТАРОЕ', 'level' => 'h2'])], 12)]),
+            ], ['role' => 'header']))->toArray(),
         ]);
-        self::assertTrue($library->exists(GlobalLibrary::SECTION, 'temp'));
+        $this->write('content/about/item.yaml', "type: page\ntitle: About\nlayout:\n  sections:\n    - settings: {global: site-header}\n");
 
-        $app->handle(new Request('POST', '/admin/builder/global', [], [
-            'action' => 'delete',
-            'global' => 'section:temp',
+        // What the editor posts back: the expanded band, edited.
+        $posted = ['sections' => [[
+            'settings' => ['global' => 'site-header', 'role' => 'header'],
+            'rows' => [['columns' => [[
+                'width' => 12,
+                'blocks' => [['type' => 'heading', 'settings' => ['text' => 'НОВОЕ', 'level' => 'h2']]],
+            ]]]],
+        ]]];
+
+        $app->handle(new Request('POST', '/admin/builder/save', [], [
+            'id' => 'about',
+            'layout_json' => json_encode($posted),
         ], [], [], []));
 
-        self::assertFalse($library->exists(GlobalLibrary::SECTION, 'temp'));
+        $shared = (new GlobalLibrary($app->fs))->section('site-header');
+        self::assertNotNull($shared);
+        self::assertSame('НОВОЕ', $shared->blocks()[0]->get('text'));
+        // The human title and the library order sit next to the payload, so an
+        // in-place edit must not overwrite them with the slug or drop them.
+        $stored = (new GlobalLibrary($app->fs))->read(GlobalLibrary::SECTION, 'site-header');
+        self::assertSame('Шапка сайта', $stored['title'] ?? null);
+
+        $page = $app->storage->load('about');
+        self::assertNotNull($page);
+        $saved = $page->get('layout');
+        self::assertSame('site-header', $saved['sections'][0]['settings']['global']);
+        // The page must not carry a duplicate copy of the shared rows.
+        self::assertArrayNotHasKey('rows', $saved['sections'][0]);
+    }
+
+    /**
+     * A global may carry an explicit order for the library listing. Saving a
+     * page that shows it must leave that key untouched.
+     */
+    public function testEditingAGlobalInPlaceKeepsItsLibraryOrder(): void
+    {
+        $app = $this->appWithBuilder();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $this->write('content/_global/section/site-header/item.yaml', <<<'YAML'
+            title: Шапка сайта
+            kind: section
+            order: 7
+            section:
+              settings: {role: header}
+              rows:
+                - columns:
+                    - width: 12
+                      blocks:
+                        - {type: heading, settings: {text: СТАРОЕ, level: h2}}
+            YAML);
+        $this->write('content/about/item.yaml', "type: page\ntitle: About\nlayout:\n  sections:\n    - settings: {global: site-header}\n");
+
+        $app->handle(new Request('POST', '/admin/builder/save', [], [
+            'id' => 'about',
+            'layout_json' => json_encode(['sections' => [[
+                'settings' => ['global' => 'site-header', 'role' => 'header'],
+                'rows' => [['columns' => [[
+                    'width' => 12,
+                    'blocks' => [['type' => 'heading', 'settings' => ['text' => 'НОВОЕ', 'level' => 'h2']]],
+                ]]]],
+            ]]]),
+        ], [], [], []));
+
+        $stored = (new GlobalLibrary($app->fs))->read(GlobalLibrary::SECTION, 'site-header');
+        self::assertSame(7, $stored['order'] ?? null);
+        self::assertSame('Шапка сайта', $stored['title'] ?? null);
+    }
+
+    /**
+     * A global block is edited as the block it really is: its own type and
+     * settings, not a list of the reference's properties.
+     */
+    public function testGlobalBlockOpensAsItsRealBlockType(): void
+    {
+        $app = $this->appWithBuilder();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $library = new GlobalLibrary($app->fs);
+        $library->save(GlobalLibrary::BLOCK, 'cta', 'Кнопка CTA', [
+            'block' => (new Block('button', ['text' => 'Связаться', 'url' => '/contact']))->toArray(),
+        ]);
+        $this->write('content/about/item.yaml', "type: page\ntitle: About\nlayout:\n  sections:\n    - rows:\n        - columns:\n            - width: 12\n              blocks:\n                - type: global\n                  settings: {name: cta}\n");
+
+        $body = $app->handle(new Request('GET', '/admin/builder', ['id' => 'about'], [], [], [], []))->body();
+
+        self::assertSame(1, preg_match("/data-builder='(.*?)'/s", $body, $m));
+        $payload = json_decode(html_entity_decode($m[1], ENT_QUOTES), true, 512, JSON_THROW_ON_ERROR);
+
+        $block = $payload['layout']['sections'][0]['rows'][0]['columns'][0]['blocks'][0];
+        self::assertSame('button', $block['type']);
+        self::assertSame('Связаться', $block['settings']['text']);
+        self::assertSame('/contact', $block['settings']['url']);
+        self::assertSame('cta', $block['settings']['global']);
+    }
+
+    /**
+     * Saving the expanded block collapses it back into a reference, and the
+     * edit lands in the library.
+     */
+    public function testEditingAGlobalBlockInPlaceUpdatesTheLibrary(): void
+    {
+        $app = $this->appWithBuilder();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $library = new GlobalLibrary($app->fs);
+        $library->save(GlobalLibrary::BLOCK, 'cta', 'Кнопка CTA', [
+            'block' => (new Block('button', ['text' => 'СТАРАЯ', 'url' => '/old']))->toArray(),
+        ]);
+        $this->write('content/about/item.yaml', "type: page\ntitle: About\nlayout:\n  sections:\n    - rows:\n        - columns:\n            - width: 12\n              blocks:\n                - type: global\n                  settings: {name: cta}\n");
+
+        $posted = ['sections' => [[
+            'rows' => [['columns' => [[
+                'width' => 12,
+                'blocks' => [['type' => 'button', 'settings' => ['text' => 'НОВАЯ', 'url' => '/new', 'global' => 'cta']]],
+            ]]]],
+        ]]];
+
+        $app->handle(new Request('POST', '/admin/builder/save', [], [
+            'id' => 'about',
+            'layout_json' => json_encode($posted),
+        ], [], [], []));
+
+        $shared = (new GlobalLibrary($app->fs))->block('cta');
+        self::assertNotNull($shared);
+        self::assertSame('button', $shared->type);
+        self::assertSame('НОВАЯ', $shared->get('text'));
+
+        $page = $app->storage->load('about');
+        self::assertNotNull($page);
+        $saved = $page->get('layout');
+        $block = $saved['sections'][0]['rows'][0]['columns'][0]['blocks'][0];
+        self::assertSame('global', $block['type']);
+        self::assertSame('cta', $block['settings']['name']);
     }
 }

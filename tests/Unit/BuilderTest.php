@@ -757,16 +757,12 @@ final class BuilderTest extends FlatCmsTestCase
 
         // The section lives in the "Добавить секцию" dropdown...
         self::assertStringContainsString('data-global-section-add="site-header"', $body);
-        // ...and its stored structure is shipped so the canvas can redraw it as
-        // editor cards instead of dumping the published markup.
+        // ...and the payload carries no separate copy of its structure: a global
+        // is expanded into the page layout itself, where it is edited in place.
         self::assertSame(1, preg_match("/data-builder='(.*?)'/s", $body, $m));
         $payload = json_decode(html_entity_decode($m[1], ENT_QUOTES), true, 512, JSON_THROW_ON_ERROR);
-        self::assertArrayHasKey('site-header', $payload['globalStructures']['section']);
-        $structure = $payload['globalStructures']['section']['site-header'];
-        self::assertSame('header', $structure['settings']['role']);
-        self::assertSame('ШАПКА', $structure['rows'][0]['columns'][0]['blocks'][0]['settings']['body']);
-        // The editor must receive structure, not rendered HTML.
-        self::assertStringNotContainsString('<section', json_encode($structure));
+        self::assertArrayNotHasKey('globalStructures', $payload);
+        self::assertArrayHasKey('site-header', $payload['globals']['section']);
     }
 
     public function testGlobalBlockStructuresAreShippedForTheCanvas(): void
@@ -782,13 +778,12 @@ final class BuilderTest extends FlatCmsTestCase
         $body = $app->handle(new Request('GET', '/admin/builder', ['id' => 'about'], [], [], [], []))->body();
 
         self::assertSame(1, preg_match("/data-builder='(.*?)'/s", $body, $m));
-        $payload = json_decode(html_entity_decode($m[1], ENT_QUOTES), true, 512, JSON_THROW_ON_ERROR);
+        $payload = json_decode(html_entity_decode($m[1]), true, 512, JSON_THROW_ON_ERROR);
 
-        self::assertArrayHasKey('cta', $payload['globalStructures']['block']);
-        $structure = $payload['globalStructures']['block']['cta'];
-        self::assertSame('button', $structure['type']);
-        self::assertSame('Связаться', $structure['settings']['text']);
-        self::assertSame('/contact', $structure['settings']['url']);
+        // The catalogue still ships so the library can list what is available,
+        // but the block's own structure is not duplicated in the payload.
+        self::assertArrayHasKey('cta', $payload['globals']['block']);
+        self::assertArrayNotHasKey('globalStructures', $payload);
     }
 
     /**

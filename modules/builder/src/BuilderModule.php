@@ -77,7 +77,7 @@ final class BuilderModule implements Module
         $router->add('POST', '/admin/builder/media', fn (Request $r) => $this->uploadMedia($r));
         $router->add('GET', '/admin/builder/types', fn (Request $r) => $this->typesApi($r));
         $router->add('POST', '/admin/builder/global', fn (Request $r) => $this->globalAction($r));
-        $router->add('GET', '/admin/globals', fn (Request $r) => $this->globalsPage($r));
+        $router->add('GET', '/admin/builder/global', fn (Request $r) => $this->globalApi($r));
     }
 
     public function build(): void
@@ -177,13 +177,6 @@ final class BuilderModule implements Module
 
         $app = $this->requireApp();
 
-        // A global is edited on the same canvas but saved to the library, not to
-        // a page. ?global=section:main-header or ?global=block:cta.
-        $global = (string) $request->query('global', '');
-        if ($global !== '') {
-            return $this->globalEditor($global, $request);
-        }
-
         $id = (string) $request->query('id', '');
         if ($id === '') {
             return Response::redirect('/admin/pages', 302);
@@ -200,124 +193,180 @@ final class BuilderModule implements Module
             return Response::redirect('/admin/content/edit?id=' . rawurlencode($id), 303);
         }
 
-        $layout = Layout::fromValue($item->get('layout'), (int) $app->config->get('builder.grid_columns', 12));
+        $columns = (int) $app->config->get('builder.grid_columns', 12);
+        $layout = Layout::fromValue($item->get('layout'), $columns);
 
         return Response::html($app->renderer->renderTemplate('admin/builder', [
             'item' => $item,
             'id' => $id,
-            'layout' => $layout,
+            // Global references are expanded here, so every shared band and
+            // block is edited in place on whatever page shows it. The save path
+            // collapses them back into references.
+            'layout' => $this->hydrate($layout),
             'types' => $this->types?->all() ?? [],
             'categories' => $this->categories(),
             'presets' => $this->presets(),
             'elements' => $this->elementTypes(),
             'menu' => $this->menuSources(),
             'globals' => $this->globals?->catalog() ?? [],
-            'globalStructures' => $this->globalStructures(),
             'media' => $app->admin->media()?->list($id) ?? [],
-            'columns' => (int) $app->config->get('builder.grid_columns', 12),
+            'columns' => $columns,
             'saved' => $request->query('saved') === '1',
             'error' => (string) $request->query('error', ''),
         ]));
     }
 
     /**
-     * Editor for one global, either a shared section or a shared block. A section
-     * global is edited as a one-section layout so the canvas and the settings
-     * panel work exactly as they do for a page.
+     * Expand every global reference into the content it points at, tagging the
+     * result so the save path knows what to collapse again. A section becomes
+     * its shared rows; a global block becomes the shared block's own type and
+     * settings, so it edits exactly like the block it came from.
+     *
+     * Works on the array form: the editor only needs plain data, and round
+     * tripping through the models would drop fields the editor should keep.
+     *
+     * @return array<string, mixed>
      */
-    private function globalEditor(string $spec, Request $request): Response
+    private function hydrate(Layout $layout): array
     {
-        $app = $this->requireApp();
-        [$kind, $name] = $this->splitGlobal($spec);
+        $data = $layout->toArray();
         $library = $this->globals;
-        if ($library === null || $name === '') {
-            return Response::redirect('/admin/globals', 303);
+        if ($library === null) {
+            return $data;
         }
 
-        if ($kind === GlobalLibrary::SECTION) {
-            $stored = $library->read(GlobalLibrary::SECTION, $name);
-            if ($stored === null || !is_array($stored['section'] ?? null)) {
-                return Response::html($app->renderer->renderTemplate('admin/404', ['title' => 'Не найдено']), 404);
-            }
-            $layout = new Layout([Section::fromArray($stored['section'])], $this->gridColumns());
-        } else {
-            $block = $library->block($name);
-            if ($block === null) {
-                return Response::html($app->renderer->renderTemplate('admin/404', ['title' => 'Не найдено']), 404);
-            }
-            $layout = new Layout([
-                new Section([new Row([new Column([$block], $this->gridColumns())])]),
-            ], $this->gridColumns());
-        }
-
-        $data = $library->read($kind, $name) ?? [];
-
-        return Response::html($app->renderer->renderTemplate('admin/builder', [
-            'item' => null,
-            'id' => '',
-            'global' => $kind . ':' . $name,
-            'globalTitle' => (string) ($data['title'] ?? $name),
-            'globalKind' => $kind,
-            'globalName' => $name,
-            'layout' => $layout,
-            'types' => $this->types?->all() ?? [],
-            'categories' => $this->categories(),
-            'presets' => $this->presets(),
-            'elements' => $this->elementTypes(),
-            'menu' => $this->menuSources(),
-            'globals' => $library->catalog(),
-            'globalStructures' => $this->globalStructures(),
-            'media' => [],
-            'columns' => $this->gridColumns(),
-            'saved' => $request->query('saved') === '1',
-            'error' => (string) $request->query('error', ''),
-        ]));
-    }
-
-    /**
-     * The list of reusable sections and blocks, so an author can see what exists
-     * and jump straight into editing one.
-     */
-    private function globalsPage(Request $request): Response
-    {
-        if (!$this->isAdmin()) {
-            return Response::redirect('/admin/login', 302);
-        }
-
-        $app = $this->requireApp();
-        $catalog = $this->globals?->catalog() ?? [GlobalLibrary::SECTION => [], GlobalLibrary::BLOCK => []];
-
-        // Usage counts: how many pages reference each global.
-        $usage = [];
-        foreach ($app->storage->scan() as $id) {
-            $item = $app->storage->load($id);
-            if ($item === null) {
+        $sections = [];
+        foreach (is_array($data['sections'] ?? null) ? $data['sections'] : [] as $section) {
+            if (!is_array($section)) {
                 continue;
             }
-            $layout = Layout::fromValue($item->get('layout'), $this->gridColumns());
-            foreach ($layout->sections() as $section) {
-                $ref = trim((string) $section->get('global', ''));
-                if ($ref !== '') {
-                    $usage[GlobalLibrary::SECTION . ':' . $ref] = ($usage[GlobalLibrary::SECTION . ':' . $ref] ?? 0) + 1;
-                }
-            }
-            foreach ($layout->blocks() as $block) {
-                if ($block->type !== GlobalBlockType::NAME) {
-                    continue;
-                }
-                $ref = trim((string) $block->get('name', ''));
-                if ($ref !== '') {
-                    $usage[GlobalLibrary::BLOCK . ':' . $ref] = ($usage[GlobalLibrary::BLOCK . ':' . $ref] ?? 0) + 1;
-                }
-            }
+            $sections[] = $this->hydrateSection($section, $library);
+        }
+        $data['sections'] = $sections;
+
+        return $data;
+    }
+
+    /**
+     * @param array<string, mixed> $section
+     *
+     * @return array<string, mixed>
+     */
+    private function hydrateSection(array $section, GlobalLibrary $library): array
+    {
+        $name = trim((string) ($section['settings']['global'] ?? ''));
+
+        if ($name === '') {
+            $section['rows'] = $this->hydrateRows($section['rows'] ?? [], $library);
+
+            return $section;
         }
 
-        return Response::html($app->renderer->renderTemplate('admin/globals', [
-            'globals' => $catalog,
-            'usage' => $usage,
-            'saved' => $request->query('saved') === '1',
-            'error' => (string) $request->query('error', ''),
-        ]));
+        $shared = $library->section($name);
+        if ($shared === null) {
+            return $section;
+        }
+
+        $sharedData = $shared->toArray();
+        $settings = is_array($sharedData['settings'] ?? null) ? $sharedData['settings'] : [];
+
+        // Local overrides win, matching how the renderer resolves a band.
+        foreach (is_array($section['settings'] ?? null) ? $section['settings'] : [] as $key => $value) {
+            if ($key !== 'global' && $value !== '' && $value !== null) {
+                $settings[$key] = $value;
+            }
+        }
+        if (($settings['role'] ?? '') === '') {
+            $settings['role'] = $shared->get('role', '');
+        }
+        // The marker is what tells the save path to collapse this back into a
+        // reference instead of storing the shared rows on the page.
+        $settings['global'] = $name;
+
+        $merged = $section;
+        $merged['settings'] = $settings;
+        $merged['rows'] = $this->hydrateRows($sharedData['rows'] ?? [], $library);
+        if (($merged['title'] ?? '') === '' && ($sharedData['title'] ?? '') !== '') {
+            $merged['title'] = $sharedData['title'];
+        }
+        $class = Structure::classes((string) ($sharedData['class'] ?? ''), (string) ($section['class'] ?? ''));
+        if ($class !== '') {
+            $merged['class'] = $class;
+        } else {
+            unset($merged['class']);
+        }
+
+        return $merged;
+    }
+
+    /**
+     * @param mixed $rows
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function hydrateRows(mixed $rows, GlobalLibrary $library): array
+    {
+        $out = [];
+        foreach (is_array($rows) ? $rows : [] as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            foreach (is_array($row['columns'] ?? null) ? $row['columns'] : [] as $ci => $column) {
+                if (!is_array($column)) {
+                    continue;
+                }
+                foreach (is_array($column['blocks'] ?? null) ? $column['blocks'] : [] as $bi => $block) {
+                    if (!is_array($block) || ($block['type'] ?? '') !== GlobalBlockType::NAME) {
+                        continue;
+                    }
+                    $replacement = $this->hydrateBlock($block, $library);
+                    if ($replacement !== null) {
+                        $row['columns'][$ci]['blocks'][$bi] = $replacement;
+                    }
+                }
+            }
+            $out[] = $row;
+        }
+
+        return $out;
+    }
+
+    /**
+     * The shared block, wearing the reference's own id/title/class and carrying
+     * the reference name so saving can put the reference back.
+     *
+     * @param array<string, mixed> $block
+     *
+     * @return array<string, mixed>|null
+     */
+    private function hydrateBlock(array $block, GlobalLibrary $library): ?array
+    {
+        $name = trim((string) ($block['settings']['name'] ?? ''));
+        $shared = $name === '' ? null : $library->block($name);
+        if ($shared === null) {
+            return null;
+        }
+
+        $sharedData = $shared->toArray();
+        $settings = is_array($sharedData['settings'] ?? null) ? $sharedData['settings'] : [];
+        $settings['global'] = $name;
+
+        $merged = $sharedData;
+        $merged['settings'] = $settings;
+        if (isset($block['id'])) {
+            $merged['id'] = $block['id'];
+        }
+        if (($block['title'] ?? '') !== '') {
+            $merged['title'] = $block['title'];
+        }
+        $class = Structure::classes((string) ($sharedData['class'] ?? ''), (string) ($block['class'] ?? ''));
+        if ($class !== '') {
+            $merged['class'] = $class;
+        } else {
+            unset($merged['class']);
+        }
+
+        return $merged;
     }
 
     /**
@@ -330,52 +379,51 @@ final class BuilderModule implements Module
             return Response::redirect('/admin/login', 302);
         }
 
-        $app = $this->requireApp();
         $library = $this->globals;
         if ($library === null) {
             return Response::json(['error' => 'Модуль не загружен.'], 500);
         }
 
-        $action = (string) $request->input('action', 'save');
-        [$kind, $name] = $this->splitGlobal((string) $request->input('global', ''));
-        $back = (string) $request->input('back', '');
+        // Promotion is the only global action the editor needs: shared content is
+        // edited in place and written back by the normal save path, so there is
+        // no separate "save the global" request.
+        return $this->promote($request, $library);
+    }
 
-        if ($action === 'delete') {
-            $library->delete($kind, $name);
-
-            return $this->globalRedirect($back, $request, 'deleted=1');
+    /**
+     * One global's stored structure, so a section dropped onto the canvas can be
+     * expanded on the spot instead of waiting for a page reload.
+     */
+    private function globalApi(Request $request): Response
+    {
+        if (!$this->isAdmin()) {
+            return Response::json(['error' => 'Требуется вход.'], 401);
         }
 
-        if ($action === 'promote') {
-            return $this->promote($request, $library);
+        $kind = (string) $request->query('kind', GlobalLibrary::SECTION) === GlobalLibrary::BLOCK
+            ? GlobalLibrary::BLOCK
+            : GlobalLibrary::SECTION;
+        $name = (string) $request->query('name', '');
+        $library = $this->globals;
+        if ($library === null) {
+            return Response::json(['error' => 'Модуль не загружен.'], 500);
         }
-
-        $title = trim((string) $request->input('title', ''));
-        $layout = $this->sanitize($this->readLayout($request), $this->gridColumns());
 
         if ($kind === GlobalLibrary::SECTION) {
-            $section = $layout->sections()[0] ?? null;
+            $section = $library->section($name);
             if ($section === null) {
-                return $this->globalRedirect($back, $request, 'error=' . rawurlencode('Пустая секция.'));
+                return Response::json(['error' => 'Глобальная секция не найдена.'], 404);
             }
-            if ($name === '') {
-                $name = $library->uniqueName(GlobalLibrary::SECTION, $title !== '' ? $title : $section->get('title', 'section'));
-            }
-            $payload = ['section' => $section->toArray()];
-        } else {
-            $block = $layout->blocks()[0] ?? null;
-            if ($block === null) {
-                return $this->globalRedirect($back, $request, 'error=' . rawurlencode('Пустой элемент.'));
-            }
-            if ($name === '') {
-                $name = $library->uniqueName(GlobalLibrary::BLOCK, $title !== '' ? $title : $block->type);
-            }
-            $payload = ['block' => $block->toArray()];
+
+            return Response::json(['kind' => $kind, 'name' => $name, 'structure' => $section->toArray()]);
         }
 
-        $library->save($kind, $name, $title !== '' ? $title : $name, $payload);
+        $block = $library->block($name);
+        if ($block === null) {
+            return Response::json(['error' => 'Глобальный элемент не найден.'], 404);
+        }
 
-        return $this->globalRedirect($back, $request, 'saved=1');
+        return Response::json(['kind' => $kind, 'name' => $name, 'structure' => $block->toArray()]);
     }
 
     /**
@@ -425,32 +473,6 @@ final class BuilderModule implements Module
         $library->save($kind, $name, $title !== '' ? $title : $name, $payload);
 
         return Response::json(['name' => $name, 'kind' => $kind, 'title' => $title !== '' ? $title : $name]);
-    }
-
-    private function globalRedirect(string $back, Request $request, string $query): Response
-    {
-        $separator = str_contains($back, '?') ? '&' : '?';
-        if ($back !== '') {
-            return Response::redirect($back . $separator . $query, 303);
-        }
-
-        return Response::redirect('/admin/globals?' . $query, 303);
-    }
-
-    /**
-     * @return array{0: string, 1: string}
-     */
-    private function splitGlobal(string $spec): array
-    {
-        $spec = trim($spec);
-        if ($spec === '') {
-            return [GlobalLibrary::SECTION, ''];
-        }
-        $parts = explode(':', $spec, 2);
-        $kind = $parts[0] === GlobalLibrary::BLOCK ? GlobalLibrary::BLOCK : GlobalLibrary::SECTION;
-        $name = trim($parts[1] ?? '');
-
-        return [$kind, $this->globals?->slug($name) ?? $name];
     }
 
     private function gridColumns(): int
@@ -612,38 +634,6 @@ final class BuilderModule implements Module
         ];
     }
 
-    /**
-     * The stored structure of every global, so the canvas can draw a reference
-     * with the same section/row/column/block cards it uses for the page itself.
-     * Shipping the structure rather than rendered markup is what keeps a global
-     * looking like the original in the editor instead of like the front end.
-     *
-     * @return array<string, array<string, array<string, mixed>>>
-     */
-    private function globalStructures(): array
-    {
-        $out = [GlobalLibrary::SECTION => [], GlobalLibrary::BLOCK => []];
-        $library = $this->globals;
-        if ($library === null) {
-            return $out;
-        }
-
-        foreach (array_keys($library->all(GlobalLibrary::SECTION)) as $name) {
-            $section = $library->section((string) $name);
-            if ($section !== null) {
-                $out[GlobalLibrary::SECTION][$name] = $section->toArray();
-            }
-        }
-        foreach (array_keys($library->all(GlobalLibrary::BLOCK)) as $name) {
-            $block = $library->block((string) $name);
-            if ($block !== null) {
-                $out[GlobalLibrary::BLOCK][$name] = $block->toArray();
-            }
-        }
-
-        return $out;
-    }
-
     private function save(Request $request): Response
     {
         if (!$this->isAdmin()) {
@@ -651,12 +641,6 @@ final class BuilderModule implements Module
         }
 
         $app = $this->requireApp();
-
-        // Saving from a global editor writes to the library, not to a page.
-        $global = (string) $request->input('global', '');
-        if ($global !== '') {
-            return $this->globalAction($request);
-        }
 
         $id = (string) $request->input('id', '');
         $item = $app->storage->load($id);
@@ -675,11 +659,146 @@ final class BuilderModule implements Module
         }
 
         $data = $item->all();
-        $data['layout'] = $layout->toArray();
+        // Shared bands and blocks were edited in place, so their new content goes
+        // to the library and the page keeps only a reference to it.
+        $data['layout'] = $this->collapse($layout->toArray());
         $app->fs->writeYaml('content/' . $safe . '/item.yaml', $data);
         $app->build();
 
         return Response::redirect('/admin/builder?id=' . rawurlencode($id) . '&saved=1', 303);
+    }
+
+    /**
+     * The inverse of hydrate(): write every expanded global back to the library
+     * and leave a reference behind. Editing a shared band on one page therefore
+     * updates it everywhere, which is the whole point of a global.
+     *
+     * @param array<string, mixed> $layout
+     *
+     * @return array<string, mixed>
+     */
+    private function collapse(array $layout): array
+    {
+        $library = $this->globals;
+        if ($library === null || !is_array($layout['sections'] ?? null)) {
+            return $layout;
+        }
+
+        $sections = [];
+        foreach ($layout['sections'] as $section) {
+            if (!is_array($section)) {
+                continue;
+            }
+            $sections[] = $this->collapseSection($section, $library);
+        }
+        $layout['sections'] = $sections;
+
+        return $layout;
+    }
+
+    /**
+     * @param array<string, mixed> $section
+     *
+     * @return array<string, mixed>
+     */
+    private function collapseSection(array $section, GlobalLibrary $library): array
+    {
+        $name = trim((string) ($section['settings']['global'] ?? ''));
+        if ($name === '') {
+            $section['rows'] = $this->collapseRows($section['rows'] ?? [], $library);
+
+            return $section;
+        }
+
+        $settings = is_array($section['settings'] ?? null) ? $section['settings'] : [];
+        unset($settings['global']);
+        $rows = $this->collapseRows($section['rows'] ?? [], $library);
+
+        $payload = ['settings' => $settings, 'rows' => $rows];
+        if (($section['title'] ?? '') !== '') {
+            $payload['title'] = $section['title'];
+        }
+        if (($section['class'] ?? '') !== '') {
+            $payload['class'] = $section['class'];
+        }
+        $library->save(
+            GlobalLibrary::SECTION,
+            $name,
+            (string) ($section['title'] ?? ''),
+            ['section' => $payload],
+        );
+
+        $reference = ['settings' => ['global' => $name]];
+        if (isset($section['id'])) {
+            $reference['id'] = $section['id'];
+        }
+
+        return $reference;
+    }
+
+    /**
+     * @param mixed $rows
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function collapseRows(mixed $rows, GlobalLibrary $library): array
+    {
+        $out = [];
+        foreach (is_array($rows) ? $rows : [] as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            foreach (is_array($row['columns'] ?? null) ? $row['columns'] : [] as $ci => $column) {
+                if (!is_array($column)) {
+                    continue;
+                }
+                foreach (is_array($column['blocks'] ?? null) ? $column['blocks'] : [] as $bi => $block) {
+                    if (!is_array($block)) {
+                        continue;
+                    }
+                    $name = trim((string) ($block['settings']['global'] ?? ''));
+                    if ($name === '') {
+                        continue;
+                    }
+                    $row['columns'][$ci]['blocks'][$bi] = $this->collapseBlock($block, $name, $library);
+                }
+            }
+            $out[] = $row;
+        }
+
+        return $out;
+    }
+
+    /**
+     * @param array<string, mixed> $block
+     *
+     * @return array<string, mixed>
+     */
+    private function collapseBlock(array $block, string $name, GlobalLibrary $library): array
+    {
+        $settings = is_array($block['settings'] ?? null) ? $block['settings'] : [];
+        unset($settings['global']);
+
+        $payload = ['type' => (string) ($block['type'] ?? ''), 'settings' => $settings];
+        if (($block['title'] ?? '') !== '') {
+            $payload['title'] = $block['title'];
+        }
+        if (($block['class'] ?? '') !== '') {
+            $payload['class'] = $block['class'];
+        }
+        $library->save(
+            GlobalLibrary::BLOCK,
+            $name,
+            (string) ($block['title'] ?? ''),
+            ['block' => $payload],
+        );
+
+        $reference = ['type' => GlobalBlockType::NAME, 'settings' => ['name' => $name]];
+        if (isset($block['id'])) {
+            $reference['id'] = $block['id'];
+        }
+
+        return $reference;
     }
 
     /**

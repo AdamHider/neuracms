@@ -94,7 +94,20 @@ final class GlobalLibrary
             return false;
         }
 
-        $data = ['title' => $title !== '' ? $title : $name, 'kind' => $kind] + $payload;
+        $existing = $this->read($kind, $name) ?? [];
+        // An in-place edit posts the payload without the library title, so keep
+        // the stored one instead of degrading it to the slug.
+        if ($title === '') {
+            $title = (string) ($existing['title'] ?? $name);
+        }
+        $data = ['title' => $title, 'kind' => $kind] + $payload;
+        // Order and any other bookkeeping a human added live beside the payload;
+        // rewriting the file from a page edit must not drop them.
+        foreach ($existing as $key => $value) {
+            if (!array_key_exists($key, $data)) {
+                $data[$key] = $value;
+            }
+        }
         $this->fs->ensureDir($this->dir($kind) . '/' . $name);
 
         return $this->fs->writeYaml($this->base . '/' . $kind . '/' . $name . '/item.yaml', $data);
@@ -125,7 +138,7 @@ final class GlobalLibrary
             return null;
         }
 
-        return Section::fromArray($data['section']);
+        return Section::fromArray($this->withFileMeta($data));
     }
 
     public function block(string $name): ?Block
@@ -135,9 +148,31 @@ final class GlobalLibrary
             return null;
         }
 
-        $block = Block::fromArray($data['block']);
+        $block = Block::fromArray($this->withFileMeta($data));
 
         return $block->type === '' ? null : $block;
+    }
+
+    /**
+     * The title of a global is stored next to the payload, not inside it, so a
+     * loaded section or block has to borrow it. Without this an in-place edit
+     * would write the name back over the human title.
+     *
+     * @param array<string, mixed> $data
+     *
+     * @return array<string, mixed>
+     */
+    private function withFileMeta(array $data): array
+    {
+        $payload = is_array($data['section'] ?? null)
+            ? $data['section']
+            : (is_array($data['block'] ?? null) ? $data['block'] : []);
+
+        if (($payload['title'] ?? '') === '' && is_string($data['title'] ?? null)) {
+            $payload['title'] = $data['title'];
+        }
+
+        return $payload;
     }
 
     /**

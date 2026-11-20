@@ -77,47 +77,7 @@
     font-size: .82rem;
 }
 .builder__global-note p { margin: .2rem 0 0; font-size: .78rem; }
-.builder__global-ref {
-    margin: 0;
-    padding: .6rem .7rem;
-    background: #f5f3ff;
-    border-top: 1px solid #ddd6fe;
-    font-size: .84rem;
-    color: #4c1d95;
-}
-.builder__global-body { position: relative; }
-/* A global reference redraws the shared structure with the ordinary editor
-   cards, handles and inline controls, so it looks exactly like the band did on
-   the page it came from. The controls are disabled: the content lives in the
-   global, and "Редактировать" opens the real editor for it. */
-.builder__global-shared {
-    padding: .5rem;
-    background: #fbfaff;
-    border-bottom: 1px solid #ddd6fe;
-}
-.builder__global-shared .builder__row,
-.builder__global-shared .builder__column { background: transparent; }
-.builder__global-shared .builder__handle { cursor: default; opacity: .45; }
-.builder__global-shared .builder__block { cursor: default; }
-.builder__global-shared .builder__icon-btn:disabled,
-.builder__global-shared .builder__add-col:disabled {
-    opacity: .35;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-.builder__global-shared .builder__drop-hint { visibility: hidden; }
-.builder__block-fields {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .15rem .6rem;
-    margin-left: auto;
-    padding: 0 .4rem;
-    font-size: .74rem;
-    color: var(--admin-muted, #6b7280);
-}
-.builder__field { display: inline-flex; gap: .25rem; align-items: baseline; }
-.builder__field-label { opacity: .75; }
-.builder__field-value { color: var(--admin-ink, #1f2430); font-weight: 500; }
+.builder__badge--global { background: #f5f3ff; color: #6d28d9; }
 
 /* ---- Canvas ---- */
 .builder__canvas-wrap { padding: .85rem; }
@@ -194,7 +154,12 @@
 }
 .builder__row-title { font-weight: 600; color: var(--admin-text, #1f2937); }
 .builder__row-meta { color: var(--admin-muted, #6b7280); }
-.builder__row-columns { display: flex; flex-wrap: wrap; gap: .6rem; align-items: stretch; }
+.builder__row-columns {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0;
+    align-items: stretch;
+}
 .builder__row-columns.is-over { background: #f5f8ff; border-radius: 8px; }
 .builder__row-empty { padding: .5rem .6rem; margin: 0; }
 .builder__column {
@@ -257,20 +222,6 @@
 .builder__block:hover .builder__block-actions,
 .builder__block.is-selected .builder__block-actions { opacity: 1; }
 .builder__block-actions .builder__icon-btn { padding: .1rem .25rem; }
-/* A global block reference shows the shared markup inline; it is a preview, so
-   its own controls must not intercept clicks meant for the card. */
-.builder__block-preview {
-    max-width: 12rem;
-    overflow: hidden;
-    padding: 0 .3rem;
-    border-left: 2px solid #ddd6fe;
-    color: var(--admin-muted, #6b7280);
-    font-size: .75rem;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-.builder__block-preview * { display: inline; pointer-events: none; }
-.builder__block-preview p { margin: 0; }
 
 /* Inline "add column" target: sits at the end of the row it appends to. */
 .builder__add-col {
@@ -291,6 +242,32 @@
     cursor: pointer;
 }
 .builder__add-col:hover {
+    border-color: var(--admin-accent, #2563eb);
+    background: #eff6ff;
+    color: var(--admin-accent, #2563eb);
+}
+
+/* The "add row" affordance sits under the last row and looks like "add column". */
+.builder__row-add-wrap {
+    display: flex;
+    justify-content: stretch;
+    padding: .1rem .25rem .25rem;
+}
+.builder__add-row {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .25rem;
+    padding: .35rem .5rem;
+    border: 2px dashed var(--admin-line, #e3e8f0);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--admin-muted, #6b7280);
+    font-size: .72rem;
+    cursor: pointer;
+}
+.builder__add-row:hover {
     border-color: var(--admin-accent, #2563eb);
     background: #eff6ff;
     color: var(--admin-accent, #2563eb);
