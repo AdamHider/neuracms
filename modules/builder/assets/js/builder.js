@@ -48,6 +48,10 @@
     var selection = null;
     var drag = null;
 
+    // Undo/redo snapshots of the whole layout. Structural edits push a snapshot
+    // before they mutate, so one step always undoes one user action.
+    var history = { stack: [], index: -1, limit: 20, quiet: false };
+
     var JUSTIFY = [['', 'по умолчанию'], ['start', 'в начало'], ['center', 'по центру'], ['end', 'в конец'],
         ['between', 'равномерно'], ['around', 'с отступами'], ['evenly', 'равные отступы']];
     var ALIGN = [['', 'по умолчанию'], ['start', 'в начало'], ['center', 'по центру'], ['end', 'в конец'],
@@ -82,6 +86,160 @@
 
     function clone(obj) {
         return JSON.parse(JSON.stringify(obj));
+    }
+
+    /**
+     * Every change to the layout ends in a render, so that is where history is
+     * recorded: the snapshot is taken after the change, which makes the stack a
+     * list of states the editor can return to. Renders that only move the
+     * selection produce the same snapshot and are ignored.
+     */
+    function commitHistory() {
+        if (history.quiet) { return; }
+
+        var snapshot = JSON.stringify(model());
+        if (history.index >= 0 && history.stack[history.index] === snapshot) {
+            return;
+        }
+
+        history.stack = history.stack.slice(0, history.index + 1);
+        history.stack.push(snapshot);
+        if (history.stack.length > history.limit) {
+            history.stack.shift();
+        }
+        history.index = history.stack.length - 1;
+        renderHistoryButtons();
+    }
+
+    var historyTimer = null;
+
+    /**
+     * Typing into a field should not leave one snapshot per keystroke, so text
+     * edits are recorded once the user pauses. Selects and checkboxes commit at
+     * once: they are single deliberate changes.
+     */
+    function commitHistorySoon(el) {
+        if (historyTimer) {
+            window.clearTimeout(historyTimer);
+            historyTimer = null;
+        }
+        var immediate = el && (el.tagName === 'SELECT' || el.type === 'checkbox' || el.type === 'radio');
+        if (immediate) {
+            commitHistory();
+
+            return;
+        }
+        historyTimer = window.setTimeout(function () {
+            historyTimer = null;
+            commitHistory();
+        }, 600);
+    }
+
+    function undo() {
+        if (history.index <= 0) { return; }
+        history.index--;
+        restore(history.stack[history.index]);
+    }
+
+    function redo() {
+        if (history.index >= history.stack.length - 1) { return; }
+        history.index++;
+        restore(history.stack[history.index]);
+    }
+
+    function restore(snapshot) {
+        var parsed;
+        try {
+            parsed = JSON.parse(snapshot);
+        } catch (e) {
+            return;
+        }
+        history.quiet = true;
+        config.layout = parsed;
+        // The selection points at indexes that may no longer exist.
+        selection = null;
+        render();
+        history.quiet = false;
+        renderHistoryButtons();
+    }
+
+    function renderHistoryButtons() {
+        var undoBtn = document.querySelector('[data-builder-undo]');
+        var redoBtn = document.querySelector('[data-builder-redo]');
+        if (undoBtn) { undoBtn.disabled = history.index <= 0; }
+        if (redoBtn) { redoBtn.disabled = history.index >= history.stack.length - 1; }
+    }
+
+    /**
+     * Widths a row needs so its columns fit the grid. A column of 0 is "auto"
+     * and takes an even share of what is left; fixed widths keep their size
+     * until the row overflows, then the columns shrink.
+     *
+     * When a specific column is being added, it keeps the share it asked for and
+     * the others shrink to make room. Without that, adding a column to a row
+     * that already sums to the grid pushed the newcomer onto a second line.
+     */
+    function fitColumns(columns, keepIndex) {
+        var auto = 0;
+        var fixed = 0;
+        columns.forEach(function (column) {
+            if (column.width > 0) { fixed += Math.min(column.width, grid); } else { auto++; }
+        });
+
+        // Auto columns fill whatever is left, so only a real shortage needs work.
+        if (fixed + auto <= grid) {
+            return columns;
+        }
+
+        var budget = Math.max(auto, grid - auto);
+        var keep = typeof keepIndex === 'number' && columns[keepIndex] && columns[keepIndex].width > 0
+            ? columns[keepIndex]
+            : null;
+
+        if (keep) {
+            // The newcomer may claim at most what is left after one unit for
+            // every other column, so no neighbour is squeezed to nothing.
+            var keepWidth = Math.min(keep.width, budget - (columns.length - 1));
+            if (keepWidth >= 1) {
+                keep.width = keepWidth;
+                budget -= keepWidth;
+            } else {
+                keep = null;
+            }
+        }
+
+        var shrinking = columns.filter(function (column) {
+            return column !== keep && column.width > 0;
+        });
+        // Nothing left to shrink but a full row: give every column an equal share
+        // rather than leaving the row wider than the grid.
+        if (!shrinking.length) {
+            if (keep) {
+                var share = Math.max(1, Math.floor(grid / columns.length));
+                columns.forEach(function (column) { column.width = share; });
+            }
+
+            return columns;
+        }
+
+        var total = shrinking.reduce(function (n, column) { return n + column.width; }, 0);
+        var scale = budget / total;
+        var assigned = 0;
+        shrinking.forEach(function (column) {
+            column.width = Math.max(1, Math.min(grid, Math.floor(column.width * scale)));
+            assigned += column.width;
+        });
+
+        // Hand the rounding remainder back so the row sums to the budget exactly.
+        for (var i = 0; assigned < budget && i < grid * 4; i++) {
+            var target = shrinking[i % shrinking.length];
+            if (target.width < grid) {
+                target.width++;
+                assigned++;
+            }
+        }
+
+        return columns;
     }
 
     function defaultsFor(name) {
@@ -208,6 +366,7 @@
         renderSettings();
         syncJson();
         renderCount();
+        commitHistory();
     }
 
     function renderCount() {
@@ -335,11 +494,15 @@
 
         var html = '<div class="builder__row' + (isSelected([si, ri]) ? ' is-selected' : '')
             + '" data-si="' + si + '" data-ri="' + ri + '">';
+        var rowGlobal = !!(row.settings && row.settings.global);
         html += '<div class="builder__row-head">'
             + '<span class="builder__handle" draggable="true" data-drag="row" data-si="' + si + '" data-ri="' + ri + '" title="Перетащить ряд">' + icon('drag') + '</span>'
             + '<span class="builder__row-title">' + esc(row.title || 'Ряд ' + (ri + 1)) + '</span>'
             + '<span class="builder__row-meta">' + columns.length + ' кол.</span>'
+            + (rowGlobal ? '<span class="builder__badge builder__badge--global">' + icon('global') + ' общий</span>' : '')
             + '<span class="builder-bar__spacer"></span>'
+            + (rowGlobal ? '' : '<button type="button" class="builder__icon-btn" data-promote-row="' + si + ':' + ri + '" title="Сделать глобальным">' + icon('global') + '</button>')
+            + '<button type="button" class="builder__icon-btn" data-row-dup="' + si + ':' + ri + '" title="Дублировать ряд">' + icon('copy') + '</button>'
             + '<button type="button" class="builder__icon-btn" data-row-del="' + si + ':' + ri + '" title="Удалить ряд">' + icon('delete') + '</button>'
             + '</div>';
 
@@ -376,10 +539,13 @@
         var html = '<div class="builder__column' + (isSelected([si, ri, ci]) ? ' is-selected' : '') + '"'
             + ' data-si="' + si + '" data-ri="' + ri + '" data-ci="' + ci + '"'
             + ' style="' + columnFlex(span) + '">';
+        var columnGlobal = !!(column.settings && column.settings.global);
         html += '<div class="builder__column-head">'
             + '<span class="builder__handle" draggable="true" data-drag="column" data-si="' + si + '" data-ri="' + ri + '" data-ci="' + ci + '" title="Перетащить колонку">' + icon('drag') + '</span>'
             + '<span class="builder__column-title">' + esc(column.title || (span > 0 ? span + '/' + grid : 'авто')) + '</span>'
+            + (columnGlobal ? '<span class="builder__badge builder__badge--global">' + icon('global') + '</span>' : '')
             + '<span class="builder-bar__spacer"></span>'
+            + (columnGlobal ? '' : '<button type="button" class="builder__icon-btn" data-promote-column="' + si + ':' + ri + ':' + ci + '" title="Сделать глобальной">' + icon('global') + '</button>')
             + '<button type="button" class="builder__icon-btn" data-col-width-down="' + si + ':' + ri + ':' + ci + '" title="Уже">' + icon('minus') + '</button>'
             + '<button type="button" class="builder__icon-btn" data-col-width-up="' + si + ':' + ri + ':' + ci + '" title="Шире">' + icon('plus') + '</button>'
             + '<button type="button" class="builder__icon-btn" data-col-del="' + si + ':' + ri + ':' + ci + '" title="Удалить колонку">' + icon('close') + '</button>'
@@ -439,32 +605,26 @@
     }
 
     /**
-     * Promote the selected section or block to a global and swap the local copy
-     * for a reference. The promotion happens in place: the canvas is not posted
-     * and the page is not reloaded, so nothing the user has typed is lost.
+     * Promote the selected node to a global and swap the local copy for a
+     * reference. The promotion happens in place: the canvas is not posted and
+     * the page is not reloaded, so nothing the user has typed is lost.
      */
     function promote(kind, path) {
-        var si = path[0];
-        var title = window.prompt(kind === 'section'
-            ? 'Название глобальной секции (например, «Шапка сайта»)'
-            : 'Название глобального элемента', kind === 'section' ? 'Шапка сайта' : '');
+        var node = nodeAt(path);
+        if (!node) { return; }
+
+        var title = window.prompt(PROMOTE_PROMPT[kind] || PROMOTE_PROMPT.block, PROMOTE_DEFAULT[kind] || '');
         if (title === null) { return; }
 
         // Send only the thing being promoted, so the server copies exactly what
         // is on the canvas and the rest of the layout is left alone.
-        var node = nodeAt(path);
-        if (!node) { return; }
-
         var body = new URLSearchParams();
         body.set('action', 'promote');
         body.set('kind', kind);
         body.set('title', title);
         body.set('payload', JSON.stringify(node));
-        if (kind === 'section') {
-            body.set('index', String(si));
-        } else {
-            body.set('block_index', path.join(':'));
-        }
+        body.set('index', String(path[0] || 0));
+        body.set('block_index', path.join(':'));
 
         fetch('/admin/builder/global', {
             method: 'POST',
@@ -481,29 +641,33 @@
                 return;
             }
             replaceWithReference(kind, path, result.name);
-            // The new reference opens expanded, like any other global on the
-            // page, so its blocks stay visible and editable.
-            var reference = kind === 'section' ? sectionAt(path[0]) : blockAt(path[0], path[1], path[2], path[3]);
-            if (reference && result.structure) {
-                if (kind === 'section') {
-                    reference.rows = result.structure.rows || [];
-                    reference.settings = result.structure.settings || reference.settings;
-                    reference.settings.global = result.name;
-                } else {
-                    reference.type = result.structure.type || reference.type;
-                    reference.settings = result.structure.settings || {};
-                    reference.settings.global = result.name;
-                }
-            }
+            expandReference(kind, path, result.name, result.structure);
             config.globals = config.globals || {};
             config.globals[kind] = config.globals[kind] || {};
-            config.globals[kind][result.name] = { name: result.name, title: title, kind: kind };
+            config.globals[kind][result.name] = {
+                name: result.name,
+                title: result.title || title,
+                kind: kind
+            };
             render();
         }).catch(function () {
             window.alert('Не удалось сделать глобальным.');
         });
     }
 
+    var PROMOTE_PROMPT = {
+        section: 'Название глобальной секции (например, «Шапка сайта»)',
+        row: 'Название глобального ряда',
+        column: 'Название глобальной колонки',
+        block: 'Название глобального элемента'
+    };
+    var PROMOTE_DEFAULT = { section: 'Шапка сайта', row: '', column: '', block: '' };
+
+    /**
+     * Swap the local node for a reference that keeps the node's identity. A
+     * column also keeps its width: the width describes the row it sits in, not
+     * the shared content, so a shared column can be 4/12 here and 8/12 there.
+     */
     function replaceWithReference(kind, path, name) {
         if (kind === 'section') {
             var section = sectionAt(path[0]);
@@ -516,6 +680,32 @@
 
             return;
         }
+
+        if (kind === 'row') {
+            var parent = sectionAt(path[0]);
+            var row = rowAt(path[0], path[1]);
+            if (parent && row) {
+                rowsOf(parent)[path[1]] = { id: row.id || uid(), settings: { global: name }, columns: [] };
+            }
+
+            return;
+        }
+
+        if (kind === 'column') {
+            var rowNode = rowAt(path[0], path[1]);
+            var column = columnAt(path[0], path[1], path[2]);
+            if (rowNode && column) {
+                columnsOf(rowNode)[path[2]] = {
+                    id: column.id || uid(),
+                    width: column.width || 0,
+                    settings: { global: name },
+                    blocks: []
+                };
+            }
+
+            return;
+        }
+
         var block = blockAt(path[0], path[1], path[2], path[3]);
         if (block) {
             columnAt(path[0], path[1], path[2]).blocks[path[3]] = {
@@ -524,8 +714,61 @@
         }
     }
 
+    /**
+     * Fill a fresh reference with the content the server stored, so it opens
+     * expanded and editable instead of showing up empty until the next reload.
+     */
+    function expandReference(kind, path, name, structure) {
+        if (!structure) { return; }
+
+        if (kind === 'section') {
+            var section = sectionAt(path[0]);
+            if (section) {
+                section.rows = structure.rows || [];
+                section.settings = structure.settings || section.settings || {};
+                section.settings.global = name;
+            }
+
+            return;
+        }
+
+        if (kind === 'row') {
+            var row = rowAt(path[0], path[1]);
+            if (row) {
+                row.columns = structure.columns || [];
+                row.settings = structure.settings || row.settings || {};
+                row.settings.global = name;
+            }
+
+            return;
+        }
+
+        if (kind === 'column') {
+            var column = columnAt(path[0], path[1], path[2]);
+            if (column) {
+                column.blocks = structure.blocks || [];
+                column.settings = structure.settings || column.settings || {};
+                column.settings.global = name;
+            }
+
+            return;
+        }
+
+        var block = blockAt(path[0], path[1], path[2], path[3]);
+        if (block) {
+            block.type = structure.type || block.type;
+            block.settings = structure.settings || {};
+            block.settings.global = name;
+        }
+    }
+
     function renderSettings() {
+        var headEl = document.getElementById('builder-settings-head');
+        var tabsEl = document.getElementById('builder-settings-tabs');
+
         if (!selection) {
+            if (headEl) { headEl.innerHTML = ''; }
+            if (tabsEl) { tabsEl.innerHTML = ''; }
             settingsBody.innerHTML = '<p class="muted">Выберите секцию, ряд, колонку или элемент, чтобы настроить его.</p>';
 
             return;
@@ -537,18 +780,145 @@
             return;
         }
 
-        settingsBody.innerHTML = settingsHtml(selection.kind, node, selection.path);
-    }
-
-    function settingsHtml(kind, node, path) {
-        var html = '<div class="builder__settings-title">' + icon(kind === 'block' ? blockIcon(node) : kind) + ' '
-            + esc(settingsTitle(kind, node, path)) + '</div>';
-
-        if (kind === 'block') {
-            return html + blockSettingsHtml(node, path);
+        var groups = settingsGroups(selection.kind, node);
+        var names = Object.keys(groups).filter(function (name) { return groups[name] !== ''; });
+        if (names.indexOf(settingsTab) === -1) {
+            settingsTab = names[0] || 'basic';
         }
 
-        return html + nodeSettingsHtml(kind, node, path);
+        if (headEl) {
+            headEl.innerHTML = settingsHeadHtml(selection.kind, node, selection.path);
+        }
+        if (tabsEl) {
+            tabsEl.innerHTML = names.length < 2 ? '' : names.map(function (name) {
+                return '<button type="button" class="builder__tab' + (name === settingsTab ? ' is-active' : '') + '"'
+                    + ' data-settings-tab="' + esc(name) + '" role="tab" aria-selected="' + (name === settingsTab) + '">'
+                    + esc(TAB_LABELS[name] || name) + '</button>';
+            }).join('');
+        }
+        settingsBody.innerHTML = groups[settingsTab] || '<p class="muted">Нет настроек.</p>';
+    }
+
+    var TAB_LABELS = { basic: 'Основное', style: 'Оформление' };
+    var settingsTab = 'basic';
+
+    /**
+     * The panel header names the element itself, so the panel has no separate
+     * "Настройки" title. The action menu next to it carries the operations that
+     * used to be buttons at the bottom of the form.
+     */
+    function settingsHeadHtml(kind, node, path) {
+        var isGlobal = !!(node.settings && (node.settings.global || node.settings.name));
+        var html = '<span class="builder__settings-icon">'
+            + icon(kind === 'block' ? blockIcon(node) : kind) + '</span>'
+            + '<span class="builder__settings-name" title="' + esc(settingsTitle(kind, node, path)) + '">'
+            + esc(settingsTitle(kind, node, path)) + '</span>'
+            + (isGlobal ? '<span class="builder__badge builder__badge--global" title="Общий для всех страниц">' + icon('global') + '</span>' : '');
+
+        html += '<div class="dropdown builder__settings-menu">'
+            + '<button type="button" class="builder__icon-btn dropdown-toggle" data-bs-toggle="dropdown"'
+            + ' aria-expanded="false" title="Действия">' + icon('more') + '</button>'
+            + '<ul class="dropdown-menu dropdown-menu-end">';
+
+        if (!isGlobal) {
+            html += '<li><button type="button" class="dropdown-item" data-promote-node="' + esc(path.join(':')) + '"'
+                + ' data-node-kind="' + esc(kind) + '">' + icon('global') + ' Сделать глобальным</button></li>';
+        }
+        html += '<li><button type="button" class="dropdown-item" data-duplicate-node="' + esc(path.join(':')) + '"'
+            + ' data-node-kind="' + esc(kind) + '">' + icon('copy') + ' Дублировать</button></li>'
+            + '<li><hr class="dropdown-divider"></li>'
+            + '<li><button type="button" class="dropdown-item text-danger" data-delete-node="' + esc(path.join(':')) + '"'
+            + ' data-node-kind="' + esc(kind) + '">' + icon('delete') + ' Удалить</button></li>'
+            + '</ul></div>';
+
+        return html;
+    }
+
+    /**
+     * Settings split into tabs. "basic" is what the node is, "style" is how it
+     * looks; a node with nothing in a group gets no tab for it.
+     */
+    function settingsGroups(kind, node) {
+        var s = node.settings || {};
+        var basic = '';
+        var style = '';
+
+        if (kind === 'block') {
+            var type = types[node.type];
+            if (type && type.fields) {
+                Object.keys(type.fields).forEach(function (key) {
+                    basic += fieldHtml(key, type.fields[key], s);
+                });
+            } else {
+                basic += '<p class="muted">У этого элемента нет настроек.</p>';
+            }
+        }
+
+        if (kind === 'section') {
+            var role = sectionRole(node);
+            basic += '<label class="builder__setting">Роль'
+                + '<select data-setting="node:role">'
+                + option('', 'Обычная секция', role)
+                + option('header', 'Шапка сайта', role)
+                + option('footer', 'Подвал сайта', role)
+                + '</select></label>';
+            basic += '<label class="builder__setting">Ширина'
+                + '<select data-setting="node:width">'
+                + option('boxed', 'По контейнеру', s.width || 'boxed')
+                + option('full', 'На всю ширину', s.width || 'boxed')
+                + '</select></label>';
+            basic += '<label class="builder__setting">Вариант'
+                + '<select data-setting="node:variant">'
+                + option('', 'Обычный', s.variant || '')
+                + option('muted', 'Серый фон', s.variant || '')
+                + option('dark', 'Тёмный', s.variant || '')
+                + option('accent', 'Акцентный', s.variant || '')
+                + '</select></label>';
+            style += '<label class="builder__setting">Фон (CSS)'
+                + '<input type="text" data-setting="node:background" value="' + esc(s.background || '') + '" placeholder="#f5f5f5 или var(--accent)"></label>';
+            style += '<label class="builder__setting">Отступы (CSS)'
+                + '<input type="text" data-setting="node:padding" value="' + esc(s.padding || '') + '" placeholder="3rem 1rem"></label>';
+        }
+
+        if (kind === 'column') {
+            var widthSelect = '<label class="builder__setting">Ширина (из ' + grid + ')'
+                + '<select data-setting="node:width">' + option('0', 'Авто', node.width || 0);
+            for (var w = 1; w <= grid; w++) {
+                widthSelect += option(String(w), String(w), node.width || 0);
+            }
+            basic += widthSelect + '</select></label>';
+        }
+
+        if (kind !== 'block') {
+            basic += '<label class="builder__setting">Выравнивание по главной оси'
+                + '<select data-setting="node:justify">' + options(JUSTIFY, s.justify || '') + '</select></label>'
+                + '<label class="builder__setting">Выравнивание по поперечной оси'
+                + '<select data-setting="node:align">' + options(ALIGN, s.align || '') + '</select></label>';
+        }
+
+        style += '<label class="builder__setting">Название в редакторе'
+            + '<input type="text" data-setting="node:title" value="' + esc(node.title || '') + '" placeholder="Необязательно"></label>'
+            + '<label class="builder__setting">CSS-класс'
+            + '<input type="text" data-setting="node:class" value="' + esc(node['class'] || '') + '" placeholder="my-hero"></label>';
+
+        if (kind === 'block') {
+            style += '<label class="builder__setting">Выравнивание по главной оси'
+                + '<select data-setting="node:justify">' + options(JUSTIFY, s.justify || '') + '</select></label>'
+                + '<label class="builder__setting">Выравнивание по поперечной оси'
+                + '<select data-setting="node:align">' + options(ALIGN, s.align || '') + '</select></label>';
+        }
+
+        var globalName = String((s.global || s.name || ''));
+        if (globalName !== '' && kind !== 'block') {
+            basic += '<div class="builder__global-note">' + icon('global') + ' Общий для всех страниц'
+                + '<p class="muted">Правки здесь видны везде, где он используется.</p></div>';
+        }
+        if (kind === 'block' && s.global) {
+            basic += '<div class="builder__global-note">' + icon('global') + ' Глобальный элемент <code>' + esc(s.global) + '</code>'
+                + '<p class="muted">Правки здесь видны на всех страницах, где он используется.</p></div>';
+        }
+
+        return { basic: basic, style: style };
     }
 
     function settingsTitle(kind, node, path) {
@@ -562,116 +932,6 @@
         if (kind === 'column') { return 'Колонка ' + (path[2] + 1); }
 
         return blockLabel(node);
-    }
-
-    /**
-     * Title and CSS class are offered on every node, which is what makes the
-     * editor uniform: a section, a row, a column and a block all answer to the
-     * same two fields.
-     */
-    function commonSettingsHtml(node) {
-        var s = node.settings || {};
-
-        return '<label class="builder__setting">Название в редакторе'
-            + '<input type="text" data-setting="node:title" value="' + esc(node.title || '') + '" placeholder="Необязательно"></label>'
-            + '<label class="builder__setting">CSS-класс'
-            + '<input type="text" data-setting="node:class" value="' + esc(node['class'] || '') + '" placeholder="my-hero"></label>'
-            + '<label class="builder__setting">Выравнивание по главной оси'
-            + '<select data-setting="node:justify">' + options(JUSTIFY, s.justify || '') + '</select></label>'
-            + '<label class="builder__setting">Выравнивание по поперечной оси'
-            + '<select data-setting="node:align">' + options(ALIGN, s.align || '') + '</select></label>';
-    }
-
-    function nodeSettingsHtml(kind, node, path) {
-        var s = node.settings || (node.settings = {});
-        var html = commonSettingsHtml(node);
-
-        if (kind === 'section') {
-            var role = sectionRole(node);
-            var globalName = String(s.global || '');
-            if (globalName) {
-                html += '<div class="builder__global-note">'
-                    + icon('global') + ' Глобальная секция <code>' + esc(globalName) + '</code>'
-                    + '<p class="muted">Правки здесь видны на всех страницах, где она используется.</p>'
-                    + '</div>';
-            }
-            html += '<label class="builder__setting">Роль'
-                + '<select data-setting="node:role">'
-                + option('', 'Обычная секция', role)
-                + option('header', 'Шапка сайта', role)
-                + option('footer', 'Подвал сайта', role)
-                + '</select></label>';
-            html += '<label class="builder__setting">Ширина'
-                + '<select data-setting="node:width">'
-                + option('boxed', 'По контейнеру', s.width || 'boxed')
-                + option('full', 'На всю ширину', s.width || 'boxed')
-                + '</select></label>';
-            html += '<label class="builder__setting">Вариант'
-                + '<select data-setting="node:variant">'
-                + option('', 'Обычный', s.variant || '')
-                + option('muted', 'Серый фон', s.variant || '')
-                + option('dark', 'Тёмный', s.variant || '')
-                + option('accent', 'Акцентный', s.variant || '')
-                + '</select></label>';
-            html += '<label class="builder__setting">Фон (CSS)'
-                + '<input type="text" data-setting="node:background" value="' + esc(s.background || '') + '" placeholder="#f5f5f5 или var(--accent)"></label>';
-            html += '<label class="builder__setting">Отступы (CSS)'
-                + '<input type="text" data-setting="node:padding" value="' + esc(s.padding || '') + '" placeholder="3rem 1rem"></label>';
-        }
-
-        if (kind === 'column') {
-            html += '<label class="builder__setting">Ширина (из ' + grid + ')'
-                + '<select data-setting="node:width">'
-                + option('0', 'Авто', node.width || 0);
-            for (var w = 1; w <= grid; w++) {
-                html += option(String(w), String(w), node.width || 0);
-            }
-            html += '</select></label>';
-        }
-
-        html += '<div class="builder__settings-actions">';
-        if (kind === 'section') {
-            html += '<button type="button" class="btn btn-sm btn-outline-danger" data-section-del="' + path[0] + '">'
-                + icon('delete') + ' Удалить секцию</button>';
-        } else if (kind === 'row') {
-            html += '<button type="button" class="btn btn-sm btn-outline-danger" data-row-del="' + path[0] + ':' + path[1] + '">'
-                + icon('delete') + ' Удалить ряд</button>';
-        } else if (kind === 'column') {
-            html += '<button type="button" class="btn btn-sm btn-outline-danger" data-col-del="' + path.join(':') + '">'
-                + icon('delete') + ' Удалить колонку</button>';
-        }
-        html += '</div>';
-
-        return html;
-    }
-
-    function blockSettingsHtml(block, path) {
-        var type = types[block.type];
-        var settings = block.settings || (block.settings = {});
-        var html = commonSettingsHtml(block);
-
-        if (settings.global) {
-            html += '<div class="builder__global-note">'
-                + icon('global') + ' Глобальный элемент <code>' + esc(settings.global) + '</code>'
-                + '<p class="muted">Правки здесь видны на всех страницах, где он используется.</p>'
-                + '</div>';
-        }
-
-        if (type && type.fields) {
-            Object.keys(type.fields).forEach(function (key) {
-                html += fieldHtml(key, type.fields[key], settings);
-            });
-        } else {
-            html += '<p class="muted">У этого элемента нет настроек.</p>';
-        }
-
-        var id = path.join(':');
-        html += '<div class="builder__settings-actions">'
-            + '<button type="button" class="btn btn-sm btn-outline-danger" data-block-del="' + id + '">'
-            + icon('delete') + ' Удалить</button>'
-            + '</div>';
-
-        return html;
     }
 
     function fieldHtml(key, field, settings) {
@@ -903,7 +1163,13 @@
     function addColumn(si, ri) {
         var row = rowAt(si, ri);
         if (!row) { return; }
-        columnsOf(row).push({ width: 0, blocks: [] });
+        var columns = columnsOf(row);
+        // Give the new column a slot before fitting, so an overflow is resolved
+        // by shrinking the existing columns rather than by wrapping the new one
+        // onto a second line.
+        var newcomer = { width: Math.max(1, Math.floor(grid / (columns.length + 1))), blocks: [] };
+        columns.push(newcomer);
+        fitColumns(columns, columns.length - 1);
         select('column', [si, ri, row.columns.length - 1]);
         render();
     }
@@ -1015,10 +1281,18 @@
      * half a row, which is the sensible first width for a fresh column.
      */
     function resizeColumn(si, ri, ci, delta) {
+        var row = rowAt(si, ri);
         var column = columnAt(si, ri, ci);
-        if (!column) { return; }
+        if (!row || !column) { return; }
         var current = column.width > 0 ? column.width : Math.max(1, Math.floor(grid / 2));
-        column.width = Math.max(1, Math.min(grid, current + delta));
+        // A column cannot grow past what its neighbours leave free, otherwise
+        // the row would overflow and wrap.
+        var siblings = 0;
+        columnsOf(row).forEach(function (other, i) {
+            if (i !== ci && other.width > 0) { siblings += other.width; }
+        });
+        var ceiling = Math.max(1, grid - siblings);
+        column.width = Math.max(1, Math.min(ceiling, current + delta));
         render();
     }
 
@@ -1249,7 +1523,105 @@
         return path;
     }
 
+    function duplicateNode(kind, path) {
+        if (kind === 'section') {
+            var section = sectionAt(path[0]);
+            if (!section) { return; }
+            var sectionCopy = clone(section);
+            sectionCopy.id = uid();
+            sections().splice(path[0] + 1, 0, sectionCopy);
+            select('section', [path[0] + 1]);
+            render();
+
+            return;
+        }
+        if (kind === 'row') {
+            var sectionNode = sectionAt(path[0]);
+            var row = rowAt(path[0], path[1]);
+            if (!sectionNode || !row) { return; }
+            var rowCopy = clone(row);
+            rowCopy.id = uid();
+            rowsOf(sectionNode).splice(path[1] + 1, 0, rowCopy);
+            select('row', [path[0], path[1] + 1]);
+            render();
+
+            return;
+        }
+        if (kind === 'column') {
+            var parent = rowAt(path[0], path[1]);
+            var column = columnAt(path[0], path[1], path[2]);
+            if (!parent || !column) { return; }
+            var columnCopy = clone(column);
+            columnCopy.id = uid();
+            columnsOf(parent).splice(path[2] + 1, 0, columnCopy);
+            fitColumns(columnsOf(parent), path[2] + 1);
+            select('column', [path[0], path[1], path[2] + 1]);
+            render();
+
+            return;
+        }
+        duplicateBlock(path[0], path[1], path[2], path[3]);
+    }
+
+    function deleteNode(kind, path) {
+        if (kind === 'section') {
+            sections().splice(path[0], 1);
+        } else if (kind === 'row') {
+            var sectionNode = sectionAt(path[0]);
+            if (!sectionNode || !sectionNode.rows) { return; }
+            sectionNode.rows.splice(path[1], 1);
+        } else if (kind === 'column') {
+            var row = rowAt(path[0], path[1]);
+            if (!row || !row.columns) { return; }
+            row.columns.splice(path[2], 1);
+        } else {
+            removeBlock(path[0], path[1], path[2], path[3]);
+
+            return;
+        }
+        selection = null;
+        render();
+    }
+
     function onEditorClick(event) {
+        var tab = event.target.closest('[data-settings-tab]');
+        if (tab) {
+            settingsTab = tab.getAttribute('data-settings-tab');
+            renderSettings();
+
+            return;
+        }
+
+        var promoteNode = event.target.closest('[data-promote-node]');
+        if (promoteNode) {
+            promote(
+                promoteNode.getAttribute('data-node-kind'),
+                promoteNode.getAttribute('data-promote-node').split(':').map(Number)
+            );
+
+            return;
+        }
+
+        var duplicateNodeBtn = event.target.closest('[data-duplicate-node]');
+        if (duplicateNodeBtn) {
+            duplicateNode(
+                duplicateNodeBtn.getAttribute('data-node-kind'),
+                duplicateNodeBtn.getAttribute('data-duplicate-node').split(':').map(Number)
+            );
+
+            return;
+        }
+
+        var deleteNodeBtn = event.target.closest('[data-delete-node]');
+        if (deleteNodeBtn) {
+            deleteNode(
+                deleteNodeBtn.getAttribute('data-node-kind'),
+                deleteNodeBtn.getAttribute('data-delete-node').split(':').map(Number)
+            );
+
+            return;
+        }
+
         var filterAdd = event.target.closest('[data-filter-add]');
         if (filterAdd) {
             var filters = currentBlockFilters();
@@ -1282,6 +1654,28 @@
         var promoteBlock = event.target.closest('[data-promote-block]');
         if (promoteBlock) {
             promote('block', promoteBlock.getAttribute('data-promote-block').split(':').map(Number));
+
+            return;
+        }
+
+        var promoteRow = event.target.closest('[data-promote-row]');
+        if (promoteRow) {
+            promote('row', promoteRow.getAttribute('data-promote-row').split(':').map(Number));
+
+            return;
+        }
+
+        var promoteColumn = event.target.closest('[data-promote-column]');
+        if (promoteColumn) {
+            promote('column', promoteColumn.getAttribute('data-promote-column').split(':').map(Number));
+
+            return;
+        }
+
+        var rowDup = event.target.closest('[data-row-dup]');
+        if (rowDup) {
+            var prd = rowDup.getAttribute('data-row-dup').split(':').map(Number);
+            duplicateNode('row', prd);
 
             return;
         }
@@ -1528,6 +1922,7 @@
             }
             syncJson();
             updateCardSummary();
+            commitHistorySoon(el);
 
             return;
         }
@@ -1544,14 +1939,17 @@
             }
             syncJson();
             refreshLabel(selection.kind, selection.path);
+            commitHistorySoon(el);
 
             return;
         }
 
         if (key === 'width' && selection.kind === 'column') {
             node.width = parseInt(value, 10) || 0;
+            fitColumns(columnsOf(rowAt(selection.path[0], selection.path[1])), selection.path[2]);
             syncJson();
             renderCanvas();
+            commitHistorySoon(el);
 
             return;
         }
@@ -1560,6 +1958,7 @@
         node.settings[key] = value;
         syncJson();
         renderCanvas();
+        commitHistorySoon(el);
     }
 
     function updateCardSummary() {
@@ -1633,6 +2032,17 @@
         });
     }
 
+    document.addEventListener('click', function (event) {
+        if (event.target.closest('[data-builder-undo]')) {
+            undo();
+
+            return;
+        }
+        if (event.target.closest('[data-builder-redo]')) {
+            redo();
+        }
+    });
+
     var backButton = document.querySelector('[data-builder-back]');
     if (backButton) {
         backButton.addEventListener('click', function () {
@@ -1643,6 +2053,24 @@
             }
         });
     }
+
+    document.addEventListener('keydown', function (event) {
+        var mod = event.ctrlKey || event.metaKey;
+        if (!mod || event.altKey) { return; }
+        var key = (event.key || '').toLowerCase();
+        if (key !== 'z' && key !== 'y') { return; }
+        // Never steal the shortcut from a text field the user is typing in.
+        var field = event.target && event.target.closest
+            ? event.target.closest('input, textarea, select, [contenteditable="true"]')
+            : null;
+        if (field) { return; }
+        event.preventDefault();
+        if (key === 'y' || event.shiftKey) {
+            redo();
+        } else {
+            undo();
+        }
+    });
 
     if (jsonArea) {
         jsonArea.addEventListener('change', function () {

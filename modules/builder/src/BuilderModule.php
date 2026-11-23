@@ -311,10 +311,29 @@ final class BuilderModule implements Module
             if (!is_array($row)) {
                 continue;
             }
+
+            $rowName = trim((string) ($row['settings']['global'] ?? ''));
+            if ($rowName !== '') {
+                $sharedRow = $library->row($rowName);
+                if ($sharedRow !== null) {
+                    $row = $this->hydrateRow($row, $sharedRow, $rowName);
+                }
+            }
+
             foreach (is_array($row['columns'] ?? null) ? $row['columns'] : [] as $ci => $column) {
                 if (!is_array($column)) {
                     continue;
                 }
+
+                $columnName = trim((string) ($column['settings']['global'] ?? ''));
+                if ($columnName !== '') {
+                    $sharedColumn = $library->column($columnName);
+                    if ($sharedColumn !== null) {
+                        $column = $this->hydrateColumn($column, $sharedColumn, $columnName);
+                        $row['columns'][$ci] = $column;
+                    }
+                }
+
                 foreach (is_array($column['blocks'] ?? null) ? $column['blocks'] : [] as $bi => $block) {
                     if (!is_array($block) || ($block['type'] ?? '') !== GlobalBlockType::NAME) {
                         continue;
@@ -329,6 +348,84 @@ final class BuilderModule implements Module
         }
 
         return $out;
+    }
+
+    /**
+     * A shared row wearing the reference's own id/title/class, marked with the
+     * name so the save path can collapse it back.
+     *
+     * @param array<string, mixed> $row
+     *
+     * @return array<string, mixed>
+     */
+    private function hydrateRow(array $row, Row $shared, string $name): array
+    {
+        $sharedData = $shared->toArray();
+        $settings = is_array($sharedData['settings'] ?? null) ? $sharedData['settings'] : [];
+        foreach (is_array($row['settings'] ?? null) ? $row['settings'] : [] as $key => $value) {
+            if ($key !== 'global' && $value !== '' && $value !== null) {
+                $settings[$key] = $value;
+            }
+        }
+        $settings['global'] = $name;
+
+        $merged = $sharedData;
+        $merged['settings'] = $settings;
+        if (isset($row['id'])) {
+            $merged['id'] = $row['id'];
+        }
+        if (($row['title'] ?? '') !== '') {
+            $merged['title'] = $row['title'];
+        }
+        $class = Structure::classes((string) ($sharedData['class'] ?? ''), (string) ($row['class'] ?? ''));
+        if ($class !== '') {
+            $merged['class'] = $class;
+        } else {
+            unset($merged['class']);
+        }
+
+        return $merged;
+    }
+
+    /**
+     * A shared column wearing the reference's own id/title/class. The width is
+     * the reference's, so one shared column can sit at a different share of
+     * different rows.
+     *
+     * @param array<string, mixed> $column
+     *
+     * @return array<string, mixed>
+     */
+    private function hydrateColumn(array $column, Column $shared, string $name): array
+    {
+        $sharedData = $shared->toArray();
+        $settings = is_array($sharedData['settings'] ?? null) ? $sharedData['settings'] : [];
+        foreach (is_array($column['settings'] ?? null) ? $column['settings'] : [] as $key => $value) {
+            if ($key !== 'global' && $value !== '' && $value !== null) {
+                $settings[$key] = $value;
+            }
+        }
+        $settings['global'] = $name;
+
+        $merged = $sharedData;
+        $merged['settings'] = $settings;
+        if (isset($column['width'])) {
+            $merged['width'] = (int) $column['width'];
+        }
+        if (isset($column['id'])) {
+            $merged['id'] = $column['id'];
+        }
+        if (($column['title'] ?? '') !== '') {
+            $merged['title'] = $column['title'];
+        }
+        $class = Structure::classes((string) ($sharedData['class'] ?? ''), (string) ($column['class'] ?? ''));
+        if ($class !== '') {
+            $merged['class'] = $class;
+        } else {
+            unset($merged['class']);
+        }
+
+        return $merged;
     }
 
     /**
@@ -400,30 +497,19 @@ final class BuilderModule implements Module
             return Response::json(['error' => 'Требуется вход.'], 401);
         }
 
-        $kind = (string) $request->query('kind', GlobalLibrary::SECTION) === GlobalLibrary::BLOCK
-            ? GlobalLibrary::BLOCK
-            : GlobalLibrary::SECTION;
+        $kind = $this->promotionKind($request);
         $name = (string) $request->query('name', '');
         $library = $this->globals;
         if ($library === null) {
             return Response::json(['error' => 'Модуль не загружен.'], 500);
         }
 
-        if ($kind === GlobalLibrary::SECTION) {
-            $section = $library->section($name);
-            if ($section === null) {
-                return Response::json(['error' => 'Глобальная секция не найдена.'], 404);
-            }
-
-            return Response::json(['kind' => $kind, 'name' => $name, 'structure' => $section->toArray()]);
-        }
-
-        $block = $library->block($name);
-        if ($block === null) {
+        $structure = $library->structure($kind, $name);
+        if ($structure === null) {
             return Response::json(['error' => 'Глобальный элемент не найден.'], 404);
         }
 
-        return Response::json(['kind' => $kind, 'name' => $name, 'structure' => $block->toArray()]);
+        return Response::json(['kind' => $kind, 'name' => $name, 'structure' => $structure]);
     }
 
     /**
@@ -433,78 +519,144 @@ final class BuilderModule implements Module
      */
     private function promote(Request $request, GlobalLibrary $library): Response
     {
-        $kind = (string) $request->input('kind', GlobalLibrary::SECTION) === GlobalLibrary::BLOCK
-            ? GlobalLibrary::BLOCK
-            : GlobalLibrary::SECTION;
+        $kind = $this->promotionKind($request);
         $title = trim((string) $request->input('title', ''));
         $node = $this->promotionNode($request);
 
-        if ($node !== null) {
-            // The editor sent the node itself, so the indexes in the request
-            // name a position in the full canvas and are meaningless here.
-            if ($kind === GlobalLibrary::SECTION) {
-                $section = $this->sanitizeSection($node, $this->gridColumns());
-                if ($section === null) {
-                    return Response::json(['error' => 'Секция не найдена.'], 422);
-                }
-                $payload = ['section' => $section->toArray()];
-                $fallback = (string) $section->get('title', 'section');
-            } else {
-                $block = $this->sanitizeBlock($node);
-                if ($block === null) {
-                    return Response::json(['error' => 'Элемент не найден.'], 422);
-                }
-                $payload = ['block' => $block->toArray()];
-                $fallback = $block->type;
-            }
-        } elseif ($kind === GlobalLibrary::SECTION) {
-            $layout = $this->sanitize($this->readLayout($request), $this->gridColumns());
-            $index = (int) $request->input('index', -1);
-            $section = $layout->sections()[$index] ?? null;
-            if ($section === null) {
-                return Response::json(['error' => 'Секция не найдена.'], 422);
-            }
-            $payload = ['section' => $section->toArray()];
-            $fallback = (string) $section->get('title', 'section');
-        } else {
-            $layout = $this->sanitize($this->readLayout($request), $this->gridColumns());
-            // Current path is section:row:column:block. A three-part path comes
-            // from layouts saved before rows existed, so it names row 0.
-            $path = array_map('intval', explode(':', (string) $request->input('block_index', '0:0:0:0')));
-            if (count($path) >= 4) {
-                [$si, $ri, $ci, $bi] = $path;
-            } else {
-                $si = $path[0] ?? 0;
-                $ri = 0;
-                $ci = $path[1] ?? 0;
-                $bi = $path[2] ?? 0;
-            }
-            $rows = $layout->sections()[$si]?->rows() ?? [];
-            $columns = $rows[$ri]?->columns() ?? [];
-            $block = $columns[$ci]?->blocks()[$bi] ?? null;
-            if ($block === null) {
-                return Response::json(['error' => 'Элемент не найден.'], 422);
-            }
-            $payload = ['block' => $block->toArray()];
-            $fallback = $block->type;
+        $payload = $node !== null
+            ? $this->promotionPayloadFromNode($kind, $node)
+            : $this->promotionPayloadFromLayout($request, $kind);
+        if ($payload instanceof Response) {
+            return $payload;
         }
+        [$body, $fallback] = $payload;
 
         $name = $library->uniqueName($kind, $title !== '' ? $title : $fallback);
-        $library->save($kind, $name, $title !== '' ? $title : $name, $payload);
+        $library->save($kind, $name, $title !== '' ? $title : $name, [$kind => $body]);
 
         // Answer with what was stored, in the same shape as the read endpoint.
         // The editor swaps its local copy for a reference right away, and a
-        // reference without rows would read as an empty global on the next save.
-        $structure = $kind === GlobalLibrary::SECTION
-            ? ($library->section($name)?->toArray() ?? [])
-            : ($library->block($name)?->toArray() ?? []);
-
+        // reference without content would read as an empty global on the next
+        // save.
         return Response::json([
             'name' => $name,
             'kind' => $kind,
             'title' => $title !== '' ? $title : $name,
-            'structure' => $structure,
+            'structure' => $library->structure($kind, $name) ?? [],
         ]);
+    }
+
+    private function promotionKind(Request $request): string
+    {
+        $kind = (string) $request->input('kind', GlobalLibrary::SECTION);
+
+        return in_array($kind, [GlobalLibrary::SECTION, GlobalLibrary::ROW, GlobalLibrary::COLUMN, GlobalLibrary::BLOCK], true)
+            ? $kind
+            : GlobalLibrary::SECTION;
+    }
+
+    /**
+     * Store the node the editor sent. The node stands alone, so the indexes in
+     * the request name a position in the full canvas and are meaningless here.
+     *
+     * @param array<string, mixed> $node
+     *
+     * @return array{0: array<string, mixed>, 1: string}|Response
+     */
+    private function promotionPayloadFromNode(string $kind, array $node): array|Response
+    {
+        $grid = $this->gridColumns();
+
+        if ($kind === GlobalLibrary::SECTION) {
+            $section = $this->sanitizeSection($node, $grid);
+            if ($section === null) {
+                return Response::json(['error' => 'Секция не найдена.'], 422);
+            }
+
+            return [$section->toArray(), (string) $section->get('title', 'section')];
+        }
+
+        if ($kind === GlobalLibrary::ROW) {
+            $row = $this->sanitizeRow($node, $grid);
+            if ($row === null) {
+                return Response::json(['error' => 'Ряд не найден.'], 422);
+            }
+
+            return [$row->toArray(), $row->title() !== '' ? $row->title() : 'row'];
+        }
+
+        if ($kind === GlobalLibrary::COLUMN) {
+            $column = $this->sanitizeColumn($node, $grid);
+            if ($column === null) {
+                return Response::json(['error' => 'Колонка не найдена.'], 422);
+            }
+
+            return [$column->toArray(), $column->title() !== '' ? $column->title() : 'column'];
+        }
+
+        $block = $this->sanitizeBlock($node);
+        if ($block === null) {
+            return Response::json(['error' => 'Элемент не найден.'], 422);
+        }
+
+        return [$block->toArray(), $block->type];
+    }
+
+    /**
+     * Older clients post the whole canvas plus an index or a path instead of the
+     * node itself. Resolve it the same way, from the layout.
+     *
+     * @return array{0: array<string, mixed>, 1: string}|Response
+     */
+    private function promotionPayloadFromLayout(Request $request, string $kind): array|Response
+    {
+        $layout = $this->sanitize($this->readLayout($request), $this->gridColumns());
+
+        if ($kind === GlobalLibrary::SECTION) {
+            $section = $layout->sections()[(int) $request->input('index', -1)] ?? null;
+            if ($section === null) {
+                return Response::json(['error' => 'Секция не найдена.'], 422);
+            }
+
+            return [$section->toArray(), (string) $section->get('title', 'section')];
+        }
+
+        // Current path is section:row:column:block. A three-part path comes from
+        // layouts saved before rows existed, so it names row 0.
+        $path = array_map('intval', explode(':', (string) $request->input('block_index', '0:0:0:0')));
+        if (count($path) >= 4) {
+            [$si, $ri, $ci, $bi] = $path;
+        } else {
+            $si = $path[0] ?? 0;
+            $ri = 0;
+            $ci = $path[1] ?? 0;
+            $bi = $path[2] ?? 0;
+        }
+
+        $row = $layout->sections()[$si]?->rows()[$ri] ?? null;
+        if ($row === null) {
+            return Response::json(['error' => 'Ряд не найден.'], 422);
+        }
+
+        if ($kind === GlobalLibrary::ROW) {
+            return [$row->toArray(), $row->title() !== '' ? $row->title() : 'row'];
+        }
+
+        $column = $row->columns()[$ci] ?? null;
+        if ($column === null) {
+            return Response::json(['error' => 'Колонка не найдена.'], 422);
+        }
+
+        if ($kind === GlobalLibrary::COLUMN) {
+            return [$column->toArray(), $column->title() !== '' ? $column->title() : 'column'];
+        }
+
+        $block = $column->blocks()[$bi] ?? null;
+        if ($block === null) {
+            return Response::json(['error' => 'Элемент не найден.'], 422);
+        }
+
+        return [$block->toArray(), $block->type];
     }
 
     /**
@@ -813,25 +965,117 @@ final class BuilderModule implements Module
             if (!is_array($row)) {
                 continue;
             }
+
+            $rowName = trim((string) ($row['settings']['global'] ?? ''));
+            $expandedRow = $rowName === '' ? null : ($library->row($rowName)?->columns() ?? []);
             foreach (is_array($row['columns'] ?? null) ? $row['columns'] : [] as $ci => $column) {
                 if (!is_array($column)) {
                     continue;
                 }
+
+                $name = trim((string) ($column['settings']['global'] ?? ''));
+                if ($name !== '') {
+                    $column = $this->collapseColumn($column, $name, $library);
+                    $row['columns'][$ci] = $column;
+                }
+
                 foreach (is_array($column['blocks'] ?? null) ? $column['blocks'] : [] as $bi => $block) {
                     if (!is_array($block)) {
                         continue;
                     }
-                    $name = trim((string) ($block['settings']['global'] ?? ''));
-                    if ($name === '') {
+                    $blockName = trim((string) ($block['settings']['global'] ?? ''));
+                    if ($blockName === '') {
                         continue;
                     }
-                    $row['columns'][$ci]['blocks'][$bi] = $this->collapseBlock($block, $name, $library);
+                    $row['columns'][$ci]['blocks'][$bi] = $this->collapseBlock($block, $blockName, $library);
                 }
             }
+
+            if ($rowName !== '') {
+                $row = $this->collapseRow($row, $rowName, $expandedRow !== [], $library);
+            }
+
             $out[] = $row;
         }
 
         return $out;
+    }
+
+    /**
+     * Write a shared row back and leave a reference. A reference that arrives
+     * without columns was never expanded, so the stored row is left alone
+     * instead of being emptied.
+     *
+     * @param array<string, mixed> $row
+     *
+     * @return array<string, mixed>
+     */
+    private function collapseRow(array $row, string $name, bool $wasExpanded, GlobalLibrary $library): array
+    {
+        $settings = is_array($row['settings'] ?? null) ? $row['settings'] : [];
+        unset($settings['global']);
+        $columns = is_array($row['columns'] ?? null) ? $row['columns'] : [];
+
+        if ($columns === [] && $wasExpanded) {
+            return $this->rowReference($row, $name);
+        }
+
+        $payload = ['settings' => $settings, 'columns' => $columns];
+        if (($row['title'] ?? '') !== '') {
+            $payload['title'] = $row['title'];
+        }
+        if (($row['class'] ?? '') !== '') {
+            $payload['class'] = $row['class'];
+        }
+        $library->save(GlobalLibrary::ROW, $name, (string) ($row['title'] ?? ''), ['row' => $payload]);
+
+        return $this->rowReference($row, $name);
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     *
+     * @return array<string, mixed>
+     */
+    private function rowReference(array $row, string $name): array
+    {
+        $reference = ['settings' => ['global' => $name], 'columns' => []];
+        if (isset($row['id'])) {
+            $reference['id'] = $row['id'];
+        }
+
+        return $reference;
+    }
+
+    /**
+     * Write a shared column back and leave a reference. The width stays on the
+     * reference, because it belongs to the row the column sits in, not to the
+     * shared content.
+     *
+     * @param array<string, mixed> $column
+     *
+     * @return array<string, mixed>
+     */
+    private function collapseColumn(array $column, string $name, GlobalLibrary $library): array
+    {
+        $settings = is_array($column['settings'] ?? null) ? $column['settings'] : [];
+        unset($settings['global']);
+
+        $payload = ['settings' => $settings, 'blocks' => is_array($column['blocks'] ?? null) ? $column['blocks'] : []];
+        if (($column['title'] ?? '') !== '') {
+            $payload['title'] = $column['title'];
+        }
+        if (($column['class'] ?? '') !== '') {
+            $payload['class'] = $column['class'];
+        }
+        $library->save(GlobalLibrary::COLUMN, $name, (string) ($column['title'] ?? ''), ['column' => $payload]);
+
+        $reference = ['settings' => ['global' => $name], 'width' => (int) ($column['width'] ?? 0), 'blocks' => []];
+        if (isset($column['id'])) {
+            $reference['id'] = $column['id'];
+        }
+
+        return $reference;
     }
 
     /**
@@ -1021,21 +1265,10 @@ final class BuilderModule implements Module
             if (!is_array($column)) {
                 continue;
             }
-            $blocks = [];
-            foreach (is_array($column['blocks'] ?? null) ? $column['blocks'] : [] as $entry) {
-                if (is_array($entry)) {
-                    $block = $this->sanitizeBlock($entry);
-                    if ($block !== null) {
-                        $blocks[] = $block;
-                    }
-                }
+            $clean = $this->sanitizeColumn($column, $columns);
+            if ($clean !== null) {
+                $rowColumns[] = $clean;
             }
-            $width = isset($column['width']) ? max(0, min($columns, (int) $column['width'])) : 0;
-            $settings = $this->sanitizeSettings($column['settings'] ?? []);
-            $id = isset($column['id']) && is_string($column['id']) ? $column['id'] : null;
-            $title = isset($column['title']) && is_string($column['title']) ? trim($column['title']) : '';
-            $class = isset($column['class']) && is_string($column['class']) ? trim($column['class']) : '';
-            $rowColumns[] = new Column($blocks, $width, $settings, $id, $title, $class);
         }
 
         // A row given as a flat block list gets one full-width column.
@@ -1052,16 +1285,44 @@ final class BuilderModule implements Module
             $rowColumns[] = new Column($blocks, $columns);
         }
 
-        if ($rowColumns === []) {
-            return null;
-        }
-
         $settings = $this->sanitizeSettings($raw['settings'] ?? []);
         $id = isset($raw['id']) && is_string($raw['id']) ? $raw['id'] : null;
         $title = isset($raw['title']) && is_string($raw['title']) ? trim($raw['title']) : '';
         $class = isset($raw['class']) && is_string($raw['class']) ? trim($raw['class']) : '';
 
+        // A row that only points at a global keeps no columns of its own, the
+        // same way a global section reference keeps no rows.
+        $isGlobalRef = trim((string) ($settings['global'] ?? '')) !== '';
+        if ($rowColumns === [] && !$isGlobalRef) {
+            return null;
+        }
+
         return new Row($rowColumns, $settings, $id, $title, $class);
+    }
+
+    private function sanitizeColumn(mixed $raw, int $columns): ?Column
+    {
+        if (!is_array($raw)) {
+            return null;
+        }
+
+        $blocks = [];
+        foreach (is_array($raw['blocks'] ?? null) ? $raw['blocks'] : [] as $entry) {
+            if (is_array($entry)) {
+                $block = $this->sanitizeBlock($entry);
+                if ($block !== null) {
+                    $blocks[] = $block;
+                }
+            }
+        }
+
+        $width = isset($raw['width']) ? max(0, min($columns, (int) $raw['width'])) : 0;
+        $settings = $this->sanitizeSettings($raw['settings'] ?? []);
+        $id = isset($raw['id']) && is_string($raw['id']) ? $raw['id'] : null;
+        $title = isset($raw['title']) && is_string($raw['title']) ? trim($raw['title']) : '';
+        $class = isset($raw['class']) && is_string($raw['class']) ? trim($raw['class']) : '';
+
+        return new Column($blocks, $width, $settings, $id, $title, $class);
     }
 
     private function sanitizeBlock(mixed $entry): ?Block

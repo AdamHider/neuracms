@@ -66,6 +66,9 @@ final class Icons
         'duplicate' => 'copy',
         'move-up' => 'arrow-up',
         'move-down' => 'arrow-down',
+        'more' => 'three-dots-vertical',
+        'undo' => 'arrow-counterclockwise',
+        'redo' => 'arrow-clockwise',
     ];
 
     public static function name(string $key): string

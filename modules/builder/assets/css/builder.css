@@ -274,7 +274,68 @@
 }
 
 /* ---- Settings ---- */
-.builder__settings { padding: .85rem; position: sticky; top: 72px; }
+/* The panel is pinned to the viewport and scrolls inside itself, so a node with
+   many fields never pushes the page longer than one screen. */
+.builder__settings {
+    padding: 0;
+    position: sticky;
+    top: 72px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 88px);
+    overflow: hidden;
+}
+.builder__settings-head {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .7rem .85rem;
+    border-bottom: 1px solid var(--admin-line, #e3e8f0);
+    min-height: 2.9rem;
+}
+.builder__settings-head:empty { display: none; }
+.builder__settings-icon { color: var(--admin-muted, #6b7280); display: flex; }
+.builder__settings-name {
+    font-weight: 600;
+    font-size: .9rem;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.builder__settings-menu { flex: 0 0 auto; }
+.builder__settings-menu .dropdown-toggle::after { display: none; }
+.builder__settings-tabs {
+    display: flex;
+    gap: .25rem;
+    padding: .5rem .6rem 0;
+    border-bottom: 1px solid var(--admin-line, #e3e8f0);
+}
+.builder__settings-tabs:empty { display: none; }
+.builder__tab {
+    border: 0;
+    background: transparent;
+    color: var(--admin-muted, #6b7280);
+    font: inherit;
+    font-size: .8rem;
+    padding: .35rem .6rem;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+}
+.builder__tab:hover { color: var(--admin-ink, #1f2430); background: #f8fafc; }
+.builder__tab.is-active {
+    color: var(--admin-accent, #2563eb);
+    border-bottom-color: var(--admin-accent, #2563eb);
+    font-weight: 600;
+}
+.builder__settings-body {
+    padding: .85rem;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+}
 .builder__settings-title { font-weight: 600; margin-bottom: .6rem; display: flex; align-items: center; gap: .4rem; }
 .builder__setting { display: block; margin-bottom: .7rem; font-size: .82rem; color: var(--admin-muted, #6b7280); }
 .builder__setting input[type="text"],

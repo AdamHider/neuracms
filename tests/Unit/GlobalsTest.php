@@ -616,6 +616,257 @@ layout:
         self::assertSame('site-nav', $block->get('class'));
     }
 
+    /**
+     * Rows and columns are promoted the same way sections and blocks are: the
+     * single node is posted, stored under its own kind, and answered with the
+     * stored copy so the editor can expand the reference in place.
+     */
+    public function testPromoteRowStoresTheRowAndAnswersWithItsColumns(): void
+    {
+        $app = $this->appWithBuilder();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $response = $app->handle(new Request('POST', '/admin/builder/global', [], [
+            'action' => 'promote',
+            'kind' => 'row',
+            'title' => 'Полоса преимуществ',
+            'payload' => json_encode([
+                'settings' => ['justify' => 'center'],
+                'columns' => [
+                    ['width' => 6, 'blocks' => [['type' => 'heading', 'settings' => ['text' => 'Быстро']]]],
+                    ['width' => 6, 'blocks' => [['type' => 'heading', 'settings' => ['text' => 'Надёжно']]]],
+                ],
+            ]),
+        ], [], [], []));
+
+        self::assertSame(200, $response->status());
+        $result = json_decode($response->body(), true);
+        self::assertSame('row', $result['kind']);
+        self::assertSame('polosa-preimuschestv', $result['name']);
+
+        $stored = (new GlobalLibrary($app->fs))->row('polosa-preimuschestv');
+        self::assertNotNull($stored);
+        self::assertCount(2, $stored->columns());
+        self::assertSame('Быстро', $stored->columns()[0]->blocks()[0]->get('text'));
+        self::assertSame(6, $stored->columns()[1]->width());
+
+        self::assertSame('center', $result['structure']['settings']['justify'] ?? null);
+        self::assertCount(2, $result['structure']['columns'] ?? []);
+    }
+
+    public function testPromoteColumnStoresTheColumnAndAnswersWithItsBlocks(): void
+    {
+        $app = $this->appWithBuilder();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+
+        $response = $app->handle(new Request('POST', '/admin/builder/global', [], [
+            'action' => 'promote',
+            'kind' => 'column',
+            'title' => 'Боковая колонка',
+            'payload' => json_encode([
+                'width' => 4,
+                'settings' => ['align' => 'center'],
+                'blocks' => [['type' => 'text', 'settings' => ['body' => 'Подпись']]],
+            ]),
+        ], [], [], []));
+
+        self::assertSame(200, $response->status());
+        $result = json_decode($response->body(), true);
+        self::assertSame('column', $result['kind']);
+
+        $stored = (new GlobalLibrary($app->fs))->column('bokovaya-kolonka');
+        self::assertNotNull($stored);
+        self::assertCount(1, $stored->blocks());
+        self::assertSame('Подпись', $stored->blocks()[0]->get('body'));
+        self::assertSame(1, count($result['structure']['blocks'] ?? []));
+    }
+
+    /**
+     * A page that references a shared row renders its columns, and saving the
+     * page writes the edit back to the library instead of duplicating it.
+     */
+    public function testSharedRowRendersAndRoundTripsThroughThePage(): void
+    {
+        $app = $this->appWithBuilder();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+        $library = new GlobalLibrary($app->fs);
+        $library->save(GlobalLibrary::ROW, 'features', 'Преимущества', ['row' => [
+            'columns' => [
+                ['width' => 6, 'blocks' => [['type' => 'heading', 'settings' => ['text' => 'Оригинал']]]],
+            ],
+        ]]);
+
+        $this->write('content/rowpage/item.yaml', "type: page\ntitle: Rows\nlayout:\n  sections:\n    - rows:\n        - settings: {global: features}\n");
+
+        $item = $app->storage->load('rowpage');
+        self::assertNotNull($item);
+        $html = $app->module('builder')->renderer()->render($item);
+        self::assertStringContainsString('Оригинал', $html);
+
+        // The editor posts the expanded row back, edited.
+        $app->handle(new Request('POST', '/admin/builder/save', [], [
+            'id' => 'rowpage',
+            'layout_json' => json_encode(['sections' => [[
+                'rows' => [[
+                    'settings' => ['global' => 'features'],
+                    'columns' => [
+                        ['width' => 6, 'blocks' => [['type' => 'heading', 'settings' => ['text' => 'Изменено']]]],
+                    ],
+                ]],
+            ]]]),
+        ], [], [], []));
+
+        $shared = (new GlobalLibrary($app->fs))->row('features');
+        self::assertNotNull($shared);
+        self::assertSame('Изменено', $shared->columns()[0]->blocks()[0]->get('text'));
+
+        // ...and the page itself keeps only the reference.
+        $saved = $app->storage->load('rowpage');
+        $layout = $saved?->get('layout');
+        $row = $layout['sections'][0]['rows'][0] ?? [];
+        self::assertSame('features', $row['settings']['global'] ?? null);
+        self::assertSame([], $row['columns'] ?? null, 'the page must not store a copy of the shared row');
+    }
+
+    /**
+     * A shared column keeps the width of the row it sits in, so the same shared
+     * column can be narrow on one page and wide on another.
+     */
+    public function testSharedColumnKeepsTheWidthOfItsRow(): void
+    {
+        $app = $this->appWithBuilder();
+        (new UserRepository($app->fs))->create('admin', 'secret-password', 'admin');
+        $app->handle(new Request('POST', '/admin/login', [], ['login' => 'admin', 'password' => 'secret-password'], [], [], []));
+        $library = new GlobalLibrary($app->fs);
+        $library->save(GlobalLibrary::COLUMN, 'aside', 'Боковая', ['column' => [
+            'blocks' => [['type' => 'text', 'settings' => ['body' => 'Общий текст']]],
+        ]]);
+
+        $this->write('content/colpage/item.yaml', "type: page\ntitle: Cols\nlayout:\n  sections:\n    - rows:\n        - columns:\n            - settings: {global: aside}\n              width: 4\n");
+
+        $item = $app->storage->load('colpage');
+        $html = $app->module('builder')->renderer()->render($item);
+        self::assertStringContainsString('Общий текст', $html);
+        self::assertStringContainsString('--g-span:4', $html);
+
+        $app->handle(new Request('POST', '/admin/builder/save', [], [
+            'id' => 'colpage',
+            'layout_json' => json_encode(['sections' => [[
+                'rows' => [[
+                    'columns' => [[
+                        'width' => 4,
+                        'settings' => ['global' => 'aside'],
+                        'blocks' => [['type' => 'text', 'settings' => ['body' => 'Правка']]],
+                    ]],
+                ]],
+            ]]]),
+        ], [], [], []));
+
+        $shared = (new GlobalLibrary($app->fs))->column('aside');
+        self::assertNotNull($shared);
+        self::assertSame('Правка', $shared->blocks()[0]->get('body'));
+
+        $saved = $app->storage->load('colpage');
+        $column = $saved?->get('layout')['sections'][0]['rows'][0]['columns'][0] ?? [];
+        self::assertSame('aside', $column['settings']['global'] ?? null);
+        self::assertSame(4, $column['width'] ?? null, 'the width belongs to the reference, not the shared column');
+        self::assertSame([], $column['blocks'] ?? null);
+    }
+
+    /**
+     * Adding a column to a row that already fills the grid has to shrink the
+     * existing columns instead of wrapping the new one onto a second line.
+     */
+    public function testAddingAColumnShrinksAFullRowInsteadOfWrapping(): void
+    {
+        $js = (string) file_get_contents(__DIR__ . '/../../modules/builder/assets/js/builder.js');
+        $fit = $this->functionBody($js, 'function fitColumns(');
+
+        self::assertStringContainsString('budget', $fit);
+
+        // The editor gives the newcomer a slot before fitting, so the fit sees
+        // an overflow and resolves it.
+        $addColumn = $this->functionBody($js, 'function addColumn(');
+        self::assertStringContainsString('fitColumns(', $addColumn);
+    }
+
+    public function testColumnResizeCannotOverflowTheRow(): void
+    {
+        $js = (string) file_get_contents(__DIR__ . '/../../modules/builder/assets/js/builder.js');
+        $resize = $this->functionBody($js, 'function resizeColumn(');
+
+        self::assertStringContainsString('ceiling', $resize);
+        self::assertStringContainsString('grid - siblings', $resize);
+    }
+
+    /**
+     * Undo/redo has to cover every structural change, and the stack is capped so
+     * a long session cannot grow without bound. History is recorded on render,
+     * which every mutation ends with, so it cannot miss an edit.
+     */
+    public function testHistoryIsRecordedOnEveryRenderAndCapped(): void
+    {
+        $js = (string) file_get_contents(__DIR__ . '/../../modules/builder/assets/js/builder.js');
+
+        self::assertStringContainsString('limit: 20', $js);
+        self::assertStringContainsString('function commitHistory()', $js);
+        self::assertStringContainsString('function undo()', $js);
+        self::assertStringContainsString('function redo()', $js);
+
+        $render = $this->functionBody($js, 'function render(');
+        self::assertStringContainsString('commitHistory()', $render, 'render must record the state it produced');
+
+        // A snapshot taken before the change would make the top of the stack the
+        // pre-edit state, which is why undo appeared to do nothing.
+        self::assertStringNotContainsString('checkpoint()', $js);
+
+        // Undo restores a snapshot, so it must not record that restore as a new
+        // edit or redo would be impossible.
+        $restore = $this->functionBody($js, 'function restore(');
+        self::assertStringContainsString('history.quiet', $restore);
+    }
+
+    /**
+     * Settings are edited field by field; one snapshot per keystroke would fill
+     * the stack with noise, so text fields commit once the user pauses.
+     */
+    public function testSettingsEditsAreRecordedWithoutOneSnapshotPerKeystroke(): void
+    {
+        $js = (string) file_get_contents(__DIR__ . '/../../modules/builder/assets/js/builder.js');
+
+        $soon = $this->functionBody($js, 'function commitHistorySoon(');
+        self::assertStringContainsString('setTimeout', $soon);
+        self::assertStringContainsString('SELECT', $soon);
+
+        $setting = $this->functionBody($js, 'function onSettingChange(');
+        self::assertStringContainsString('commitHistorySoon(', $setting);
+    }
+
+    /**
+     * The settings panel names the element instead of saying "Настройки", and
+     * the delete action lives in the panel menu rather than as a button.
+     */
+    public function testSettingsPanelNamesTheNodeAndMovesDeleteIntoAMenu(): void
+    {
+        $js = (string) file_get_contents(__DIR__ . '/../../modules/builder/assets/js/builder.js');
+        $template = (string) file_get_contents(__DIR__ . '/../../modules/builder/templates/admin/builder.php');
+
+        self::assertStringNotContainsString('Настройки</h2>', $template);
+        self::assertStringContainsString('builder-settings-head', $template);
+        self::assertStringContainsString('builder-settings-tabs', $template);
+
+        $head = $this->functionBody($js, 'function settingsHeadHtml(');
+        self::assertStringContainsString('data-delete-node', $head);
+        self::assertStringContainsString('data-duplicate-node', $head);
+        self::assertStringContainsString('data-promote-node', $head);
+
+        // The old bottom-of-form delete buttons are gone.
+        self::assertStringNotContainsString('builder__settings-actions', $js);
+    }
+
     private function functionBody(string $js, string $signature): string
     {
         $start = strpos($js, $signature);

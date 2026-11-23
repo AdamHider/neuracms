@@ -7,9 +7,10 @@ namespace FlatCms\Modules\Builder;
 use FlatCms\Support\Fs;
 
 /**
- * Reusable sections and blocks ("globals"). A page can promote one of its own
- * sections or blocks here, and every other page can then insert a reference to
- * it: the header band is the obvious case, but any section works.
+ * Reusable structure ("globals"): a section, a row, a column or a block. A page
+ * can promote one of its own nodes here and every other page can then reference
+ * it. Sections cover the header band, rows and columns cover a repeated layout
+ * strip, and blocks cover a single particle.
  *
  * Globals live outside the content tree, in content/_global/<kind>/<name>/
  * item.yaml. The leading underscore keeps them out of Storage::scan(), so they
@@ -19,9 +20,13 @@ final class GlobalLibrary
 {
     public const SECTION = 'section';
 
+    public const ROW = 'row';
+
+    public const COLUMN = 'column';
+
     public const BLOCK = 'block';
 
-    private const KINDS = [self::SECTION, self::BLOCK];
+    private const KINDS = [self::SECTION, self::ROW, self::COLUMN, self::BLOCK];
 
     public function __construct(private readonly Fs $fs, private readonly string $base = 'content/_global')
     {
@@ -44,7 +49,7 @@ final class GlobalLibrary
                 'name' => $name,
                 'title' => (string) ($data['title'] ?? $name),
                 'kind' => $kind,
-                'role' => (string) ($data['section']['settings']['role'] ?? ''),
+                'role' => $kind === self::SECTION ? (string) ($data['section']['settings']['role'] ?? '') : '',
                 'order' => (int) ($data['order'] ?? 0),
             ];
         }
@@ -141,6 +146,26 @@ final class GlobalLibrary
         return Section::fromArray($this->withFileMeta($data));
     }
 
+    public function row(string $name): ?Row
+    {
+        $data = $this->read(self::ROW, $name);
+        if ($data === null || !is_array($data['row'] ?? null)) {
+            return null;
+        }
+
+        return Row::fromArray($this->withFileMeta($data));
+    }
+
+    public function column(string $name): ?Column
+    {
+        $data = $this->read(self::COLUMN, $name);
+        if ($data === null || !is_array($data['column'] ?? null)) {
+            return null;
+        }
+
+        return Column::fromArray($this->withFileMeta($data));
+    }
+
     public function block(string $name): ?Block
     {
         $data = $this->read(self::BLOCK, $name);
@@ -154,6 +179,22 @@ final class GlobalLibrary
     }
 
     /**
+     * The stored payload for any kind, in the shape the editor consumes: the
+     * inner node object with the library title folded in.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function structure(string $kind, string $name): ?array
+    {
+        $data = $this->read($kind, $name);
+        if ($data === null || !is_array($data[$kind] ?? null)) {
+            return null;
+        }
+
+        return $this->withFileMeta($data);
+    }
+
+    /**
      * The title of a global is stored next to the payload, not inside it, so a
      * loaded section or block has to borrow it. Without this an in-place edit
      * would write the name back over the human title.
@@ -164,9 +205,13 @@ final class GlobalLibrary
      */
     private function withFileMeta(array $data): array
     {
-        $payload = is_array($data['section'] ?? null)
-            ? $data['section']
-            : (is_array($data['block'] ?? null) ? $data['block'] : []);
+        $payload = [];
+        foreach (self::KINDS as $kind) {
+            if (is_array($data[$kind] ?? null)) {
+                $payload = $data[$kind];
+                break;
+            }
+        }
 
         if (($payload['title'] ?? '') === '' && is_string($data['title'] ?? null)) {
             $payload['title'] = $data['title'];

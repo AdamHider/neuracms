@@ -76,6 +76,12 @@ ob_start();
             <div class="builder__toolbar">
                 <span class="muted" id="builder-count"></span>
                 <span class="builder-bar__spacer"></span>
+                <div class="btn-group btn-group-sm" role="group" aria-label="История изменений">
+                    <button type="button" class="btn btn-outline-secondary" data-builder-undo="1"
+                            title="Отменить (Ctrl+Z)" aria-label="Отменить" disabled><?= $this->icon('undo') ?></button>
+                    <button type="button" class="btn btn-outline-secondary" data-builder-redo="1"
+                            title="Повторить (Ctrl+Shift+Z)" aria-label="Повторить" disabled><?= $this->icon('redo') ?></button>
+                </div>
                 <div class="dropdown">
                     <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                         <?= $this->icon('add') ?> Добавить секцию
@@ -114,9 +120,10 @@ ob_start();
         </div>
 
         <aside class="builder__settings" id="builder-settings">
-            <h2><?= $this->icon('settings') ?> Настройки</h2>
-            <div id="builder-settings-body">
-                <p class="muted">Выберите секцию или элемент, чтобы настроить его.</p>
+            <div class="builder__settings-head" id="builder-settings-head"></div>
+            <div class="builder__settings-tabs" id="builder-settings-tabs" role="tablist"></div>
+            <div class="builder__settings-body" id="builder-settings-body">
+                <p class="muted">Выберите секцию, ряд, колонку или элемент, чтобы настроить его.</p>
             </div>
         </aside>
     </div>
