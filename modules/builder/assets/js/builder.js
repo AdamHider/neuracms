@@ -19,6 +19,7 @@
     var canvas = document.getElementById('builder-canvas');
     var libraryEl = document.getElementById('builder-library');
     var settingsBody = document.getElementById('builder-settings-body');
+    var settingsPanel = document.getElementById('builder-settings');
     var jsonWrap = document.getElementById('builder-json-wrap');
     var jsonArea = document.getElementById('builder-json');
     var countEl = document.getElementById('builder-count');
@@ -1511,8 +1512,9 @@
     }
 
     canvas.addEventListener('click', onEditorClick);
-    // The settings panel repeats delete/duplicate actions, so share the handler.
-    settingsBody.addEventListener('click', onEditorClick);
+    // The panel's header holds the tab strip and the action menu, so the whole
+    // panel shares the canvas handler, not just its body.
+    settingsPanel.addEventListener('click', onEditorClick);
 
     function pathOf(el, attrs) {
         var path = [];

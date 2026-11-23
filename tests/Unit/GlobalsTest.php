@@ -867,6 +867,28 @@ layout:
         self::assertStringNotContainsString('builder__settings-actions', $js);
     }
 
+    /**
+     * The menu lives in the panel header, not the body, so a listener bound to
+     * the body alone never sees the clicks and every action silently does
+     * nothing. The listener has to sit on the panel itself.
+     */
+    public function testPanelClickHandlerCoversTheHeaderMenu(): void
+    {
+        $js = (string) file_get_contents(__DIR__ . '/../../modules/builder/assets/js/builder.js');
+
+        self::assertStringContainsString(
+            "settingsPanel.addEventListener('click', onEditorClick)",
+            $js,
+            'the action menu is in the panel header and needs the panel listener'
+        );
+        self::assertStringNotContainsString("settingsBody.addEventListener('click', onEditorClick)", $js);
+        self::assertStringContainsString(
+            "document.getElementById('builder-settings')",
+            $js,
+            'the panel element itself must be looked up'
+        );
+    }
+
     private function functionBody(string $js, string $signature): string
     {
         $start = strpos($js, $signature);
