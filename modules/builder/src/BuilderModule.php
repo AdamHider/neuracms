@@ -312,26 +312,9 @@ final class BuilderModule implements Module
                 continue;
             }
 
-            $rowName = trim((string) ($row['settings']['global'] ?? ''));
-            if ($rowName !== '') {
-                $sharedRow = $library->row($rowName);
-                if ($sharedRow !== null) {
-                    $row = $this->hydrateRow($row, $sharedRow, $rowName);
-                }
-            }
-
             foreach (is_array($row['columns'] ?? null) ? $row['columns'] : [] as $ci => $column) {
                 if (!is_array($column)) {
                     continue;
-                }
-
-                $columnName = trim((string) ($column['settings']['global'] ?? ''));
-                if ($columnName !== '') {
-                    $sharedColumn = $library->column($columnName);
-                    if ($sharedColumn !== null) {
-                        $column = $this->hydrateColumn($column, $sharedColumn, $columnName);
-                        $row['columns'][$ci] = $column;
-                    }
                 }
 
                 foreach (is_array($column['blocks'] ?? null) ? $column['blocks'] : [] as $bi => $block) {
@@ -348,84 +331,6 @@ final class BuilderModule implements Module
         }
 
         return $out;
-    }
-
-    /**
-     * A shared row wearing the reference's own id/title/class, marked with the
-     * name so the save path can collapse it back.
-     *
-     * @param array<string, mixed> $row
-     *
-     * @return array<string, mixed>
-     */
-    private function hydrateRow(array $row, Row $shared, string $name): array
-    {
-        $sharedData = $shared->toArray();
-        $settings = is_array($sharedData['settings'] ?? null) ? $sharedData['settings'] : [];
-        foreach (is_array($row['settings'] ?? null) ? $row['settings'] : [] as $key => $value) {
-            if ($key !== 'global' && $value !== '' && $value !== null) {
-                $settings[$key] = $value;
-            }
-        }
-        $settings['global'] = $name;
-
-        $merged = $sharedData;
-        $merged['settings'] = $settings;
-        if (isset($row['id'])) {
-            $merged['id'] = $row['id'];
-        }
-        if (($row['title'] ?? '') !== '') {
-            $merged['title'] = $row['title'];
-        }
-        $class = Structure::classes((string) ($sharedData['class'] ?? ''), (string) ($row['class'] ?? ''));
-        if ($class !== '') {
-            $merged['class'] = $class;
-        } else {
-            unset($merged['class']);
-        }
-
-        return $merged;
-    }
-
-    /**
-     * A shared column wearing the reference's own id/title/class. The width is
-     * the reference's, so one shared column can sit at a different share of
-     * different rows.
-     *
-     * @param array<string, mixed> $column
-     *
-     * @return array<string, mixed>
-     */
-    private function hydrateColumn(array $column, Column $shared, string $name): array
-    {
-        $sharedData = $shared->toArray();
-        $settings = is_array($sharedData['settings'] ?? null) ? $sharedData['settings'] : [];
-        foreach (is_array($column['settings'] ?? null) ? $column['settings'] : [] as $key => $value) {
-            if ($key !== 'global' && $value !== '' && $value !== null) {
-                $settings[$key] = $value;
-            }
-        }
-        $settings['global'] = $name;
-
-        $merged = $sharedData;
-        $merged['settings'] = $settings;
-        if (isset($column['width'])) {
-            $merged['width'] = (int) $column['width'];
-        }
-        if (isset($column['id'])) {
-            $merged['id'] = $column['id'];
-        }
-        if (($column['title'] ?? '') !== '') {
-            $merged['title'] = $column['title'];
-        }
-        $class = Structure::classes((string) ($sharedData['class'] ?? ''), (string) ($column['class'] ?? ''));
-        if ($class !== '') {
-            $merged['class'] = $class;
-        } else {
-            unset($merged['class']);
-        }
-
-        return $merged;
     }
 
     /**
@@ -550,7 +455,7 @@ final class BuilderModule implements Module
     {
         $kind = (string) $request->input('kind', GlobalLibrary::SECTION);
 
-        return in_array($kind, [GlobalLibrary::SECTION, GlobalLibrary::ROW, GlobalLibrary::COLUMN, GlobalLibrary::BLOCK], true)
+        return in_array($kind, [GlobalLibrary::SECTION, GlobalLibrary::BLOCK], true)
             ? $kind
             : GlobalLibrary::SECTION;
     }
@@ -574,24 +479,6 @@ final class BuilderModule implements Module
             }
 
             return [$section->toArray(), (string) $section->get('title', 'section')];
-        }
-
-        if ($kind === GlobalLibrary::ROW) {
-            $row = $this->sanitizeRow($node, $grid);
-            if ($row === null) {
-                return Response::json(['error' => 'Ряд не найден.'], 422);
-            }
-
-            return [$row->toArray(), $row->title() !== '' ? $row->title() : 'row'];
-        }
-
-        if ($kind === GlobalLibrary::COLUMN) {
-            $column = $this->sanitizeColumn($node, $grid);
-            if ($column === null) {
-                return Response::json(['error' => 'Колонка не найдена.'], 422);
-            }
-
-            return [$column->toArray(), $column->title() !== '' ? $column->title() : 'column'];
         }
 
         $block = $this->sanitizeBlock($node);
@@ -638,17 +525,9 @@ final class BuilderModule implements Module
             return Response::json(['error' => 'Ряд не найден.'], 422);
         }
 
-        if ($kind === GlobalLibrary::ROW) {
-            return [$row->toArray(), $row->title() !== '' ? $row->title() : 'row'];
-        }
-
         $column = $row->columns()[$ci] ?? null;
         if ($column === null) {
             return Response::json(['error' => 'Колонка не найдена.'], 422);
-        }
-
-        if ($kind === GlobalLibrary::COLUMN) {
-            return [$column->toArray(), $column->title() !== '' ? $column->title() : 'column'];
         }
 
         $block = $column->blocks()[$bi] ?? null;
@@ -966,17 +845,9 @@ final class BuilderModule implements Module
                 continue;
             }
 
-            $rowName = trim((string) ($row['settings']['global'] ?? ''));
-            $expandedRow = $rowName === '' ? null : ($library->row($rowName)?->columns() ?? []);
             foreach (is_array($row['columns'] ?? null) ? $row['columns'] : [] as $ci => $column) {
                 if (!is_array($column)) {
                     continue;
-                }
-
-                $name = trim((string) ($column['settings']['global'] ?? ''));
-                if ($name !== '') {
-                    $column = $this->collapseColumn($column, $name, $library);
-                    $row['columns'][$ci] = $column;
                 }
 
                 foreach (is_array($column['blocks'] ?? null) ? $column['blocks'] : [] as $bi => $block) {
@@ -991,91 +862,10 @@ final class BuilderModule implements Module
                 }
             }
 
-            if ($rowName !== '') {
-                $row = $this->collapseRow($row, $rowName, $expandedRow !== [], $library);
-            }
-
             $out[] = $row;
         }
 
         return $out;
-    }
-
-    /**
-     * Write a shared row back and leave a reference. A reference that arrives
-     * without columns was never expanded, so the stored row is left alone
-     * instead of being emptied.
-     *
-     * @param array<string, mixed> $row
-     *
-     * @return array<string, mixed>
-     */
-    private function collapseRow(array $row, string $name, bool $wasExpanded, GlobalLibrary $library): array
-    {
-        $settings = is_array($row['settings'] ?? null) ? $row['settings'] : [];
-        unset($settings['global']);
-        $columns = is_array($row['columns'] ?? null) ? $row['columns'] : [];
-
-        if ($columns === [] && $wasExpanded) {
-            return $this->rowReference($row, $name);
-        }
-
-        $payload = ['settings' => $settings, 'columns' => $columns];
-        if (($row['title'] ?? '') !== '') {
-            $payload['title'] = $row['title'];
-        }
-        if (($row['class'] ?? '') !== '') {
-            $payload['class'] = $row['class'];
-        }
-        $library->save(GlobalLibrary::ROW, $name, (string) ($row['title'] ?? ''), ['row' => $payload]);
-
-        return $this->rowReference($row, $name);
-    }
-
-    /**
-     * @param array<string, mixed> $row
-     *
-     * @return array<string, mixed>
-     */
-    private function rowReference(array $row, string $name): array
-    {
-        $reference = ['settings' => ['global' => $name], 'columns' => []];
-        if (isset($row['id'])) {
-            $reference['id'] = $row['id'];
-        }
-
-        return $reference;
-    }
-
-    /**
-     * Write a shared column back and leave a reference. The width stays on the
-     * reference, because it belongs to the row the column sits in, not to the
-     * shared content.
-     *
-     * @param array<string, mixed> $column
-     *
-     * @return array<string, mixed>
-     */
-    private function collapseColumn(array $column, string $name, GlobalLibrary $library): array
-    {
-        $settings = is_array($column['settings'] ?? null) ? $column['settings'] : [];
-        unset($settings['global']);
-
-        $payload = ['settings' => $settings, 'blocks' => is_array($column['blocks'] ?? null) ? $column['blocks'] : []];
-        if (($column['title'] ?? '') !== '') {
-            $payload['title'] = $column['title'];
-        }
-        if (($column['class'] ?? '') !== '') {
-            $payload['class'] = $column['class'];
-        }
-        $library->save(GlobalLibrary::COLUMN, $name, (string) ($column['title'] ?? ''), ['column' => $payload]);
-
-        $reference = ['settings' => ['global' => $name], 'width' => (int) ($column['width'] ?? 0), 'blocks' => []];
-        if (isset($column['id'])) {
-            $reference['id'] = $column['id'];
-        }
-
-        return $reference;
     }
 
     /**

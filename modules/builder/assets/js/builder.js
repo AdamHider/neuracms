@@ -495,14 +495,11 @@
 
         var html = '<div class="builder__row' + (isSelected([si, ri]) ? ' is-selected' : '')
             + '" data-si="' + si + '" data-ri="' + ri + '">';
-        var rowGlobal = !!(row.settings && row.settings.global);
         html += '<div class="builder__row-head">'
             + '<span class="builder__handle" draggable="true" data-drag="row" data-si="' + si + '" data-ri="' + ri + '" title="Перетащить ряд">' + icon('drag') + '</span>'
             + '<span class="builder__row-title">' + esc(row.title || 'Ряд ' + (ri + 1)) + '</span>'
             + '<span class="builder__row-meta">' + columns.length + ' кол.</span>'
-            + (rowGlobal ? '<span class="builder__badge builder__badge--global">' + icon('global') + ' общий</span>' : '')
             + '<span class="builder-bar__spacer"></span>'
-            + (rowGlobal ? '' : '<button type="button" class="builder__icon-btn" data-promote-row="' + si + ':' + ri + '" title="Сделать глобальным">' + icon('global') + '</button>')
             + '<button type="button" class="builder__icon-btn" data-row-dup="' + si + ':' + ri + '" title="Дублировать ряд">' + icon('copy') + '</button>'
             + '<button type="button" class="builder__icon-btn" data-row-del="' + si + ':' + ri + '" title="Удалить ряд">' + icon('delete') + '</button>'
             + '</div>';
@@ -540,13 +537,10 @@
         var html = '<div class="builder__column' + (isSelected([si, ri, ci]) ? ' is-selected' : '') + '"'
             + ' data-si="' + si + '" data-ri="' + ri + '" data-ci="' + ci + '"'
             + ' style="' + columnFlex(span) + '">';
-        var columnGlobal = !!(column.settings && column.settings.global);
         html += '<div class="builder__column-head">'
             + '<span class="builder__handle" draggable="true" data-drag="column" data-si="' + si + '" data-ri="' + ri + '" data-ci="' + ci + '" title="Перетащить колонку">' + icon('drag') + '</span>'
             + '<span class="builder__column-title">' + esc(column.title || (span > 0 ? span + '/' + grid : 'авто')) + '</span>'
-            + (columnGlobal ? '<span class="builder__badge builder__badge--global">' + icon('global') + '</span>' : '')
             + '<span class="builder-bar__spacer"></span>'
-            + (columnGlobal ? '' : '<button type="button" class="builder__icon-btn" data-promote-column="' + si + ':' + ri + ':' + ci + '" title="Сделать глобальной">' + icon('global') + '</button>')
             + '<button type="button" class="builder__icon-btn" data-col-width-down="' + si + ':' + ri + ':' + ci + '" title="Уже">' + icon('minus') + '</button>'
             + '<button type="button" class="builder__icon-btn" data-col-width-up="' + si + ':' + ri + ':' + ci + '" title="Шире">' + icon('plus') + '</button>'
             + '<button type="button" class="builder__icon-btn" data-col-del="' + si + ':' + ri + ':' + ci + '" title="Удалить колонку">' + icon('close') + '</button>'
@@ -658,11 +652,9 @@
 
     var PROMOTE_PROMPT = {
         section: 'Название глобальной секции (например, «Шапка сайта»)',
-        row: 'Название глобального ряда',
-        column: 'Название глобальной колонки',
         block: 'Название глобального элемента'
     };
-    var PROMOTE_DEFAULT = { section: 'Шапка сайта', row: '', column: '', block: '' };
+    var PROMOTE_DEFAULT = { section: 'Шапка сайта', block: '' };
 
     /**
      * Swap the local node for a reference that keeps the node's identity. A
@@ -677,31 +669,6 @@
                 var role = sectionRole(section);
                 if (role) { settings.role = role; }
                 sections()[path[0]] = { id: section.id || uid(), settings: settings, rows: [] };
-            }
-
-            return;
-        }
-
-        if (kind === 'row') {
-            var parent = sectionAt(path[0]);
-            var row = rowAt(path[0], path[1]);
-            if (parent && row) {
-                rowsOf(parent)[path[1]] = { id: row.id || uid(), settings: { global: name }, columns: [] };
-            }
-
-            return;
-        }
-
-        if (kind === 'column') {
-            var rowNode = rowAt(path[0], path[1]);
-            var column = columnAt(path[0], path[1], path[2]);
-            if (rowNode && column) {
-                columnsOf(rowNode)[path[2]] = {
-                    id: column.id || uid(),
-                    width: column.width || 0,
-                    settings: { global: name },
-                    blocks: []
-                };
             }
 
             return;
@@ -728,28 +695,6 @@
                 section.rows = structure.rows || [];
                 section.settings = structure.settings || section.settings || {};
                 section.settings.global = name;
-            }
-
-            return;
-        }
-
-        if (kind === 'row') {
-            var row = rowAt(path[0], path[1]);
-            if (row) {
-                row.columns = structure.columns || [];
-                row.settings = structure.settings || row.settings || {};
-                row.settings.global = name;
-            }
-
-            return;
-        }
-
-        if (kind === 'column') {
-            var column = columnAt(path[0], path[1], path[2]);
-            if (column) {
-                column.blocks = structure.blocks || [];
-                column.settings = structure.settings || column.settings || {};
-                column.settings.global = name;
             }
 
             return;
@@ -821,7 +766,9 @@
             + ' aria-expanded="false" title="Действия">' + icon('more') + '</button>'
             + '<ul class="dropdown-menu dropdown-menu-end">';
 
-        if (!isGlobal) {
+        // Only sections and blocks can be shared; rows and columns are layout
+        // scaffolding and stay with the page.
+        if (!isGlobal && (kind === 'section' || kind === 'block')) {
             html += '<li><button type="button" class="dropdown-item" data-promote-node="' + esc(path.join(':')) + '"'
                 + ' data-node-kind="' + esc(kind) + '">' + icon('global') + ' Сделать глобальным</button></li>';
         }
@@ -1656,20 +1603,6 @@
         var promoteBlock = event.target.closest('[data-promote-block]');
         if (promoteBlock) {
             promote('block', promoteBlock.getAttribute('data-promote-block').split(':').map(Number));
-
-            return;
-        }
-
-        var promoteRow = event.target.closest('[data-promote-row]');
-        if (promoteRow) {
-            promote('row', promoteRow.getAttribute('data-promote-row').split(':').map(Number));
-
-            return;
-        }
-
-        var promoteColumn = event.target.closest('[data-promote-column]');
-        if (promoteColumn) {
-            promote('column', promoteColumn.getAttribute('data-promote-column').split(':').map(Number));
 
             return;
         }

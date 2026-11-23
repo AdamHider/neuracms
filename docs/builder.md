@@ -147,6 +147,11 @@ the page as ordinary, editable rows and blocks, marked with a "глобальн�
 badge. Saving collapses them back into references and writes the edits to the
 shared global, so changing the header on one page changes it everywhere.
 
+Only **sections and blocks** can be made global. Rows and columns are layout
+scaffolding: a row is a line of the grid and a column is a share of that line,
+so they describe where content sits on one page rather than content worth
+sharing. Both stay with the page they belong to.
+
 Promoting a section or block works the same way and happens in place: the
 editor posts only the node being promoted, the library answers with what it
 stored, and the canvas swaps that node for a reference already expanded. The

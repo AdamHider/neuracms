@@ -7,10 +7,9 @@ namespace FlatCms\Modules\Builder;
 use FlatCms\Support\Fs;
 
 /**
- * Reusable structure ("globals"): a section, a row, a column or a block. A page
- * can promote one of its own nodes here and every other page can then reference
- * it. Sections cover the header band, rows and columns cover a repeated layout
- * strip, and blocks cover a single particle.
+ * Reusable sections and blocks ("globals"). A page can promote one of its own
+ * sections or blocks here, and every other page can then insert a reference to
+ * it: the header band is the obvious case, but any section works.
  *
  * Globals live outside the content tree, in content/_global/<kind>/<name>/
  * item.yaml. The leading underscore keeps them out of Storage::scan(), so they
@@ -20,13 +19,9 @@ final class GlobalLibrary
 {
     public const SECTION = 'section';
 
-    public const ROW = 'row';
-
-    public const COLUMN = 'column';
-
     public const BLOCK = 'block';
 
-    private const KINDS = [self::SECTION, self::ROW, self::COLUMN, self::BLOCK];
+    private const KINDS = [self::SECTION, self::BLOCK];
 
     public function __construct(private readonly Fs $fs, private readonly string $base = 'content/_global')
     {
@@ -49,7 +44,7 @@ final class GlobalLibrary
                 'name' => $name,
                 'title' => (string) ($data['title'] ?? $name),
                 'kind' => $kind,
-                'role' => $kind === self::SECTION ? (string) ($data['section']['settings']['role'] ?? '') : '',
+                'role' => (string) ($data['section']['settings']['role'] ?? ''),
                 'order' => (int) ($data['order'] ?? 0),
             ];
         }
@@ -146,26 +141,6 @@ final class GlobalLibrary
         return Section::fromArray($this->withFileMeta($data));
     }
 
-    public function row(string $name): ?Row
-    {
-        $data = $this->read(self::ROW, $name);
-        if ($data === null || !is_array($data['row'] ?? null)) {
-            return null;
-        }
-
-        return Row::fromArray($this->withFileMeta($data));
-    }
-
-    public function column(string $name): ?Column
-    {
-        $data = $this->read(self::COLUMN, $name);
-        if ($data === null || !is_array($data['column'] ?? null)) {
-            return null;
-        }
-
-        return Column::fromArray($this->withFileMeta($data));
-    }
-
     public function block(string $name): ?Block
     {
         $data = $this->read(self::BLOCK, $name);
@@ -205,13 +180,9 @@ final class GlobalLibrary
      */
     private function withFileMeta(array $data): array
     {
-        $payload = [];
-        foreach (self::KINDS as $kind) {
-            if (is_array($data[$kind] ?? null)) {
-                $payload = $data[$kind];
-                break;
-            }
-        }
+        $payload = is_array($data['section'] ?? null)
+            ? $data['section']
+            : (is_array($data['block'] ?? null) ? $data['block'] : []);
 
         if (($payload['title'] ?? '') === '' && is_string($data['title'] ?? null)) {
             $payload['title'] = $data['title'];

@@ -166,7 +166,7 @@ final class LayoutRenderer
 
         $inner = '';
         foreach ($section->rows() as $row) {
-            $inner .= $this->renderRow($this->resolveRow($row), $data);
+            $inner .= $this->renderRow($row, $data);
         }
 
         return '<' . $tag . ' class="' . Structure::classes(implode(' ', $classes), $section->cssClass()) . '"'
@@ -183,7 +183,7 @@ final class LayoutRenderer
     {
         $inner = '';
         foreach ($row->columns() as $column) {
-            $inner .= $this->renderColumn($this->resolveColumn($column), $data);
+            $inner .= $this->renderColumn($column, $data);
         }
 
         return '<div class="' . Structure::classes('g-row', $row->cssClass()) . '"'
@@ -297,57 +297,6 @@ final class LayoutRenderer
             $section->id(),
             $section->title() !== '' ? $section->title() : $shared->title(),
             Structure::classes($shared->cssClass(), $section->cssClass()),
-        );
-    }
-
-    /**
-     * Swap a global row reference for the stored row. The reference keeps its
-     * own id/title/class, the same way a section reference does.
-     */
-    private function resolveRow(Row $row): Row
-    {
-        $name = trim((string) $row->get('global', ''));
-        if ($name === '' || $this->globals === null) {
-            return $row;
-        }
-
-        $shared = $this->globals->row($name);
-        if ($shared === null) {
-            return $row;
-        }
-
-        return new Row(
-            $shared->columns(),
-            $row->settings(),
-            $row->id(),
-            $row->title() !== '' ? $row->title() : $shared->title(),
-            Structure::classes($shared->cssClass(), $row->cssClass()),
-        );
-    }
-
-    /**
-     * Swap a global column reference for the stored column. The width comes from
-     * the reference, because it describes the row rather than the shared content.
-     */
-    private function resolveColumn(Column $column): Column
-    {
-        $name = trim((string) $column->get('global', ''));
-        if ($name === '' || $this->globals === null) {
-            return $column;
-        }
-
-        $shared = $this->globals->column($name);
-        if ($shared === null) {
-            return $column;
-        }
-
-        return new Column(
-            $shared->blocks(),
-            $column->width(),
-            $column->settings(),
-            $column->id(),
-            $column->title() !== '' ? $column->title() : $shared->title(),
-            Structure::classes($shared->cssClass(), $column->cssClass()),
         );
     }
 
